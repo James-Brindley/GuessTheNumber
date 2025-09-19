@@ -5,12 +5,12 @@ function checkGuess() {
     let userGuess = parseInt(document.getElementById("userGuess").value);
     let feedback = document.getElementById("feedback");
 
-    if (userGuess < randomNumber) {
-        feedback.textContent = "Too low! Try again.";
+    if (userGuess == randomBadNumber) {
+        feedback.textContent = "You Loose";
     } else if (userGuess > randomNumber) {
         feedback.textContent = "Too high! Try again.";
-    } else if (userGuess == randomBadNumber) {
-        feedback.textContent = "You Loose";
+    } else if (userGuess < randomNumber) {
+        feedback.textContent = "Too low! Try again.";
     } else {
         feedback.textContent = "Correct! You guessed the number!";
     }

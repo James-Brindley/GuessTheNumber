@@ -7,6 +7,7 @@ function checkGuess() {
 
     if (userGuess == randomBadNumber) {
         feedback.textContent = "You Loose";
+        return;
     } else if (userGuess > randomNumber) {
         feedback.textContent = "Too high! Try again.";
     } else if (userGuess < randomNumber) {

@@ -1,5 +1,5 @@
 const randomNumber = Math.floor(Math.random() * 100) + 1;
-const randomBadNumber = Math.floor(Math.random() * 100) + 1;
+const randomBadNumber = 9;
 
 function checkGuess() {
     let userGuess = parseInt(document.getElementById("userGuess").value);

@@ -19,16 +19,16 @@ let hp = 10;
 document.getElementById("hpDisplay").textContent = hp;
 
 function checkGuess() {
+    let userGuess = parseInt(document.getElementById("userGuess").value);
+    let feedback = document.getElementById("feedback");
+    let hpDisplay = document.getElementById("hpDisplay");
+
     //loose a life every guess
     hp -= 1;
         hpDisplay.textContent = hp;
         if (hp === 0) {
             feedback.textContent = "Game Over! You have no lives left.";
         }
-
-    let userGuess = parseInt(document.getElementById("userGuess").value);
-    let feedback = document.getElementById("feedback");
-    let hpDisplay = document.getElementById("hpDisplay");
 
     //if a bad number is guessed you loose another life
     if (badNumbers.includes(userGuess)) {

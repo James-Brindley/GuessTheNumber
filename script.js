@@ -30,7 +30,7 @@ function checkGuess() {
     //loose a life every guess
     if (hp === 0) {
         feedback.textContent = "Game Over! You have no lives left.";
-    else {
+    } else {
         hp -= 1;
         hpDisplay.textContent = hp;
     }
@@ -40,7 +40,7 @@ function checkGuess() {
         feedback.textContent = "Bad Number! You Lose a life!";
         if (hp === 0) {
         feedback.textContent = "Game Over! You have no lives left.";
-        else {
+        } else {
             hp -= 1;
         hpDisplay.textContent = hp;
         }
@@ -53,4 +53,5 @@ function checkGuess() {
         feedback.textContent = "Correct! You guessed the number!";
     }
 }
+
 

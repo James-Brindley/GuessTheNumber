@@ -28,19 +28,21 @@ function checkGuess() {
     let hpDisplay = document.getElementById("hpDisplay");
 
     //loose a life every guess
-    hp -= 1;
+    if (hp === 0) {
+        feedback.textContent = "Game Over! You have no lives left.";
+    else {
+        hp -= 1;
         hpDisplay.textContent = hp;
-        if (hp === 0) {
-            feedback.textContent = "Game Over! You have no lives left.";
-        }
+    }
 
     //if a bad number is guessed you loose another life
     if (badNumbers.includes(userGuess)) {
         feedback.textContent = "Bad Number! You Lose a life!";
-        hp -= 1;
-        hpDisplay.textContent = hp;
         if (hp === 0) {
-            feedback.textContent = "Game Over! You have no lives left.";
+        feedback.textContent = "Game Over! You have no lives left.";
+        else {
+            hp -= 1;
+        hpDisplay.textContent = hp;
         }
         return;
     } else if (userGuess > randomNumber) {
@@ -51,3 +53,4 @@ function checkGuess() {
         feedback.textContent = "Correct! You guessed the number!";
     }
 }
+

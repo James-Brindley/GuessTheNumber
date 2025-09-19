@@ -1,5 +1,9 @@
+//Range of numbers
+let range = 50;
+document.getElementById("range").textContent = range;
+
 //The number to guess
-const randomNumber = Math.floor(Math.random() * 100) + 1;
+const randomNumber = Math.floor(Math.random() * range) + 1;
 
 //Number of bad numbers
 let badNumberCount = 5;
@@ -40,9 +44,9 @@ function checkGuess() {
         }
         return;
     } else if (userGuess > randomNumber) {
-        feedback.textContent = "Too high! Try again.";
+        feedback.textContent = "Lower! Try again.";
     } else if (userGuess < randomNumber) {
-        feedback.textContent = "Too low! Try again.";
+        feedback.textContent = "Higer! Try again.";
     } else {
         feedback.textContent = "Correct! You guessed the number!";
     }

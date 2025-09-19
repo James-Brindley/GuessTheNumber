@@ -15,16 +15,24 @@ while (badNumbers.length < badNumberCount) {
 }
 
 //Players HP
-let hp = 6;
+let hp = 10;
 document.getElementById("hpDisplay").textContent = hp;
 
 function checkGuess() {
+    //loose a life every guess
+    hp -= 1;
+        hpDisplay.textContent = hp;
+        if (hp === 0) {
+            feedback.textContent = "Game Over! You have no lives left.";
+        }
+
     let userGuess = parseInt(document.getElementById("userGuess").value);
     let feedback = document.getElementById("feedback");
     let hpDisplay = document.getElementById("hpDisplay");
 
+    //if a bad number is guessed you loose another life
     if (badNumbers.includes(userGuess)) {
-        feedback.textContent = "You Lose a life!";
+        feedback.textContent = "Bad Number! You Lose a life!";
         hp -= 1;
         hpDisplay.textContent = hp;
         if (hp === 0) {

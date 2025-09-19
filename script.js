@@ -3,7 +3,7 @@ let range = 50;
 document.getElementById("range").textContent = range;
 
 //The number to guess
-const randomNumber = Math.floor(Math.random() * range) + 1;
+let randomNumber = Math.floor(Math.random() * range) + 1;
 
 //Number of bad numbers
 let badNumberCount = 5;

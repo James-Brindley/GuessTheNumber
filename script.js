@@ -23,10 +23,13 @@ function checkGuess() {
     let feedback = document.getElementById("feedback");
     let hpDisplay = document.getElementById("hpDisplay");
 
-    if (userGuess === randomBadNumber) {
-        feedback.textContent = "You Loose a life!";
+    if (badNumbers.includes(userGuess)) {
+        feedback.textContent = "You Lose a life!";
         hp -= 1;
         hpDisplay.textContent = hp;
+        if (hp === 0) {
+            feedback.textContent = "Game Over! You have no lives left.";
+        }
         return;
     } else if (userGuess > randomNumber) {
         feedback.textContent = "Too high! Try again.";

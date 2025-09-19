@@ -1,10 +1,20 @@
+//The number to guess
 const randomNumber = Math.floor(Math.random() * 100) + 1;
 
-let randomBadNumber = Math.floor(Math.random() * 100) + 1;
-while (randomBadNumber === randomNumber) {
-    randomBadNumber = Math.floor(Math.random() * 100) + 1;
+//Number of bad numbers
+let badNumberCount = 5;
+document.getElementById("badNumberCount").textContent = badNumberCount;
+
+//Numbers that cause you to lose a life
+const badNumbers = [];
+while (badNumbers.length < badNumberCount) {
+    let newBadNumber = Math.floor(Math.random() * 100) + 1;
+    if (newBadNumber !== randomNumber && !badNumbers.includes(newBadNumber)) {
+        badNumbers.push(newBadNumber);
+    }
 }
 
+//Players HP
 let hp = 6;
 document.getElementById("hpDisplay").textContent = hp;
 

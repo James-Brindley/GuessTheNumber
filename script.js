@@ -6,6 +6,7 @@ while (randomBadNumber === randomNumber) {
 }
 
 let hp = 6;
+document.getElementById("hpDisplay").textContent = hp;
 
 function checkGuess() {
     let userGuess = parseInt(document.getElementById("userGuess").value);

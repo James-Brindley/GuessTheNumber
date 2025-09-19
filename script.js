@@ -12,7 +12,7 @@ document.getElementById("badNumberCount").textContent = badNumberCount;
 //Numbers that cause you to lose a life
 const badNumbers = [];
 while (badNumbers.length < badNumberCount) {
-    let newBadNumber = Math.floor(Math.random() * 100) + 1;
+    let newBadNumber = Math.floor(Math.random() * range) + 1;
     if (newBadNumber !== randomNumber && !badNumbers.includes(newBadNumber)) {
         badNumbers.push(newBadNumber);
     }

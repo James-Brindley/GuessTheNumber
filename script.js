@@ -19,7 +19,7 @@ while (badNumbers.length < badNumberCount) {
 }
 
 //Players HP
-let hp = 10;
+let hp = 8;
 document.getElementById("hpDisplay").textContent = hp;
 
 function checkGuess() {

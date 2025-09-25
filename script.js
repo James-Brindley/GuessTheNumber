@@ -1,5 +1,5 @@
 //Range of numbers
-let range = 50;
+let range = 20;
 document.getElementById("range").textContent = range;
 
 //The number to guess
@@ -37,12 +37,12 @@ function checkGuess() {
 
     //if a bad number is guessed you loose another life
     if (badNumbers.includes(userGuess)) {
-        feedback.textContent = "Bad Number! You Lose a life!";
         if (hp === 0) {
-        feedback.textContent = "Game Over! You have no lives left.";
+            feedback.textContent = "Game Over! You have no lives left.";
         } else {
+            feedback.textContent = "Bad Number! You Lose a life!";
             hp -= 1;
-        hpDisplay.textContent = hp;
+            hpDisplay.textContent = hp;
         }
         return;
     } else if (userGuess > randomNumber) {
@@ -53,5 +53,3 @@ function checkGuess() {
         feedback.textContent = "Correct! You guessed the number!";
     }
 }
-
-

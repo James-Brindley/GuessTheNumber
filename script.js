@@ -1,12 +1,12 @@
 //Range of numbers
-let range = 20;
+let range = 50;
 document.getElementById("range").textContent = range;
 
 //The number to guess
 let randomNumber = Math.floor(Math.random() * range) + 1;
 
 //Number of bad numbers
-let badNumberCount = 5;
+let badNumberCount = 8;
 document.getElementById("badNumberCount").textContent = badNumberCount;
 
 //Numbers that cause you to lose a life
@@ -48,7 +48,7 @@ function checkGuess() {
     } else if (userGuess > randomNumber) {
         feedback.textContent = "Lower! Try again.";
     } else if (userGuess < randomNumber) {
-        feedback.textContent = "Higer! Try again.";
+        feedback.textContent = "Higher! Try again.";
     } else {
         feedback.textContent = "Correct! You guessed the number!";
     }

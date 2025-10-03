@@ -28,12 +28,9 @@ function checkGuess() {
     let hpDisplay = document.getElementById("hpDisplay");
 
     //loose a life every guess
-    if (hp === 0) {
-        feedback.textContent = "Game Over! You have no lives left.";
-    } else {
-        hp -= 1;
-        hpDisplay.textContent = hp;
-    }
+    hp -= 1;
+    hpDisplay.textContent = hp;
+
 
     //if a bad number is guessed you loose another life
     if (badNumbers.includes(userGuess)) {
@@ -52,4 +49,11 @@ function checkGuess() {
     } else {
         feedback.textContent = "Correct! You guessed the number!";
     }
+
+        //Check for no lives
+        if (hp === 0) {
+            feedback.textContent = "Game Over! You have no lives left.";
+        } else {
+            pass
+        }
 }

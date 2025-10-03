@@ -28,32 +28,28 @@ function checkGuess() {
     let hpDisplay = document.getElementById("hpDisplay");
 
     //loose a life every guess
-    hp -= 1;
-    hpDisplay.textContent = hp;
-
-
-    //if a bad number is guessed you loose another life
-    if (badNumbers.includes(userGuess)) {
-        if (hp === 0) {
-            feedback.textContent = "Game Over! You have no lives left.";
-        } else {
-            feedback.textContent = "Bad Number! You Lose a life!";
-            hp -= 1;
-            hpDisplay.textContent = hp;
-        }
-        return;
-    } else if (userGuess > randomNumber) {
-        feedback.textContent = "Lower! Try again.";
-    } else if (userGuess < randomNumber) {
-        feedback.textContent = "Higher! Try again.";
+    if (hp === 0) {
+        feedback.textContent = "Game Over! You have no lives left.";
     } else {
-        feedback.textContent = "Correct! You guessed the number!";
-    }
+        hp -= 1;
+        hpDisplay.textContent = hp;
 
-        //Check for no lives
-        if (hp === 0) {
-            feedback.textContent = "Game Over! You have no lives left.";
+        //if a bad number is guessed you loose another life
+        if (badNumbers.includes(userGuess)) {
+            if (hp === 0) {
+                feedback.textContent = "Game Over! You have no lives left.";
+            } else {
+                feedback.textContent = "Bad Number! You Lose a life!";
+                hp -= 1;
+                hpDisplay.textContent = hp;
+            }
+            return;
+        } else if (userGuess > randomNumber) {
+            feedback.textContent = "Lower! Try again.";
+        } else if (userGuess < randomNumber) {
+            feedback.textContent = "Higher! Try again.";
         } else {
-            pass
+            feedback.textContent = "Correct! You guessed the number!";
         }
+    }
 }

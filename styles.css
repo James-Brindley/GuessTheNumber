@@ -21,8 +21,8 @@ button {
 }
 
 .imgBackground {
-    width: 100%;
-    height: 50%;
+    width: 300px;
+    height: 200px;
     background-image: url(assets/grayBackground.png);
     background-repeat: no-repeat;
     background-size: cover;

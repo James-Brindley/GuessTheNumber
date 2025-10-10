@@ -1,11 +1,6 @@
 body {
     text-align: center;
     font-family: Arial, sans-serif;
-    background-image: url(assets/grayBackground.png);
-    background-repeat: no-repeat;
-    background-position: top center;
-    background-attachment: fixed;
-    background-size: cover;
 }
 
 input {
@@ -18,4 +13,9 @@ button {
     font-size: 18px;
     padding: 5px 10px;
     cursor: pointer;
+}
+
+.imgBackground {
+    width: fit-content;
+    height: 400px;
 }

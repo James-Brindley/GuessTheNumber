@@ -1,6 +1,7 @@
 body {
     text-align: center;
     font-family: Arial, sans-serif;
+    background-image: url(grayBackground.png);
 }
 
 input {

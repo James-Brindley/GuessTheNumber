@@ -1,10 +1,23 @@
 const cols = 15;
 const rows = 4;
 
-const playerAttackCount = 5;
+const playerAttackCount = 10;
 const enemyAttackCount = 5;
 
 const totalCells = cols * rows;
+
+let playerHealth = 100;
+let enemyHealth = 100;
+
+const playerHealthDisplay = document.getElementById('player-health-display');
+const enemyHealthDisplay = document.getElementById('enemy-health-display');
+
+function updateHealth() {
+  playerHealthDisplay.textContent = `Player Health: ${playerHealth}`;
+  enemyHealthDisplay.textContent = `Enemy Health: ${enemyHealth}`;
+}
+
+updateHealth();
 
 // Function to get unique random numbers
 function getRandomUniqueNumbers(count, max, exclude = []) {
@@ -39,11 +52,15 @@ for (let r = 0; r < rows; r++) {
         const cellNumber = parseInt(cell.textContent); // get the number inside the box
           
         if (enemyAttackNumbers.includes(cellNumber)) {
-            cell.classList.toggle('eAttack'); // enemy attack class
+            cell.classList.toggle('eAttack');
+            playerHealth -= 20;
+            updateHealth();
         } else if (playerAttackNumbers.includes(cellNumber)) {
-            cell.classList.toggle('attack'); // player attack class
+            cell.classList.toggle('attack');
+            enemyHealth -= 20;
+            updateHealth();
         } else {
-            cell.classList.toggle('active'); // normal active highlight
+            cell.classList.toggle('active');
         }
           
         console.log(`Clicked box number: ${cell.textContent}`);

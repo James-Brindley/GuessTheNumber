@@ -28,6 +28,16 @@ body {
   }
   
   .grid-item.active {
-    background-color: #4CAF50;
+    background-color: #646464;
+    color: white;
+  }
+
+  .grid-item.attack {
+    background-color: #3fc225;
+    color: white;
+  }
+
+  .grid-item.eAttack {
+    background-color: #cc2626;
     color: white;
   }

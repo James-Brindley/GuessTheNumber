@@ -1,3 +1,6 @@
+rows = 15
+cols = 4
+
 document.getElementById('generate').addEventListener('click', () => {
     const cols = parseInt(document.getElementById('cols').value);
     const rows = parseInt(document.getElementById('rows').value);

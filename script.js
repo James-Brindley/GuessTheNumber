@@ -66,8 +66,6 @@ for (let r = 0; r < rows; r++) {
         } else {
             cell.classList.toggle('active');
         }
-          
-        console.log(`Clicked box number: ${cell.textContent}`);
     });
 
     container.appendChild(cell);

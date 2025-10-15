@@ -88,4 +88,5 @@ body {
     width: 300%;
     height: 300%;
     image-rendering: pixelated;
+    justify-content: center;
   }

@@ -72,12 +72,15 @@ for (let r = 0; r < rows; r++) {
   }
 }
 
-const hero = document.getElementById('hero');
+function createIdleAnimation(elementId, frames, speed = 500) {
+  const character = document.getElementById(elementId);
+  let currentFrame = 0;
 
-const heroFrames = ["assets/ready_1.png", "assets/ready_2.png", "assets/ready_3.png"];
-let currentFrame = 0;
+  setInterval(() => {
+    currentFrame = (currentFrame + 1) % frames.length;
+    character.src = frames[currentFrame];
+  }, speed);
+}
 
-setInterval(() => {
-  currentFrame = (currentFrame + 1) % heroFrames.length;
-  hero.src = heroFrames[currentFrame];
-}, 250);
+createIdleAnimation('hero', ['hero1.png', 'hero2.png']);
+createIdleAnimation('enemy', ['enemy1.png', 'enemy2.png']);

@@ -73,3 +73,13 @@ for (let r = 0; r < rows; r++) {
     container.appendChild(cell);
   }
 }
+
+const hero = document.getElementById('hero');
+
+const heroFrames = ["assets/ready_1.png", "assets/ready_2.png", "assets/ready_3.png"];
+let currentFrame = 0;
+
+setInterval(() => {
+  currentFrame = (currentFrame + 1) % heroFrames.length;
+  hero.src = heroFrames[currentFrame];
+}, 500);

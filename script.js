@@ -6,6 +6,9 @@ const enemyAttackCount = 8;
 
 const totalCells = cols * rows;
 
+const hero = createCharacter('hero', ['assets/ready_1.png', 'assets/ready_2.png', 'assets/ready_3.png'], ['attack1.png', 'attack2.png', 'attack3.png', 'attack4.png', 'attack5.png', 'attack6.png']);
+const enemy = createCharacter('enemy', ['assets/eReady_1.png', 'assets/eReady_2.png', 'assets/eReady_3.png'], ['eAttack1.png', 'eAttack2.png', 'eAttack3.png', 'eAttack4.png', 'eAttack5.png', 'eAttack6.png']);
+
 let playerHealth = 100;
 let enemyHealth = 100;
 
@@ -59,10 +62,14 @@ for (let r = 0; r < rows; r++) {
             cell.classList.toggle('eAttack');
             playerHealth -= 20;
             updateHealth();
+            enemy.playAttack();
+
         } else if (playerAttackNumbers.includes(cellNumber)) {
             cell.classList.toggle('attack');
             enemyHealth -= 20;
             updateHealth();
+            hero.playAttack();
+
         } else {
             cell.classList.toggle('active');
         }
@@ -72,15 +79,38 @@ for (let r = 0; r < rows; r++) {
   }
 }
 
-function createIdleAnimation(elementId, frames, speed) {
-  const character = document.getElementById(elementId);
-  let currentFrame = 0;
+function createCharacter(elementId, idleFrames, attackFrames, speed = 250) {
+  const el = document.getElementById(elementId);
+  let frames = idleFrames;
+  let frameIndex = 0;
+  let animInterval = null;
 
-  setInterval(() => {
-    currentFrame = (currentFrame + 1) % frames.length;
-    character.src = frames[currentFrame];
-  }, speed);
+  // internal animation loop
+  function playAnimation() {
+    clearInterval(animInterval);
+    animInterval = setInterval(() => {
+      frameIndex = (frameIndex + 1) % frames.length;
+      el.src = frames[frameIndex];
+    }, speed);
+  }
+
+  // public methods
+  const character = {
+    playIdle() {
+      frames = idleFrames;
+      frameIndex = 0;
+      playAnimation();
+    },
+    playAttack() {
+      frames = attackFrames;
+      frameIndex = 0;
+      playAnimation();
+
+      // after one cycle, go back to idle
+      setTimeout(() => character.playIdle(), attackFrames.length * speed);
+    }
+  };
+
+  character.playIdle(); // start idle by default
+  return character;
 }
-
-createIdleAnimation('hero', ['assets/ready_1.png', 'assets/ready_2.png', 'assets/ready_3.png'], 300);
-createIdleAnimation('enemy', ['assets/eReady_1.png', 'assets/eReady_2.png', 'assets/eReady_3.png'], 300);

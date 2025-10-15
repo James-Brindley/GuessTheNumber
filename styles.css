@@ -12,6 +12,11 @@ body {
     display: grid;
     gap: 5px;
     justify-content: center;
+    padding: 20px;
+    position: fixed;
+    bottom: 20px;      /* distance from bottom */
+    left: 50%;
+    transform: translateX(-50%); /* center it */
   }
   
   .grid-item {

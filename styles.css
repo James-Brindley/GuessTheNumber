@@ -40,14 +40,13 @@ body {
     justify-content: center;
     padding: 20px;
     position: fixed;
-    bottom: 20px;
+    bottom: 25%;
     left: 50%;
     transform: translateX(-50%);
   }
 
   .grid-item {
-    background-color: #ffffff00;
-    border: 1px solid #000000;
+    color: white;
     padding: 20px;
     cursor: pointer;
     transition: 0.2s;
@@ -56,6 +55,7 @@ body {
   
   .grid-item:hover {
     background-color: #00000073;
+    color: white;
   }
   
   .grid-item.active {

@@ -6,8 +6,8 @@ const enemyAttackCount = 8;
 
 const totalCells = cols * rows;
 
-const hero = createCharacter('hero', ['assets/ready_1.png', 'assets/ready_2.png', 'assets/ready_3.png'], ['attack1.png', 'attack2.png', 'attack3.png', 'attack4.png', 'attack5.png', 'attack6.png']);
-const enemy = createCharacter('enemy', ['assets/eReady_1.png', 'assets/eReady_2.png', 'assets/eReady_3.png'], ['eAttack1.png', 'eAttack2.png', 'eAttack3.png', 'eAttack4.png', 'eAttack5.png', 'eAttack6.png']);
+const hero = createCharacter('hero', ['assets/ready_1.png', 'assets/ready_2.png', 'assets/ready_3.png'], ['assets/attack1.png', 'assets/attack2.png', 'assets/attack3.png', 'assets/attack4.png', 'assets/attack5.png', 'assets/attack6.png']);
+const enemy = createCharacter('enemy', ['assets/eReady_1.png', 'assets/eReady_2.png', 'assets/eReady_3.png'], ['assets/eAttack1.png', 'assets/eAttack2.png', 'assets/eAttack3.png', 'assets/eAttack4.png', 'assets/eAttack5.png', 'assets/eAttack6.png']);
 
 let playerHealth = 100;
 let enemyHealth = 100;

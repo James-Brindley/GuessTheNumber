@@ -76,8 +76,8 @@ body {
 .hero-container, .enemy-container {
   position: fixed;
   bottom: 60%;
-  width: 100px;
-  height: 100px;
+  width: 400px;
+  height: 400px;
   z-index: 10;
   display: flex;
   justify-content: center;

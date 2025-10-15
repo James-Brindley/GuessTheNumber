@@ -1,14 +1,13 @@
 body {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: center;
-    background: #f4f4f4;
-    font-family: Arial, sans-serif;
-  }
+  margin: 0;
+  padding: 0;
+  background-image: url('assets/brickBackground.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  overflow: hidden;
+}
   
   .health-bar-container {
     position: fixed;

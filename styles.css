@@ -8,74 +8,80 @@ body {
   height: 100vh;
   overflow: hidden;
   image-rendering: pixelated;
+  font-family: pixelText;
+}
+
+@font-face {
+  font-family: pixelText;
+  src: url(fonts/RetroByte.ttf);
 }
   
-  .health-bar-container {
-    position: fixed;
-    top: 20px;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: space-between;
-    padding: 0 40px;
-    font-size: 20px;
-    font-weight: bold;
-  }
+.health-bar-container {
+  position: fixed;
+  top: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 40px;
+  font-size: 20px;
+  font-weight: bold;
+}
   
-  .player-health {
-    color: #4CAF50;
-  }
+.player-health {
+  color: #4CAF50;
+}
   
-  .enemy-health {
-    color: #E53935;
-  }
+.enemy-health {
+  color: #E53935;
+}
   
-  .controls {
-    margin-bottom: 20px;
-  }
+.controls {
+  margin-bottom: 20px;
+}
 
-  #grid-container {
-    display: grid;
-    gap: 5px;
-    justify-content: center;
-    padding: 20px;
-    position: fixed;
-    bottom: 25%;
-    left: 50%;
-    transform: translateX(-50%);
-  }
+#grid-container {
+  display: grid;
+  gap: 5px;
+  justify-content: center;
+  padding: 20px;
+  position: fixed;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+}
 
-  .grid-item {
-    color: white;
-    padding: 20px;
-    cursor: pointer;
-    transition: 0.2s;
-    user-select: none;
-  }
+.grid-item {
+  color: white;
+  padding: 20px;
+  cursor: pointer;
+  transition: 0.2s;
+  user-select: none;
+}
   
-  .grid-item:hover {
-    background-color: #00000073;
-    color: white;
-  }
+.grid-item:hover {
+  background-color: #00000073;
+  color: white;
+}
   
-  .grid-item.active {
-    background-color: #646464;
-    color: white;
-  }
+.grid-item.active {
+  background-color: #646464;
+  color: white;
+}
 
-  .grid-item.attack {
-    background-color: #3fc225;
-    color: white;
-  }
+.grid-item.attack {
+  background-color: #3fc225;
+  color: white;
+}
 
-  .grid-item.eAttack {
-    background-color: #cc2626;
-    color: white;
-  }
+.grid-item.eAttack {
+  background-color: #cc2626;
+  color: white;
+}
 
 .hero-container, .enemy-container {
   position: fixed;
-  bottom: 60%;
+  bottom: 50%;
   width: 100px;
   height: 100px;
   z-index: 10;

@@ -72,7 +72,7 @@ for (let r = 0; r < rows; r++) {
   }
 }
 
-function createIdleAnimation(elementId, frames, speed = 500) {
+function createIdleAnimation(elementId, frames, speed) {
   const character = document.getElementById(elementId);
   let currentFrame = 0;
 
@@ -82,5 +82,5 @@ function createIdleAnimation(elementId, frames, speed = 500) {
   }, speed);
 }
 
-createIdleAnimation('hero', ['assets/ready_1.png', 'assets/ready_2.png', 'assets/ready_3.png']);
-createIdleAnimation('enemy', ['assets/eReady_1.png', 'assets/eReady_2.png', 'assets/eReady_3.png']);
+createIdleAnimation('hero', ['assets/ready_1.png', 'assets/ready_2.png', 'assets/ready_3.png'], 250);
+createIdleAnimation('enemy', ['assets/eReady_1.png', 'assets/eReady_2.png', 'assets/eReady_3.png'], 200);

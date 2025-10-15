@@ -75,11 +75,12 @@ body {
 
   .hero-container {
     position: fixed;
-    bottom: 200px;
+    bottom: 150px;
     left: 50%;
     transform: translateX(-50%);
     width: 100px;
     height: 100px;
+    z-index: 10;
   }
   
   .hero-container img {

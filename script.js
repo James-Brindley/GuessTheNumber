@@ -1,5 +1,5 @@
-rows = 15
-cols = 4
+let rows = 15
+let cols = 4
 
 document.getElementById('generate').addEventListener('click', () => {
     const cols = parseInt(document.getElementById('cols').value);

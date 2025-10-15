@@ -73,40 +73,45 @@ body {
     color: white;
   }
 
-.hero-container {
+.hero-container, .enemy-container {
   position: fixed;
-  left: 40%;
-  bottom: 50%;
-  transform: translate(-50%, 0);
+  bottom: 120px;
   width: 100px;
   height: 100px;
+  z-index: 10;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10;
 }
 
-.hero-container img {
-  width: 300%;
-  height: 300%;
-  image-rendering: pixelated;
+.hero-container {
+  left: 25%;
+  transform: translateX(-50%);
 }
 
 .enemy-container {
-  position: fixed;
-  right: 40%;
-  bottom: 50%;
-  transform: translate(-50%, 0);
-  width: 100px;
-  height: 100px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
+  right: 25%;
+  transform: translateX(50%);
 }
 
-.enemy-container img {
-  width: 300%;
-  height: 300%;
-  image-rendering: pixelated;
+/* attack movement animations */
+@keyframes heroAttackMove {
+  0% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(calc(-50% + 100px)) translateY(-10px); } /* moves right & up */
+  100% { transform: translateX(-50%) translateY(0); } /* back to start */
+}
+
+@keyframes enemyAttackMove {
+  0% { transform: translateX(50%) translateY(0); }
+  50% { transform: translateX(calc(50% - 100px)) translateY(-10px); } /* moves left & up */
+  100% { transform: translateX(50%) translateY(0); }
+}
+
+/* attach these classes when attacking */
+.hero-container.attacking {
+  animation: heroAttackMove 0.6s ease-out;
+}
+
+.enemy-container.attacking {
+  animation: enemyAttackMove 0.6s ease-out;
 }

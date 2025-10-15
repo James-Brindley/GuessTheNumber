@@ -92,12 +92,12 @@ body {
 }
 
 .hero-container {
-  left: 35%;
+  left: 40%;
   transform: translateX(-50%);
 }
 
 .enemy-container {
-  right: 35%;
+  right: 40%;
   transform: translateX(50%);
 }
 

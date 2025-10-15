@@ -82,4 +82,4 @@ let currentFrame = 0;
 setInterval(() => {
   currentFrame = (currentFrame + 1) % heroFrames.length;
   hero.src = heroFrames[currentFrame];
-}, 500);
+}, 1000);

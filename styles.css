@@ -107,15 +107,15 @@ body {
 
 /* attack movement animations */
 @keyframes heroAttackMove {
-  0% { transform: translateX(-100%) translateY(0); }
-  50% { transform: translateX(calc(-100% + 100px)) translateY(0); } /* moves right & up */
-  100% { transform: translateX(-100%) translateY(0); } /* back to start */
+  0% { transform: translateX(-75%) translateY(0); }
+  50% { transform: translateX(calc(-200% + 100px)) translateY(0); } /* moves right & up */
+  100% { transform: translateX(-75%) translateY(0); } /* back to start */
 }
 
 @keyframes enemyAttackMove {
-  0% { transform: translateX(100%) translateY(0); }
-  50% { transform: translateX(calc(100% - 100px)) translateY(0); } /* moves left & up */
-  100% { transform: translateX(100%) translateY(0); }
+  0% { transform: translateX(75%) translateY(0); }
+  50% { transform: translateX(calc(200% - 100px)) translateY(0); } /* moves left & up */
+  100% { transform: translateX(75%) translateY(0); }
 }
 
 /* attach these classes when attacking */

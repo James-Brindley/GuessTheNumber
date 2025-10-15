@@ -82,5 +82,5 @@ function createIdleAnimation(elementId, frames, speed = 500) {
   }, speed);
 }
 
-createIdleAnimation('hero', ['assets/Ready_1.png', 'assets/Ready_2.png.png', 'assets/Ready_3.png']);
+createIdleAnimation('hero', ['assets/ready_1.png', 'assets/ready_2.png.png', 'assets/ready_3.png']);
 createIdleAnimation('enemy', ['assets/eReady_1.png', 'assets/eReady_2.png', 'assets/eReady_3.png']);

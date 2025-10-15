@@ -76,8 +76,8 @@ body {
 .hero-container, .enemy-container {
   position: fixed;
   bottom: 60%;
-  width: 400px;
-  height: 400px;
+  width: 500px;
+  height: 500px;
   z-index: 10;
   display: flex;
   justify-content: center;
@@ -87,15 +87,11 @@ body {
 .hero-container {
   left: 25%;
   transform: translateX(-50%);
-  width: 400px;
-  height: 400px;
 }
 
 .enemy-container {
   right: 25%;
   transform: translateX(50%);
-  width: 400px;
-  height: 400px;
 }
 
 /* attack movement animations */

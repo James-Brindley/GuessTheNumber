@@ -46,7 +46,7 @@ body {
   justify-content: center;
   padding: 20px;
   position: fixed;
-  bottom: 15%;
+  bottom: 10%;
   left: 50%;
   transform: translateX(-50%);
   font-size: 50px;
@@ -61,13 +61,13 @@ body {
 }
   
 .grid-item:hover {
-  background-color: #00000073;
+  background-color: #00000038;
   color: white;
 }
   
 .grid-item.active {
-  background-color: #646464;
-  color: white;
+  background-color: #00000076;
+  color: rgb(44, 44, 44);
 }
 
 .grid-item.attack {

@@ -1,55 +1,26 @@
-//Range of numbers
-let range = 50;
-document.getElementById("range").textContent = range;
-
-//The number to guess
-let randomNumber = Math.floor(Math.random() * range) + 1;
-
-//Number of bad numbers
-let badNumberCount = 8;
-document.getElementById("badNumberCount").textContent = badNumberCount;
-
-//Numbers that cause you to lose a life
-const badNumbers = [];
-while (badNumbers.length < badNumberCount) {
-    let newBadNumber = Math.floor(Math.random() * range) + 1;
-    if (newBadNumber !== randomNumber && !badNumbers.includes(newBadNumber)) {
-        badNumbers.push(newBadNumber);
+document.getElementById('generate').addEventListener('click', () => {
+    const cols = parseInt(document.getElementById('cols').value);
+    const rows = parseInt(document.getElementById('rows').value);
+    const container = document.getElementById('grid-container');
+  
+    // Clear previous grid
+    container.innerHTML = '';
+  
+    // Set grid layout
+    container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  
+    // Generate grid items
+    let number = 1;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'grid-item';
+        cell.textContent = number++;
+        cell.addEventListener('click', () => {
+          cell.classList.toggle('active');
+          console.log(`Clicked box number: ${cell.textContent}`);
+        });
+        container.appendChild(cell);
+      }
     }
-}
-
-//Players HP
-let hp = 8;
-document.getElementById("hpDisplay").textContent = hp;
-
-function checkGuess() {
-    let userGuess = parseInt(document.getElementById("userGuess").value);
-    let feedback = document.getElementById("feedback");
-    let hpDisplay = document.getElementById("hpDisplay");
-
-    //loose a life every guess
-    if (hp === 0) {
-        feedback.textContent = "Game Over! You have no lives left.";
-    } else {
-        hp -= 1;
-        hpDisplay.textContent = hp;
-
-        //if a bad number is guessed you loose another life
-        if (badNumbers.includes(userGuess)) {
-            if (hp === 0) {
-                feedback.textContent = "Game Over! You have no lives left.";
-            } else {
-                feedback.textContent = "Bad Number! You Lose a life!";
-                hp -= 1;
-                hpDisplay.textContent = hp;
-            }
-            return;
-        } else if (userGuess > randomNumber) {
-            feedback.textContent = "Lower! Try again.";
-        } else if (userGuess < randomNumber) {
-            feedback.textContent = "Higher! Try again.";
-        } else {
-            feedback.textContent = "Correct! You guessed the number!";
-        }
-    }
-}
+  });

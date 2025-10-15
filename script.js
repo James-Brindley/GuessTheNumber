@@ -1,8 +1,8 @@
 const cols = 15;
 const rows = 4;
 
-const playerAttackCount = 10;
-const enemyAttackCount = 5;
+const playerAttackCount = 12;
+const enemyAttackCount = 8;
 
 const totalCells = cols * rows;
 
@@ -49,7 +49,11 @@ for (let r = 0; r < rows; r++) {
         cell.textContent = number++;
 
     cell.addEventListener('click', () => {
-        const cellNumber = parseInt(cell.textContent); // get the number inside the box
+        if (cell.classList.contains('clicked')) return;
+
+        cell.classList.add('clicked');
+
+        const cellNumber = parseInt(cell.textContent);
           
         if (enemyAttackNumbers.includes(cellNumber)) {
             cell.classList.toggle('eAttack');

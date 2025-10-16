@@ -213,4 +213,5 @@ function nextLevel() {
   hero.playIdle();
   enemy.playIdle();
   buildGrid();
+  enemyAttackCount + 10;
 }

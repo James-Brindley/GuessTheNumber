@@ -108,10 +108,23 @@ function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSel
   let frameIndex = 0;
   let animInterval = null;
 
-  function playAnimation() {
+  function playAnimation(loop = true) {
     clearInterval(animInterval);
+    frameIndex = 0;
+
     animInterval = setInterval(() => {
-      frameIndex = (frameIndex + 1) % frames.length;
+      frameIndex++;
+
+      // if not looping and we've hit the last frame — stop and hold
+      if (!loop && frameIndex >= frames.length - 1) {
+        frameIndex = frames.length - 1;
+        el.src = frames[frameIndex];
+        clearInterval(animInterval);
+        return;
+      }
+
+      // loop normally otherwise
+      frameIndex = frameIndex % frames.length;
       el.src = frames[frameIndex];
     }, speed);
   }
@@ -119,13 +132,11 @@ function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSel
   const character = {
     playIdle() {
       frames = idleFrames;
-      frameIndex = 0;
-      playAnimation();
+      playAnimation(true);
     },
     playAttack() {
       frames = attackFrames;
-      frameIndex = 0;
-      playAnimation();
+      playAnimation(true);
       container.classList.add('attacking');
       setTimeout(() => {
         container.classList.remove('attacking');
@@ -133,10 +144,8 @@ function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSel
       }, 600);
     },
     playDeath() {
-      clearInterval(animInterval);
       frames = deathFrames;
-      frameIndex = 0;
-      playAnimation();
+      playAnimation(false); // no loop — play once
     }
   };
 
@@ -166,8 +175,10 @@ function showEndScreen(playerWon) {
   const popup = document.createElement('div');
   popup.className = 'end-screen';
   popup.innerHTML = `
-    <h1>${playerWon ? 'You Win!' : 'Game Over'}</h1>
-    <button id="next-level-btn">${playerWon ? 'Next Level' : 'Retry'}</button>
+    <div class="end-screen-content">
+      <h1>${playerWon ? 'You Win!' : 'Game Over'}</h1>
+      <button id="next-level-btn">${playerWon ? 'Next Level' : 'Retry'}</button>
+    </div>
   `;
   document.body.appendChild(popup);
 

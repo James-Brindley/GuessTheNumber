@@ -206,10 +206,25 @@ function showEndScreen(playerWon) {
 // === NEXT LEVEL FUNCTION ===
 function nextLevel() {
   gameOver = false;
+
+  // 🎯 Level scaling logic
+  // Increase enemy strength
+  enemyAttackCount += 1;
+  enemyHealth += 10;
+
+  // Every 2nd level, boost player’s attacks
+  if (level % 2 === 0) {
+    playerAttackCount += 1;
+  }
+
+  // Reset player and enemy health
   playerHealth = 100;
-  enemyHealth = 100;
   updateHealth();
-  updateLevel(); // ✅ refresh display
+
+  // Refresh level display
+  updateLevel();
+
+  // Reset animations and grid
   hero.playIdle();
   enemy.playIdle();
   buildGrid();

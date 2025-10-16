@@ -50,6 +50,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   font-size: 50px;
+  z-index: 10;
 }
 
 .grid-item {

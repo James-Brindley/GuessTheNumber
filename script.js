@@ -1,4 +1,28 @@
-e < count) {
+const cols = 15;
+const rows = 4;
+
+const playerAttackCount = 12;
+const enemyAttackCount = 8;
+const totalCells = cols * rows;
+
+// === HEALTH ===
+let playerHealth = 100;
+let enemyHealth = 100;
+
+// === UI ELEMENTS ===
+const playerHealthDisplay = document.getElementById('player-health-display');
+const enemyHealthDisplay = document.getElementById('enemy-health-display');
+const container = document.getElementById('grid-container');
+
+function updateHealth() {
+  playerHealthDisplay.textContent = `Player Health: ${playerHealth}`;
+  enemyHealthDisplay.textContent = `Enemy Health: ${enemyHealth}`;
+}
+
+// === RANDOM NUMBERS ===
+function getRandomUniqueNumbers(count, max, exclude = []) {
+  const numbers = new Set();
+  while (numbers.size < count) {
     const randomNum = Math.floor(Math.random() * max) + 1;
     if (!exclude.includes(randomNum)) numbers.add(randomNum);
   }

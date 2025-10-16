@@ -235,7 +235,7 @@ function nextLevel() {
     enemyHealth += 10;
 
     // every 2nd level give player +1 attack
-    if (level % 2 === 0) {
+    if ((level - 1) % 2 === 0) {
       playerAttackCount += 1;
     }
 
@@ -243,8 +243,8 @@ function nextLevel() {
   }
 
   // reset health each level (player and enemy)
-  playerHealth = 100;
-  enemyHealth = Math.max(100, enemyHealth); // ensure enemyHealth is at least 100 if not increased
+  playerHealth = playerHealth;
+  enemyHealth = enemyHealth; // ensure enemyHealth is at least 100 if not increased
 
   updateHealth();
   updateLevel(); // refresh display

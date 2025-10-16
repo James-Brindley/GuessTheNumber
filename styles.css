@@ -167,13 +167,13 @@ body {
 
 .end-screen h1 {
   font-size: 120px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   text-shadow: 4px 4px 0px #000000aa;
 }
 
 .end-screen p {
-  font-size: 50px;
-  margin-bottom: 20px;
+  font-size: 30px;
+  margin-bottom: 30px;
   text-shadow: 4px 4px 0px #000000aa;
 }
 

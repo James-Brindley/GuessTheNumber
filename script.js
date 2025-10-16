@@ -82,6 +82,9 @@ function buildGrid() {
   playerAttackNumbers = getRandomUniqueNumbers(playerAttackCount, totalCells);
   enemyAttackNumbers = getRandomUniqueNumbers(enemyAttackCount, totalCells, playerAttackNumbers);
 
+  console.log(`Player Attack Count: ${playerAttackCount}`);
+  console.log(`Enemy Attack Count: ${enemyAttackCount}`);
+
   let number = 1;
 
   for (let r = 0; r < rows; r++) {
@@ -231,6 +234,8 @@ function nextLevel() {
     if (level % 2 === 0) {
       playerAttackCount += 1;
     }
+
+    console.log(`Level ${level} — Player Attack Count: ${playerAttackCount}, Enemy Attack Count: ${enemyAttackCount}`);
   }
 
   // reset health each level (player and enemy)

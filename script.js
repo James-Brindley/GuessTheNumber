@@ -201,7 +201,9 @@ function showEndScreen(playerWon) {
   popup.innerHTML = `
     <div class="end-screen-content">
       <h1>${playerWon ? 'You Win!' : 'Game Over'}</h1>
-      <button id="next-level-btn">${playerWon ? 'Next Level' : 'Retry'}</button>
+      <p>${(level - 1 % 2) === 0 ? 'Enemy +1 Attack' : 'Enemy & Player +1 Attack'}</p>
+      <p>Enemy +10 HP</p>
+      <button id="next-level-btn">${playerWon ? 'Next Level' : 'Restart'}</button>
     </div>
   `;
   document.body.appendChild(popup);

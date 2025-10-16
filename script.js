@@ -230,9 +230,8 @@ function nextLevel() {
 
   // If level > 1 apply scaling; if level === 1 we've already reset counts above on loss
   if (level > 1) {
-    // increase enemy attack count by 1 and enemy health by 10 each level
+    // increase enemy attack count by 1
     enemyAttackCount += 1;
-    enemyHealth += 10;
 
     // every 2nd level give player +1 attack
     if ((level - 1) % 2 === 0) {
@@ -243,8 +242,8 @@ function nextLevel() {
   }
 
   // reset health each level (player and enemy)
-  playerHealth = playerHealth;
-  enemyHealth = enemyHealth; // ensure enemyHealth is at least 100 if not increased
+  playerHealth = 100;
+  enemyHealth = 100 + (10 * level-1); // ensure enemyHealth is at least 100 if not increased
 
   updateHealth();
   updateLevel(); // refresh display

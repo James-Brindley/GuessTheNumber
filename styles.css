@@ -132,3 +132,58 @@ body {
 .enemy-container.attacking {
   animation: enemyAttackMove 0.6s ease-out;
 }
+
+@keyframes deathFade {
+  0% { opacity: 1; transform: scale(8) rotate(0deg); }
+  50% { opacity: 0.6; transform: scale(7.5) rotate(10deg); }
+  100% { opacity: 0; transform: scale(6.5) rotate(-45deg); }
+}
+
+.dead {
+  animation: deathFade 1s ease-out forwards;
+}
+
+/* End Screen Overlay */
+#endScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  display: none; /* hidden until triggered */
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#endContent {
+  background: #222;
+  padding: 40px;
+  border-radius: 16px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 0 30px rgba(0,0,0,0.5);
+  font-family: pixelText;
+}
+
+#endContent h1 {
+  margin-bottom: 20px;
+  font-size: 60px;
+}
+
+#endContent button {
+  margin: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #4caf50;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#endContent button:hover {
+  background: #66bb6a;
+}

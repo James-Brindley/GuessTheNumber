@@ -2,8 +2,8 @@ const cols = 15;
 const rows = 4;
 
 // --- CHANGED: make these mutable so we can increase them each level ---
-const BASE_PLAYER_ATTACK_COUNT = 12; // base values to reset on death
-const BASE_ENEMY_ATTACK_COUNT = 8;
+const BASE_PLAYER_ATTACK_COUNT = 10; // base values to reset on death
+const BASE_ENEMY_ATTACK_COUNT = 5;
 
 let playerAttackCount = BASE_PLAYER_ATTACK_COUNT; // was const before
 let enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;   // was const before

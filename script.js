@@ -9,16 +9,28 @@ const totalCells = cols * rows;
 let playerHealth = 100;
 let enemyHealth = 100;
 
-let level = 1;
+// === LEVEL ===
+let level = 1; // ✅ added
 
 // === UI ELEMENTS ===
 const playerHealthDisplay = document.getElementById('player-health-display');
 const enemyHealthDisplay = document.getElementById('enemy-health-display');
 const container = document.getElementById('grid-container');
 
+// ✅ NEW: level display element
+const levelDisplay = document.createElement('div');
+levelDisplay.id = 'level-display';
+levelDisplay.textContent = `Level ${level}`;
+document.body.appendChild(levelDisplay);
+
 function updateHealth() {
   playerHealthDisplay.textContent = `Player Health: ${playerHealth}`;
   enemyHealthDisplay.textContent = `Enemy Health: ${enemyHealth}`;
+}
+
+// ✅ NEW: update level display
+function updateLevel() {
+  levelDisplay.textContent = `Level ${level}`;
 }
 
 // === RANDOM NUMBERS ===
@@ -52,6 +64,7 @@ const enemy = createCharacter(
 );
 
 updateHealth();
+updateLevel();
 
 let gameOver = false;
 
@@ -117,7 +130,6 @@ function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSel
     animInterval = setInterval(() => {
       frameIndex++;
 
-      // if not looping and we've hit the last frame — stop and hold
       if (!loop && frameIndex >= frames.length - 1) {
         frameIndex = frames.length - 1;
         el.src = frames[frameIndex];
@@ -125,7 +137,6 @@ function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSel
         return;
       }
 
-      // loop normally otherwise
       frameIndex = frameIndex % frames.length;
       el.src = frames[frameIndex];
     }, speed);
@@ -147,7 +158,7 @@ function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSel
     },
     playDeath() {
       frames = deathFrames;
-      playAnimation(false); // no loop — play once
+      playAnimation(false);
     }
   };
 
@@ -186,6 +197,8 @@ function showEndScreen(playerWon) {
 
   document.getElementById('next-level-btn').addEventListener('click', () => {
     popup.remove();
+    if (playerWon) level++; // ✅ increase on win
+    else level = 1; // ✅ reset on loss
     nextLevel();
   });
 }
@@ -196,6 +209,7 @@ function nextLevel() {
   playerHealth = 100;
   enemyHealth = 100;
   updateHealth();
+  updateLevel(); // ✅ refresh display
   hero.playIdle();
   enemy.playIdle();
   buildGrid();

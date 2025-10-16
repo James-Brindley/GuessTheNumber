@@ -11,8 +11,11 @@ let enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;   // was const before
 const totalCells = cols * rows;
 
 // === HEALTH ===
-let playerHealth = 100;
-let enemyHealth = 100;
+const BASE_PLAYER_HEALTH_COUUNT = 100;
+const BASE_ENEMY_HEALTH_COUNT = 100;
+
+let playerHealth = BASE_PLAYER_HEALTH_COUNT;
+let enemyHealth = BASE_ENEMY_HEALTH_COUNT;
 
 // === LEVEL ===
 let level = 1; // ✅ added
@@ -213,6 +216,7 @@ function showEndScreen(playerWon) {
       // reset attack counts to base when player loses
       playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
       enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
+      enemyHealth = BASE_ENEMY_HEALTH_COUNT
       // optionally reset enemyHealth to base (we'll set health in nextLevel)
     }
 

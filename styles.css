@@ -200,7 +200,10 @@ body {
   transform: translateX(-50%);
   font-size: 28px;
   color: white;
-  font-family: 'Press Start 2P', monospace; /* or your game font */
   text-shadow: 2px 2px 4px black;
   z-index: 10;
+}
+
+.hidden {
+  display: none;
 }

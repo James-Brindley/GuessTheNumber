@@ -1,8 +1,13 @@
 const cols = 15;
 const rows = 4;
 
-const playerAttackCount = 12;
-const enemyAttackCount = 8;
+// --- CHANGED: make these mutable so we can increase them each level ---
+const BASE_PLAYER_ATTACK_COUNT = 12; // base values to reset on death
+const BASE_ENEMY_ATTACK_COUNT = 8;
+
+let playerAttackCount = BASE_PLAYER_ATTACK_COUNT; // was const before
+let enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;   // was const before
+
 const totalCells = cols * rows;
 
 // === HEALTH ===
@@ -17,7 +22,7 @@ const playerHealthDisplay = document.getElementById('player-health-display');
 const enemyHealthDisplay = document.getElementById('enemy-health-display');
 const container = document.getElementById('grid-container');
 
-// ✅ NEW: level display element
+// ✅ NEW: level display element (keeps changes minimal — created dynamically)
 const levelDisplay = document.createElement('div');
 levelDisplay.id = 'level-display';
 levelDisplay.textContent = `Level ${level}`;
@@ -73,7 +78,7 @@ function buildGrid() {
   container.innerHTML = ''; // clear old grid
   container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
 
-  // generate new random attack numbers
+  // generate new random attack numbers using current mutable counts
   playerAttackNumbers = getRandomUniqueNumbers(playerAttackCount, totalCells);
   enemyAttackNumbers = getRandomUniqueNumbers(enemyAttackCount, totalCells, playerAttackNumbers);
 
@@ -158,7 +163,7 @@ function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSel
     },
     playDeath() {
       frames = deathFrames;
-      playAnimation(false);
+      playAnimation(false); // no loop — play once and hold last frame
     }
   };
 
@@ -197,8 +202,17 @@ function showEndScreen(playerWon) {
 
   document.getElementById('next-level-btn').addEventListener('click', () => {
     popup.remove();
-    if (playerWon) level++; // ✅ increase on win
-    else level = 1; // ✅ reset on loss
+
+    if (playerWon) {
+      level++; // increase level on win
+    } else {
+      level = 1; // reset level on loss
+      // reset attack counts to base when player loses
+      playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
+      enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
+      // optionally reset enemyHealth to base (we'll set health in nextLevel)
+    }
+
     nextLevel();
   });
 }
@@ -207,24 +221,24 @@ function showEndScreen(playerWon) {
 function nextLevel() {
   gameOver = false;
 
-  // 🎯 Level scaling logic
-  // Increase enemy strength
-  enemyAttackCount += 1;
-  enemyHealth += 10;
+  // If level > 1 apply scaling; if level === 1 we've already reset counts above on loss
+  if (level > 1) {
+    // increase enemy attack count by 1 and enemy health by 10 each level
+    enemyAttackCount += 1;
+    enemyHealth += 10;
 
-  // Every 2nd level, boost player’s attacks
-  if (level % 2 === 0) {
-    playerAttackCount += 1;
+    // every 2nd level give player +1 attack
+    if (level % 2 === 0) {
+      playerAttackCount += 1;
+    }
   }
 
-  // Reset player and enemy health
+  // reset health each level (player and enemy)
   playerHealth = 100;
+  enemyHealth = Math.max(100, enemyHealth); // ensure enemyHealth is at least 100 if not increased
+
   updateHealth();
-
-  // Refresh level display
-  updateLevel();
-
-  // Reset animations and grid
+  updateLevel(); // refresh display
   hero.playIdle();
   enemy.playIdle();
   buildGrid();

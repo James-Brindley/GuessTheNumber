@@ -50,7 +50,6 @@ body {
   left: 50%;
   transform: translateX(-50%);
   font-size: 50px;
-  z-index: 10;
 }
 
 .grid-item {
@@ -193,17 +192,3 @@ body {
   to { opacity: 1; }
 }
 
-#level-display {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 28px;
-  color: white;
-  text-shadow: 2px 2px 4px black;
-  z-index: 10;
-}
-
-.hidden {
-  display: none;
-}

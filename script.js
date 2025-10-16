@@ -206,7 +206,6 @@ function showEndScreen(playerWon) {
 // === NEXT LEVEL FUNCTION ===
 function nextLevel() {
   gameOver = false;
-  enemyAttackCount = 50;
   playerHealth = 100;
   enemyHealth = 100;
   updateHealth();

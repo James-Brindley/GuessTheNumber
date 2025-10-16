@@ -1,38 +1,109 @@
 const cols = 15;
 const rows = 4;
-
 const playerAttackCount = 12;
 const enemyAttackCount = 8;
 const totalCells = cols * rows;
 
-// === HEALTH ===
 let playerHealth = 100;
 let enemyHealth = 100;
+let level = 1;
 
-// === UI ELEMENTS ===
 const playerHealthDisplay = document.getElementById('player-health-display');
 const enemyHealthDisplay = document.getElementById('enemy-health-display');
-const container = document.getElementById('grid-container');
+const levelDisplay = document.getElementById('level-display');
+
+const overlay = document.getElementById('overlay');
+const overlayMessage = document.getElementById('overlay-message');
+const nextBtn = document.getElementById('next-level-btn');
+const retryBtn = document.getElementById('retry-btn');
+
+nextBtn.addEventListener('click', () => {
+  level++;
+  startGame();
+  overlay.classList.add('hidden');
+});
+
+retryBtn.addEventListener('click', () => {
+  level = 1;
+  startGame();
+  overlay.classList.add('hidden');
+});
 
 function updateHealth() {
   playerHealthDisplay.textContent = `Player Health: ${playerHealth}`;
   enemyHealthDisplay.textContent = `Enemy Health: ${enemyHealth}`;
 }
 
-// === RANDOM NUMBERS ===
+function updateLevelDisplay() {
+  levelDisplay.textContent = `Level ${level}`;
+}
+
 function getRandomUniqueNumbers(count, max, exclude = []) {
   const numbers = new Set();
   while (numbers.size < count) {
     const randomNum = Math.floor(Math.random() * max) + 1;
-    if (!exclude.includes(randomNum)) numbers.add(randomNum);
+    if (!exclude.includes(randomNum)) {
+      numbers.add(randomNum);
+    }
   }
   return Array.from(numbers);
 }
 
-let playerAttackNumbers = [];
-let enemyAttackNumbers = [];
+function createCharacter(elementId, idleFrames, attackFrames, deathFrames, containerSelector, speed = 250) {
+  const el = document.getElementById(elementId);
+  const container = document.querySelector(containerSelector);
+  let frames = idleFrames;
+  let frameIndex = 0;
+  let animInterval = null;
+  let isDead = false;
 
-// === CREATE CHARACTERS ===
+  function playAnimation(loop = true) {
+    clearInterval(animInterval);
+    animInterval = setInterval(() => {
+      frameIndex++;
+      if (frameIndex >= frames.length) {
+        if (loop) frameIndex = 0;
+        else frameIndex = frames.length - 1; // stay on last frame
+      }
+      el.src = frames[frameIndex];
+    }, speed);
+  }
+
+  const character = {
+    playIdle() {
+      if (isDead) return;
+      frames = idleFrames;
+      frameIndex = 0;
+      playAnimation(true);
+    },
+    playAttack() {
+      if (isDead) return;
+      frames = attackFrames;
+      frameIndex = 0;
+      playAnimation(true);
+      container.classList.add('attacking');
+      setTimeout(() => {
+        container.classList.remove('attacking');
+        character.playIdle();
+      }, 600);
+    },
+    playDeath() {
+      isDead = true;
+      clearInterval(animInterval);
+      frames = deathFrames;
+      frameIndex = 0;
+      playAnimation(false);
+    },
+    reset() {
+      isDead = false;
+      this.playIdle();
+    }
+  };
+
+  character.playIdle();
+  return character;
+}
+
 const hero = createCharacter(
   'hero',
   ['assets/ready_1.png', 'assets/ready_2.png', 'assets/ready_3.png'],
@@ -49,21 +120,20 @@ const enemy = createCharacter(
   '.enemy-container'
 );
 
-updateHealth();
+function startGame() {
+  playerHealth = 100;
+  enemyHealth = 100;
+  updateHealth();
+  updateLevelDisplay();
+  hero.reset();
+  enemy.reset();
 
-let gameOver = false;
-
-// === BUILD GRID ===
-function buildGrid() {
-  container.innerHTML = ''; // clear old grid
-  container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-
-  // generate new random attack numbers
-  playerAttackNumbers = getRandomUniqueNumbers(playerAttackCount, totalCells);
-  enemyAttackNumbers = getRandomUniqueNumbers(enemyAttackCount, totalCells, playerAttackNumbers);
+  const container = document.getElementById('grid-container');
+  container.innerHTML = '';
+  const playerAttackNumbers = getRandomUniqueNumbers(playerAttackCount, totalCells);
+  const enemyAttackNumbers = getRandomUniqueNumbers(enemyAttackCount, totalCells, playerAttackNumbers);
 
   let number = 1;
-
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const cell = document.createElement('div');
@@ -71,26 +141,25 @@ function buildGrid() {
       cell.textContent = number++;
 
       cell.addEventListener('click', () => {
-        if (cell.classList.contains('clicked') || gameOver) return;
-
+        if (cell.classList.contains('clicked')) return;
         cell.classList.add('clicked');
-        const cellNumber = parseInt(cell.textContent);
 
+        const cellNumber = parseInt(cell.textContent);
         if (enemyAttackNumbers.includes(cellNumber)) {
           cell.classList.add('eAttack');
           playerHealth -= 20;
           updateHealth();
           enemy.playAttack();
-          checkGameOver();
         } else if (playerAttackNumbers.includes(cellNumber)) {
           cell.classList.add('attack');
           enemyHealth -= 20;
           updateHealth();
           hero.playAttack();
-          checkGameOver();
         } else {
           cell.classList.add('active');
         }
+
+        checkGameOver();
       });
 
       container.appendChild(cell);
@@ -98,103 +167,21 @@ function buildGrid() {
   }
 }
 
-buildGrid();
-
-// === CHARACTER CREATION FUNCTION ===
-function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSelector, speed = 250) {
-  const el = document.getElementById(id);
-  const container = document.querySelector(containerSelector);
-  let frames = idleFrames;
-  let frameIndex = 0;
-  let animInterval = null;
-
-  function playAnimation(loop = true) {
-    clearInterval(animInterval);
-    frameIndex = 0;
-
-    animInterval = setInterval(() => {
-      frameIndex++;
-
-      // if not looping and we've hit the last frame — stop and hold
-      if (!loop && frameIndex >= frames.length - 1) {
-        frameIndex = frames.length - 1;
-        el.src = frames[frameIndex];
-        clearInterval(animInterval);
-        return;
-      }
-
-      // loop normally otherwise
-      frameIndex = frameIndex % frames.length;
-      el.src = frames[frameIndex];
-    }, speed);
-  }
-
-  const character = {
-    playIdle() {
-      frames = idleFrames;
-      playAnimation(true);
-    },
-    playAttack() {
-      frames = attackFrames;
-      playAnimation(true);
-      container.classList.add('attacking');
-      setTimeout(() => {
-        container.classList.remove('attacking');
-        character.playIdle();
-      }, 600);
-    },
-    playDeath() {
-      frames = deathFrames;
-      playAnimation(false); // no loop — play once
-    }
-  };
-
-  character.playIdle();
-  return character;
-}
-
-// === GAME END CHECK ===
 function checkGameOver() {
   if (playerHealth <= 0) {
-    playerHealth = 0;
-    updateHealth();
     hero.playDeath();
-    showEndScreen(false);
+    showOverlay('You Lost!', false);
   } else if (enemyHealth <= 0) {
-    enemyHealth = 0;
-    updateHealth();
     enemy.playDeath();
-    showEndScreen(true);
+    showOverlay('You Won!', true);
   }
 }
 
-// === END SCREEN POPUP ===
-function showEndScreen(playerWon) {
-  gameOver = true;
-
-  const popup = document.createElement('div');
-  popup.className = 'end-screen';
-  popup.innerHTML = `
-    <div class="end-screen-content">
-      <h1>${playerWon ? 'You Win!' : 'Game Over'}</h1>
-      <button id="next-level-btn">${playerWon ? 'Next Level' : 'Retry'}</button>
-    </div>
-  `;
-  document.body.appendChild(popup);
-
-  document.getElementById('next-level-btn').addEventListener('click', () => {
-    popup.remove();
-    nextLevel();
-  });
+function showOverlay(message, win) {
+  overlay.classList.remove('hidden');
+  overlayMessage.textContent = message;
+  nextBtn.style.display = win ? 'inline-block' : 'none';
+  retryBtn.style.display = win ? 'none' : 'inline-block';
 }
 
-// === NEXT LEVEL FUNCTION ===
-function nextLevel() {
-  gameOver = false;
-  playerHealth = 100;
-  enemyHealth = 100;
-  updateHealth();
-  hero.playIdle();
-  enemy.playIdle();
-  buildGrid();
-}
+startGame();

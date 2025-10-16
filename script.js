@@ -11,7 +11,7 @@ let enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;   // was const before
 const totalCells = cols * rows;
 
 // === HEALTH ===
-const BASE_PLAYER_HEALTH_COUUNT = 100;
+const BASE_PLAYER_HEALTH_COUNT = 100;
 const BASE_ENEMY_HEALTH_COUNT = 100;
 
 let playerHealth = BASE_PLAYER_HEALTH_COUNT;

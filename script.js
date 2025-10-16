@@ -205,6 +205,7 @@ function showEndScreen(playerWon) {
 
 // === NEXT LEVEL FUNCTION ===
 function nextLevel() {
+  enemyAttackCount = 50;
   gameOver = false;
   playerHealth = 100;
   enemyHealth = 100;
@@ -213,5 +214,4 @@ function nextLevel() {
   hero.playIdle();
   enemy.playIdle();
   buildGrid();
-  enemyAttackCount += 10;
 }

@@ -244,8 +244,8 @@ function nextLevel() {
   }
 
   // reset health each level (player and enemy)
-  playerHealth = 100;
-  enemyHealth = 100 + (10 * (level-1)); // ensure enemyHealth is at least 100 if not increased
+  playerHealth = BASE_PLAYER_HEALTH_COUNT;
+  enemyHealth = BASE_ENEMY_HEALTH_COUNT + (10 * (level-1)); // ensure enemyHealth is at least 100 if not increased
 
   updateHealth();
   updateLevel(); // refresh display

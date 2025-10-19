@@ -375,3 +375,17 @@ function nextLevel() {
   enemy.playIdle();
   buildGrid();
 }
+
+// === START GAME BUTTON ===
+startButton.addEventListener('click', () => {
+  mainMenu.style.display = 'none'; // hide main menu
+  level = 1;                       // ensure starting at level 1
+  playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
+  enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
+  playerHealth = BASE_PLAYER_HEALTH_COUNT;
+  enemyHealth = BASE_ENEMY_HEALTH_COUNT;
+  playerItems = [];
+  updateHealth();
+  updateLevel();
+  nextLevel();                      // build first level grid
+});

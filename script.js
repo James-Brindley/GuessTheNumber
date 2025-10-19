@@ -419,12 +419,15 @@ inventoryButton.addEventListener('mouseenter', () => {
   // Build inventory list dynamically
   inventoryPanel.innerHTML = '';
   
-  if (playerItems.length === 0) {
+  // ✅ Only show proper collectible items that have a name & rarity
+  const collectibleItems = playerItems.filter(i => i.name && i.rarity);
+
+  if (collectibleItems.length === 0) {
     const none = document.createElement('div');
     none.textContent = "No items collected yet!";
     inventoryPanel.appendChild(none);
   } else {
-    playerItems.forEach(item => {
+    collectibleItems.forEach(item => {
       // Determine rarity class
       let rarityClass = 'common';
       if (item.rarity === RARITY.RARE) rarityClass = 'rare';
@@ -439,16 +442,4 @@ inventoryButton.addEventListener('mouseenter', () => {
   }
 
   inventoryPanel.style.display = 'flex';
-});
-
-inventoryButton.addEventListener('mouseleave', () => {
-  inventoryPanel.style.display = 'none';
-});
-
-inventoryPanel.addEventListener('mouseenter', () => {
-  inventoryPanel.style.display = 'flex';
-});
-
-inventoryPanel.addEventListener('mouseleave', () => {
-  inventoryPanel.style.display = 'none';
 });

@@ -327,13 +327,6 @@ function showShop() {
 // === END SCREEN ===
 function showEndScreen(playerWon) {
   gameOver = true;
-  
-  if (level % 3 === 0) {
-        showShop();
-      }
-  else {
-    
-  }
 
   const popup = document.createElement('div');
   popup.className = 'end-screen';

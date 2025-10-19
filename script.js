@@ -391,3 +391,14 @@ startButton.addEventListener('click', () => {
   updateLevel();
   nextLevel();                      // build first level grid
 });
+
+// === MAIN MENU START BUTTON ===
+window.addEventListener('DOMContentLoaded', () => {
+  const startButton = document.getElementById('start-game-btn');
+  const mainMenu = document.getElementById('main-menu');
+
+  startButton.addEventListener('click', () => {
+    mainMenu.style.display = 'none';
+    startNewGame();
+  });
+});

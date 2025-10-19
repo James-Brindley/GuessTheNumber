@@ -263,8 +263,8 @@ function checkGameOver() {
   }
 }
 
-// === MODIFIED SHOP SYSTEM ===
-function showShop(beforeNextLevel = false) {
+// === SHOP SYSTEM ===
+function showShop() {
   const popup = document.createElement('div');
   popup.className = 'end-screen';
 
@@ -274,7 +274,9 @@ function showShop(beforeNextLevel = false) {
   const shopChoices = [];
   const count = Math.min(3, weightedPool.length);
   const indexes = new Set();
-  while (indexes.size < count) indexes.add(Math.floor(Math.random() * weightedPool.length));
+  while (indexes.size < count) {
+    indexes.add(Math.floor(Math.random() * weightedPool.length));
+  }
   indexes.forEach(i => shopChoices.push(weightedPool[i]));
 
   popup.innerHTML = `
@@ -298,7 +300,7 @@ function showShop(beforeNextLevel = false) {
     btn.textContent = "Continue";
     btn.addEventListener('click', () => {
       popup.remove();
-      if (beforeNextLevel) nextLevel();
+      nextLevel();
     });
     itemContainer.appendChild(btn);
     return;
@@ -318,53 +320,13 @@ function showShop(beforeNextLevel = false) {
       popup.remove();
       playerItems.push(item);
       item.applyEffect();
-      if (beforeNextLevel) nextLevel();
+      nextLevel();
     });
     itemContainer.appendChild(btn);
   });
 }
 
-
-// === SHOW ITEM INVENTORY POPUP ===
-function createInventoryButton() {
-  const btn = document.createElement('div');
-  btn.id = 'inventory-btn';
-  btn.textContent = '🎒 Items';
-  document.body.appendChild(btn);
-
-  const popup = document.createElement('div');
-  popup.id = 'inventory-popup';
-  popup.style.display = 'none';
-  document.body.appendChild(popup);
-
-  function updateInventoryPopup() {
-    popup.innerHTML = `<h2>Your Items</h2>`;
-    if (playerItems.length === 0) {
-      popup.innerHTML += `<p>No items collected yet.</p>`;
-    } else {
-      popup.innerHTML += playerItems.map(item => {
-        const name = item.name || item.id;
-        const desc = item.description || '(Passive effect)';
-        return `<div class="inventory-item"><strong>${name}</strong><br>${desc}</div>`;
-      }).join('');
-    }
-  }
-
-  btn.addEventListener('mouseenter', () => {
-    updateInventoryPopup();
-    popup.style.display = 'block';
-  });
-  btn.addEventListener('mouseleave', () => {
-    popup.style.display = 'none';
-  });
-  popup.addEventListener('mouseenter', () => popup.style.display = 'block');
-  popup.addEventListener('mouseleave', () => popup.style.display = 'none');
-}
-
-createInventoryButton();
-
-
-// === MODIFIED END SCREEN ===
+// === END SCREEN ===
 function showEndScreen(playerWon) {
   gameOver = true;
 
@@ -374,10 +336,7 @@ function showEndScreen(playerWon) {
     <div class="end-screen-content">
       <h1>${playerWon ? 'You Win!' : 'Game Over'}</h1>
       <p>${playerWon ? 'Prepare for the next battle...' : 'Try again from Level 1'}</p>
-      <div style="display:flex;gap:20px;justify-content:center;">
-        <button id="next-level-btn">${playerWon ? 'Next Level' : 'Retry'}</button>
-        <button id="return-main-btn">Main Menu</button>
-      </div>
+      <button id="next-level-btn">${playerWon ? 'Next Level' : 'Retry'}</button>
     </div>
   `;
   document.body.appendChild(popup);
@@ -386,17 +345,16 @@ function showEndScreen(playerWon) {
     popup.remove();
     if (playerWon) {
       level++;
-      enemyAttackCount += 1;
-      enemyHealth += 10;
-      if (level % 2 === 0) playerAttackCount += 1;
-
-      // ✅ Only show shop every 3rd level
-      if (level % 3 === 0) {
-        showShop(true); // show shop before next level
-      } else {
-        nextLevel();
+      // === Difficulty scaling ===
+      enemyAttackCount += 1;    // +1 attack number each level
+      enemyHealth += 10;        // +10 HP each level
+      if (level % 2 === 0) {
+        playerAttackCount += 1; // +1 player attack every 2 levels
       }
+      // After scaling, go to item shop
+      showShop();
     } else {
+      // === Reset everything on loss ===
       level = 1;
       enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
       enemyHealth = BASE_ENEMY_HEALTH_COUNT;
@@ -405,12 +363,6 @@ function showEndScreen(playerWon) {
       playerItems = [];
       nextLevel();
     }
-  });
-
-  // ✅ Return to main menu
-  document.getElementById('return-main-btn').addEventListener('click', () => {
-    popup.remove();
-    mainMenu.style.display = 'flex';
   });
 }
 

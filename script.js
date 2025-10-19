@@ -41,6 +41,33 @@ function updateHealth() {
 
 function updateLevel() {
   levelDisplay.textContent = `Level ${level}`;
+
+  // === BOSS SETTINGS ===
+let isBossLevel = false;
+
+// Optional: Adjust these as you balance later
+const BOSS_MULTIPLIER = {
+  health: 3,     // Boss has 3x normal HP
+  damage: 2,     // Boss deals 2x base damage
+};
+
+const bossSprites = {
+  idle: [
+    'assets/bossIdle1.png',
+    'assets/bossIdle2.png',
+    'assets/bossIdle3.png'
+  ],
+  attack: [
+    'assets/bossAttack1.png',
+    'assets/bossAttack2.png',
+    'assets/bossAttack3.png'
+  ],
+  death: [
+    'assets/bossDeath1.png',
+    'assets/bossDeath2.png',
+    'assets/bossDeath3.png'
+  ]
+};
 }
 
 // === DYNAMIC HEALTH & DAMAGE CALCULATIONS ===
@@ -97,7 +124,7 @@ function getPlayerMaxHealth() {
 
 function getEnemyMaxHealth() {
   // Base enemy health scales by level
-  let base = BASE_ENEMY_HEALTH_COUNT + (level - 1) * 10;
+  let base = BASE_ENEMY_HEALTH_COUNT;
   let bonus = 0;
 
   // Allow items or future effects to modify enemy HP
@@ -237,7 +264,8 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
 
   } else {
     // ✅ Enemy base damage is always 20 minus reductions
-    let damage = 20 - (stats.damageReduction || 0);
+    let baseEnemyDamage = 20 * (isBossLevel ? BOSS_MULTIPLIER.damage : 1);
+    let damage = baseEnemyDamage - (stats.damageReduction || 0);
     if (damage < 0) damage = 0;
 
     // ✅ Check ignore damage chance (rings)
@@ -519,6 +547,9 @@ function showEndScreen(playerWon) {
 function nextLevel() {
   gameOver = false;
 
+  // ✅ Determine if this is a boss level
+  isBossLevel = (level % 10 === 0);
+
   // ✅ Get player stats once
   const stats = getPlayerStats();
 
@@ -526,11 +557,45 @@ function nextLevel() {
   playerMaxHealth = getPlayerMaxHealth();
   enemyMaxHealth = getEnemyMaxHealth();
 
+  // ✅ If boss, multiply enemy HP and set boss sprite set
+  if (isBossLevel) {
+    enemyMaxHealth *= BOSS_MULTIPLIER.health;
+    enemyHealth = enemyMaxHealth;
+
+    // Swap enemy animation to boss
+    enemy.idleFrames = bossSprites.idle;
+    enemy.attackFrames = bossSprites.attack;
+    enemy.deathFrames = bossSprites.death;
+
+    // Optional: display boss name popup
+    const bossPopup = document.createElement("div");
+    bossPopup.className = "revive-popup";
+    bossPopup.style.background = "rgba(200, 0, 0, 0.9)";
+    bossPopup.style.color = "white";
+    bossPopup.textContent = "⚔️ Boss Appears!";
+    document.body.appendChild(bossPopup);
+    setTimeout(() => bossPopup.remove(), 2000);
+
+  } else {
+    enemyHealth = enemyMaxHealth;
+
+    // Revert enemy to normal after boss level
+    enemy.idleFrames = ['assets/eReady_1.png', 'assets/eReady_2.png', 'assets/eReady_3.png'];
+    enemy.attackFrames = ['assets/eAttack_2.png', 'assets/eAttack_4.png', 'assets/eAttack_6.png'];
+    enemy.deathFrames = ['assets/eDeath_1.png', 'assets/eDeath_2.png', 'assets/eDeath_3.png'];
+  }
+
   // ✅ Regenerate health each level if applicable
   playerHealth = Math.min(playerMaxHealth, playerHealth + stats.regenPerRound);
-  enemyHealth = enemyMaxHealth;
 
   updateHealth();
+
+  if (isBossLevel) {
+    enemyHealthDisplay.classList.add("boss-health");
+  } else {
+    enemyHealthDisplay.classList.remove("boss-health");
+  }
+
   updateLevel();
   hero.playIdle();
   enemy.playIdle();

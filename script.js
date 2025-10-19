@@ -417,12 +417,15 @@ const inventoryPanel = document.getElementById('inventory-panel');
 
 // Function to refresh inventory list
 function updateInventoryPanel() {
-  if (playerItems.length === 0) {
+  // Only show real collectible items (those with name & description)
+  const displayableItems = playerItems.filter(i => i.name && i.description);
+
+  if (displayableItems.length === 0) {
     inventoryPanel.innerHTML = "<p>No items collected yet.</p>";
     return;
   }
 
-  inventoryPanel.innerHTML = playerItems.map(item => `
+  inventoryPanel.innerHTML = displayableItems.map(item => `
     <div class="inventory-item" style="border-color:${item.rarity?.color || '#ccc'};">
       <strong style="color:${item.rarity?.color || '#fff'};">${item.name}</strong><br>
       <span>${item.description}</span>

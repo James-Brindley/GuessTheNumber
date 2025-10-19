@@ -411,35 +411,33 @@ function resetGame() {
   gameOver = false;
 }
 
-// === INVENTORY BUTTON LOGIC ===
+// === INVENTORY PANEL HANDLING ===
 const inventoryButton = document.getElementById('inventory-button');
 const inventoryPanel = document.getElementById('inventory-panel');
 
-inventoryButton.addEventListener('mouseenter', () => {
-  // Build inventory list dynamically
-  inventoryPanel.innerHTML = '';
-  
-  // ✅ Only show proper collectible items that have a name & rarity
-  const collectibleItems = playerItems.filter(i => i.name && i.rarity);
-
-  if (collectibleItems.length === 0) {
-    const none = document.createElement('div');
-    none.textContent = "No items collected yet!";
-    inventoryPanel.appendChild(none);
-  } else {
-    collectibleItems.forEach(item => {
-      // Determine rarity class
-      let rarityClass = 'common';
-      if (item.rarity === RARITY.RARE) rarityClass = 'rare';
-      else if (item.rarity === RARITY.EPIC) rarityClass = 'epic';
-      else if (item.rarity === RARITY.LEGENDARY) rarityClass = 'legendary';
-      
-      const div = document.createElement('div');
-      div.className = `inventory-item ${rarityClass}`;
-      div.textContent = `${item.name} – ${item.description}`;
-      inventoryPanel.appendChild(div);
-    });
+// Function to refresh inventory list
+function updateInventoryPanel() {
+  if (playerItems.length === 0) {
+    inventoryPanel.innerHTML = "<p>No items collected yet.</p>";
+    return;
   }
 
-  inventoryPanel.style.display = 'flex';
+  inventoryPanel.innerHTML = playerItems.map(item => `
+    <div class="inventory-item" style="border-color:${item.rarity?.color || '#ccc'};">
+      <strong style="color:${item.rarity?.color || '#fff'};">${item.name}</strong><br>
+      <span>${item.description}</span>
+    </div>
+  `).join('');
+}
+
+// Show panel when hovered
+inventoryButton.addEventListener('mouseenter', () => {
+  updateInventoryPanel();
+  inventoryPanel.style.display = 'block';
+});
+
+// Hide panel when not hovered
+inventoryContainer = document.getElementById('inventory-container');
+inventoryContainer.addEventListener('mouseleave', () => {
+  inventoryPanel.style.display = 'none';
 });

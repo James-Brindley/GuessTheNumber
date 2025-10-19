@@ -254,75 +254,52 @@ body {
   transition: 0.2s;
 }
 
-/* === INVENTORY BUTTON & PANEL === */
-#inventory-button {
+/* === INVENTORY BUTTON === */
+#inventory-container {
   position: fixed;
+  top: 150px;
   left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.7);
-  border: 3px solid white;
-  color: white;
+  z-index: 1000;
+}
+
+#inventory-button {
   font-size: 40px;
-  border-radius: 50%;
-  width: 70px;
-  height: 70px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: 3px solid white;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  z-index: 2000;
+  padding: 10px 15px;
+  font-family: pixelText;
+  transition: 0.3s;
 }
 
 #inventory-button:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-50%) scale(1.05);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 #inventory-panel {
-  position: fixed;
-  left: 110px;
-  top: 50%;
-  transform: translateY(-50%);
+  display: none;
+  position: absolute;
+  top: 70px;
+  left: 0;
   background: rgba(0, 0, 0, 0.85);
   border: 3px solid white;
-  border-radius: 20px;
+  border-radius: 15px;
   padding: 20px;
   color: white;
   font-family: pixelText;
-  font-size: 25px;
-  min-width: 300px;
-  display: none;
-  flex-direction: column;
-  gap: 10px;
-  z-index: 1999;
-}
-
-.inventory-item {
-  border: 2px solid white;
-  border-radius: 10px;
-  padding: 10px;
-  text-align: left;
   font-size: 22px;
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+  text-align: left;
 }
 
-.inventory-item.common {
-  border-color: #4CAF50;
-  color: #4CAF50;
-}
-
-.inventory-item.rare {
-  border-color: #2196F3;
-  color: #2196F3;
-}
-
-.inventory-item.epic {
-  border-color: #9C27B0;
-  color: #9C27B0;
-}
-
-.inventory-item.legendary {
-  border-color: #FFD700;
-  color: #FFD700;
+/* Each item row in the inventory */
+.inventory-item {
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  border-left: 5px solid;
 }

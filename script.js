@@ -227,15 +227,20 @@ function checkGameOver() {
   }
 }
 
-// === SHOP SYSTEM ===
 function showShop() {
   const popup = document.createElement('div');
   popup.className = 'end-screen';
 
   // Choose 3 random items the player doesn't have
   const available = allItems.filter(item => !playerItems.some(pi => pi.id === item.id));
-  const shopChoices = getRandomUniqueNumbers(Math.min(3, available.length), available.length)
-    .map(i => available[i]);
+
+  const shopChoices = [];
+  const count = Math.min(3, available.length);
+  const indexes = new Set();
+  while (indexes.size < count) {
+    indexes.add(Math.floor(Math.random() * available.length));
+  }
+  indexes.forEach(i => shopChoices.push(available[i]));
 
   popup.innerHTML = `
     <div class="end-screen-content">
@@ -247,6 +252,23 @@ function showShop() {
   document.body.appendChild(popup);
 
   const itemContainer = popup.querySelector('#shop-items');
+
+  if (shopChoices.length === 0) {
+    const msg = document.createElement('p');
+    msg.textContent = "No more items available!";
+    msg.style.fontSize = "30px";
+    itemContainer.appendChild(msg);
+
+    const btn = document.createElement('button');
+    btn.textContent = "Continue";
+    btn.addEventListener('click', () => {
+      popup.remove();
+      nextLevel();
+    });
+    itemContainer.appendChild(btn);
+    return;
+  }
+
   shopChoices.forEach(item => {
     const btn = document.createElement('button');
     btn.textContent = `${item.name} - ${item.description}`;
@@ -284,7 +306,7 @@ function showEndScreen(playerWon) {
     if (playerWon) {
       level++;
       // ✅ Every 3rd level, show the shop instead of directly going next
-      if (level % 3 === 0) {
+      if ((level -1) % 3 === 0) {
         showShop();
       } else {
         nextLevel();

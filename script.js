@@ -298,6 +298,7 @@ function showShop() {
     btn.textContent = "Continue";
     btn.addEventListener('click', () => {
       popup.remove();
+      updateInventoryPanel();
       nextLevel();
     });
     itemContainer.appendChild(btn);
@@ -349,12 +350,11 @@ function showEndScreen(playerWon) {
       level++;
 
       // ✅ Every 3rd level → show shop before next battle
-      if (level % 3 === 0) {
+      if ((level - 1) % 3 === 0) {
         showShop();
       } else {
         // === Normal scaling ===
         enemyAttackCount += 1;    // +1 attack number each level
-        enemyHealth += 10;        // +10 HP each level
         if (level % 2 === 0) playerAttackCount += 1; // +1 player attack every 2 levels
         nextLevel();
       }
@@ -409,5 +409,29 @@ function resetGame() {
   level = 1;
   updateHealth();
   updateLevel();
+  updateInventoryPanel();
   gameOver = false;
+}
+
+// === INVENTORY PANEL UPDATE ===
+function updateInventoryPanel() {
+  const list = document.getElementById('inventory-list');
+  if (!list) return;
+  list.innerHTML = '';
+
+  if (playerItems.length === 0) {
+    const none = document.createElement('li');
+    none.textContent = 'No items equipped';
+    none.style.color = 'gray';
+    list.appendChild(none);
+    return;
+  }
+
+  playerItems.forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = item.name || item.id;
+    li.style.color = item.rarity ? item.rarity.color : 'white';
+    li.style.textShadow = '2px 2px 0 black';
+    list.appendChild(li);
+  });
 }

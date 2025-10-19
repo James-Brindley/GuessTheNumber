@@ -11,80 +11,86 @@ body {
   font-family: pixelText;
 }
 
+/* === FONT === */
 @font-face {
   font-family: pixelText;
   src: url(fonts/RetroByte.ttf);
 }
-  
+
+/* === SCALING BASE === */
+html {
+  font-size: calc(0.5vw + 0.5vh);
+}
+
+/* === HEALTH BAR === */
 .health-bar-container {
   position: fixed;
-  top: 20px;
+  top: 2vh;
   left: 0;
   right: 0;
   display: flex;
   justify-content: space-between;
-  padding: 0 40px;
-  font-size: 50px;
+  padding: 0 4vw;
+  font-size: 3rem;
   font-weight: bold;
 }
-  
+
 .player-health {
   color: #4CAF50;
 }
-  
+
 .enemy-health {
   color: #E53935;
 }
-  
-.controls {
-  margin-bottom: 20px;
-}
 
+/* === GRID === */
 #grid-container {
   display: grid;
-  gap: 5px;
+  gap: 0.5vw;
   justify-content: center;
-  padding: 20px;
+  padding: 2vh;
   position: fixed;
-  bottom: 5%;
+  bottom: 5vh;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 50px;
+  grid-template-columns: repeat(15, 1fr);
+  width: 80vw;
+  max-width: 90vw;
+  font-size: 2.8rem;
 }
 
 .grid-item {
   color: white;
-  padding: 20px;
+  padding: 0.8rem;
   cursor: pointer;
   transition: 0.2s;
   user-select: none;
+  text-align: center;
 }
-  
+
 .grid-item:hover {
   background-color: #0000001b;
-  color: white;
 }
-  
+
 .grid-item.active {
   background-color: #0000006c;
-  color: white;
 }
 
 .grid-item.attack {
   background-color: #379125b0;
-  color: white;
 }
 
 .grid-item.eAttack {
   background-color: #e44444b5;
-  color: white;
 }
 
-.hero-container, .enemy-container {
+/* === CHARACTERS === */
+.hero-container,
+.enemy-container {
   position: fixed;
-  bottom: 50%;
-  width: 100px;
-  height: 100px;
+  bottom: 45%;
+  width: 8vw;
+  height: 8vw;
   z-index: 10;
   display: flex;
   justify-content: center;
@@ -92,39 +98,49 @@ body {
 }
 
 .hero-container {
-  left: 40%;
+  left: 35%;
   transform: translateX(-50%);
 }
 
 .enemy-container {
-  right: 40%;
+  right: 35%;
   transform: translateX(50%);
 }
 
-.hero-container img, .enemy-container img {
-  width: auto;
+.hero-container img,
+.enemy-container img {
+  width: 100%;
   height: auto;
-  max-width: 100%;
-  max-height: 100%;
-
-  transform: scale(8);
+  transform: scale(6);
   transform-origin: bottom center;
   image-rendering: pixelated;
 }
 
+/* === ATTACK MOVEMENT === */
 @keyframes heroAttackMove {
-  0% { transform: translateX(0%) translateY(0); }
-  50% { transform: translateX(calc(300px)) translateY(0); }
-  100% { transform: translateX(0%) translateY(0); }
+  0% {
+    transform: translateX(0%) translateY(0);
+  }
+  50% {
+    transform: translateX(15vw) translateY(0);
+  }
+  100% {
+    transform: translateX(0%) translateY(0);
+  }
 }
 
 @keyframes enemyAttackMove {
-  0% { transform: translateX(0%) translateY(0); }
-  50% { transform: translateX(calc(-300px)) translateY(0); }
-  100% { transform: translateX(0%) translateY(0); }
+  0% {
+    transform: translateX(0%) translateY(0);
+  }
+  50% {
+    transform: translateX(-15vw) translateY(0);
+  }
+  100% {
+    transform: translateX(0%) translateY(0);
+  }
 }
 
-/* attach these classes when attacking */
 .hero-container.attacking {
   animation: heroAttackMove 0.6s ease-out;
 }
@@ -133,16 +149,27 @@ body {
   animation: enemyAttackMove 0.6s ease-out;
 }
 
+/* === DEATH === */
 @keyframes deathFade {
-  0% { opacity: 1; transform: scale(8) rotate(0deg); }
-  50% { opacity: 0.6; transform: scale(7.5) rotate(10deg); }
-  100% { opacity: 0; transform: scale(6.5) rotate(-45deg); }
+  0% {
+    opacity: 1;
+    transform: scale(6) rotate(0deg);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(5.5) rotate(10deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(5) rotate(-45deg);
+  }
 }
 
 .dead {
   animation: deathFade 1s ease-out forwards;
 }
 
+/* === END SCREEN === */
 .end-screen {
   position: fixed;
   inset: 0;
@@ -159,30 +186,29 @@ body {
 
 .end-screen-content {
   background: rgba(0, 0, 0, 0.6);
-  border: 4px solid white;
-  border-radius: 20px;
-  padding: 80px 120px;
-  box-shadow: 0 0 30px #ffffff55;
+  border: 0.3rem solid white;
+  border-radius: 2rem;
+  padding: 5vh 8vw;
+  box-shadow: 0 0 2rem #ffffff55;
 }
 
 .end-screen h1 {
-  font-size: 120px;
-  margin-bottom: 10px;
-  text-shadow: 4px 4px 0px #000000aa;
+  font-size: 8rem;
+  margin-bottom: 1vh;
+  text-shadow: 0.3rem 0.3rem 0px #000000aa;
 }
 
 .end-screen p {
-  font-size: 30px;
-  margin-bottom: 30px;
-  text-shadow: 4px 4px 0px #000000aa;
+  font-size: 2rem;
+  margin-bottom: 2vh;
 }
 
 .end-screen button {
-  font-size: 50px;
-  padding: 20px 60px;
+  font-size: 3rem;
+  padding: 1rem 3rem;
   background: #4CAF50;
   border: none;
-  border-radius: 15px;
+  border-radius: 1rem;
   cursor: pointer;
   font-family: pixelText;
 }
@@ -194,18 +220,23 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
+/* === LEVEL DISPLAY === */
 #level-display {
   position: fixed;
-  top: 20px;
+  top: 2vh;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 40px;
+  font-size: 3rem;
   color: white;
-  text-shadow: 3px 3px 0px black;
+  text-shadow: 0.3rem 0.3rem 0px black;
   z-index: 100;
 }
 
@@ -226,24 +257,24 @@ body {
 
 .menu-content {
   background: rgba(0, 0, 0, 0.6);
-  border: 4px solid white;
-  border-radius: 20px;
-  padding: 100px 150px;
-  box-shadow: 0 0 30px #ffffff55;
+  border: 0.3rem solid white;
+  border-radius: 2rem;
+  padding: 5vh 8vw;
+  box-shadow: 0 0 2rem #ffffff55;
 }
 
 .menu-content h1 {
-  font-size: 120px;
-  margin-bottom: 40px;
-  text-shadow: 4px 4px 0px #000000aa;
+  font-size: 8rem;
+  margin-bottom: 3vh;
+  text-shadow: 0.3rem 0.3rem 0px #000000aa;
 }
 
 .menu-content button {
-  font-size: 60px;
-  padding: 25px 80px;
+  font-size: 3.5rem;
+  padding: 1rem 3rem;
   background: #4CAF50;
   border: none;
-  border-radius: 15px;
+  border-radius: 1rem;
   cursor: pointer;
   font-family: pixelText;
 }
@@ -252,4 +283,27 @@ body {
   background: #66bb6a;
   transform: scale(1.05);
   transition: 0.2s;
+}
+
+/* === MOBILE OPTIMIZATION === */
+@media (max-width: 900px) {
+  html {
+    font-size: calc(1vw + 1vh);
+  }
+
+  .hero-container,
+  .enemy-container {
+    width: 14vw;
+    height: 14vw;
+  }
+
+  #grid-container {
+    width: 95vw;
+    font-size: 2rem;
+  }
+
+  .end-screen h1,
+  .menu-content h1 {
+    font-size: 6rem;
+  }
 }

@@ -318,6 +318,7 @@ function showShop() {
       popup.remove();
       playerItems.push(item);
       item.applyEffect();
+      nextLevel();
     });
     itemContainer.appendChild(btn);
   });
@@ -326,13 +327,6 @@ function showShop() {
 // === END SCREEN ===
 function showEndScreen(playerWon) {
   gameOver = true;
-  
-  if (level % 3 === 0) {
-        showShop();
-      }
-  else {
-    
-  }
 
   const popup = document.createElement('div');
   popup.className = 'end-screen';
@@ -341,21 +335,30 @@ function showEndScreen(playerWon) {
       <h1>${playerWon ? 'You Win!' : 'Game Over'}</h1>
       <p>${playerWon ? 'Prepare for the next battle...' : 'Try again from Level 1'}</p>
       <button id="next-level-btn">${playerWon ? 'Next Level' : 'Retry'}</button>
+      <br><br>
+      <button id="main-menu-btn">Main Menu</button>
     </div>
   `;
   document.body.appendChild(popup);
 
+  // === Button handlers ===
   document.getElementById('next-level-btn').addEventListener('click', () => {
     popup.remove();
+
     if (playerWon) {
       level++;
-      // === Difficulty scaling ===
-      enemyAttackCount += 1;    // +1 attack number each level
-      enemyHealth += 10;        // +10 HP each level
-      if (level % 2 === 0) {
-        playerAttackCount += 1; // +1 player attack every 2 levels
+
+      // ✅ Every 3rd level → show shop before next battle
+      if (level % 3 === 0) {
+        showShop();
+      } else {
+        // === Normal scaling ===
+        enemyAttackCount += 1;    // +1 attack number each level
+        enemyHealth += 10;        // +10 HP each level
+        if (level % 2 === 0) playerAttackCount += 1; // +1 player attack every 2 levels
+        nextLevel();
       }
-      nextLevel();
+
     } else {
       // === Reset everything on loss ===
       level = 1;
@@ -366,6 +369,14 @@ function showEndScreen(playerWon) {
       playerItems = [];
       nextLevel();
     }
+  });
+
+  // ✅ New: Main Menu Button
+  document.getElementById('main-menu-btn').addEventListener('click', () => {
+    popup.remove();
+    mainMenu.style.display = 'flex';
+    container.innerHTML = '';
+    resetGame();
   });
 }
 
@@ -381,16 +392,22 @@ function nextLevel() {
   buildGrid();
 }
 
-// === START GAME BUTTON ===
-startButton.addEventListener('click', () => {
-  mainMenu.style.display = 'none'; // hide main menu
-  level = 1;                       // ensure starting at level 1
-  playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
-  enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('start-game-btn').addEventListener('click', () => {
+    mainMenu.style.display = 'none';
+    resetGame();
+    nextLevel();
+  });
+});
+
+function resetGame() {
   playerHealth = BASE_PLAYER_HEALTH_COUNT;
   enemyHealth = BASE_ENEMY_HEALTH_COUNT;
+  playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
+  enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
   playerItems = [];
+  level = 1;
   updateHealth();
   updateLevel();
-  nextLevel();                      // build first level grid
-});
+  gameOver = false;
+}

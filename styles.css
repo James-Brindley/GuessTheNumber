@@ -405,41 +405,49 @@ body {
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  flex-direction: column;
   font-family: pixelText;
   text-align: center;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-/* Center container for content */
 .menu-inner {
-  width: 80%;
-  max-width: 1200px;
-  text-align: center;
+  width: 90%;
+  max-width: 1000px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 30px;
 }
 
-/* Title placement: upper third */
+/* === TITLE === */
 .menu-title {
-  font-size: 180px;
-  margin-bottom: 100px;
-  text-shadow: 6px 6px 0px #000000aa;
-  transform: translateY(-20vh);
+  font-size: 120px;
+  margin: 0;
+  text-shadow: 5px 5px 0px #000000aa;
 }
 
-.menu-buttons {
+/* === MAIN MENU ONLY === */
+#main-menu .menu-title {
+  transform: translateY(-15vh);
+  font-size: 160px;
+  margin-bottom: 80px;
+}
+
+#main-menu .menu-buttons {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 40px;
-  transform: translateY(-10vh);
+  gap: 30px;
+  transform: translateY(-5vh);
 }
 
-.menu-buttons button {
-  font-size: 60px;
-  padding: 25px 80px;
+/* === BUTTON STYLES === */
+.menu-buttons button,
+#back-to-menu-btn {
+  font-size: 50px;
+  padding: 20px 70px;
   background: #4CAF50;
   border: none;
   border-radius: 15px;
@@ -449,47 +457,51 @@ body {
   transition: 0.2s;
 }
 
-.menu-buttons button:hover {
+.menu-buttons button:hover,
+#back-to-menu-btn:hover {
   background: #66bb6a;
   transform: scale(1.05);
 }
 
-/* How-to screen text */
+/* === HOW TO PLAY MENU === */
+#how-to-play-screen .menu-title {
+  font-size: 100px;
+  margin-bottom: 20px;
+}
+
 .how-to-text {
-  font-size: 22px;
+  font-size: 26px;
   text-align: left;
   color: #fff;
   text-shadow: 2px 2px 0 black;
   background: rgba(0, 0, 0, 0.5);
   border-radius: 15px;
-  padding: 40px 60px;
-  margin-bottom: 60px;
-  line-height: 1.6;
-  width: 70%;
-  max-width: 900px;
+  padding: 30px 50px;
+  line-height: 1.5;
+  width: 80%;
+  max-width: 800px;
+  overflow-y: auto;
+  max-height: 55vh;
 }
 
 .how-to-text ul {
   list-style: none;
   padding: 0;
+  margin: 10px 0;
 }
 
 .how-to-text li {
-  margin: 8px 0;
+  margin: 6px 0;
 }
 
+/* === BACK BUTTON (HOW TO PLAY) === */
 #back-to-menu-btn {
-  font-size: 50px;
-  padding: 20px 60px;
   background: #2196F3;
-  border: none;
-  border-radius: 15px;
-  cursor: pointer;
-  font-family: pixelText;
-  transition: 0.2s;
+  font-size: 45px;
+  margin-top: 20px;
+  padding: 15px 50px;
 }
 
 #back-to-menu-btn:hover {
   background: #42a5f5;
-  transform: scale(1.05);
 }

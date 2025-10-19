@@ -354,9 +354,38 @@ function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSel
   return character;
 }
 
+function tryRevive() {
+  const reviveItemIndex = playerItems.findIndex(i => i.reviveAtPercent);
+
+  if (reviveItemIndex === -1) return false; // no revive item found
+
+  const reviveItem = playerItems[reviveItemIndex];
+  const revivePercent = reviveItem.reviveAtPercent;
+
+  // Revive player
+  playerHealth = Math.floor(getPlayerMaxHealth() * revivePercent);
+  updateHealth();
+
+  // Remove the used item (one-time use)
+  playerItems.splice(reviveItemIndex, 1);
+
+  // Optional: small animation flash or popup
+  const revivePopup = document.createElement("div");
+  revivePopup.className = "revive-popup";
+  revivePopup.textContent = `${reviveItem.name} activated!`;
+  document.body.appendChild(revivePopup);
+  setTimeout(() => revivePopup.remove(), 1500);
+
+  return true;
+}
+
 // === GAME END CHECK ===
 function checkGameOver() {
   if (playerHealth <= 0) {
+    // Try revive first
+    if (tryRevive()) return; // revival successful, continue playing
+
+    // No revive available → true death
     playerHealth = 0;
     updateHealth();
     hero.playDeath();
@@ -368,6 +397,7 @@ function checkGameOver() {
     showEndScreen(true);
   }
 }
+
 
 // === SHOP SYSTEM ===
 function showShop() {

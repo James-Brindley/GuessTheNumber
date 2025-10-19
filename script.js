@@ -1,3 +1,5 @@
+Javascript:
+
 const cols = 15;
 const rows = 4;
 
@@ -31,39 +33,6 @@ levelDisplay.id = 'level-display';
 levelDisplay.textContent = `Level ${level}`;
 document.body.appendChild(levelDisplay);
 
-// === INVENTORY BUTTON & POPUP ===
-const inventoryButton = document.createElement('div');
-inventoryButton.id = 'inventory-button';
-inventoryButton.textContent = '📜 Items';
-document.body.appendChild(inventoryButton);
-
-const inventoryPopup = document.createElement('div');
-inventoryPopup.id = 'inventory-popup';
-document.body.appendChild(inventoryPopup);
-
-inventoryButton.addEventListener('mouseenter', showInventory);
-inventoryButton.addEventListener('mouseleave', hideInventory);
-inventoryPopup.addEventListener('mouseenter', showInventory);
-inventoryPopup.addEventListener('mouseleave', hideInventory);
-
-function showInventory() {
-  inventoryPopup.innerHTML = `<h3>Your Items</h3>`;
-  if (playerItems.length === 0) {
-    inventoryPopup.innerHTML += `<p>No items collected yet.</p>`;
-  } else {
-    playerItems.forEach(item => {
-      const itemDiv = document.createElement('div');
-      itemDiv.className = 'inventory-item';
-      itemDiv.innerHTML = `<strong style="color:${item.rarity?.color || 'white'}">${item.name || item.id}</strong><br><small>${item.description || ''}</small>`;
-      inventoryPopup.appendChild(itemDiv);
-    });
-  }
-  inventoryPopup.style.display = 'block';
-}
-function hideInventory() {
-  inventoryPopup.style.display = 'none';
-}
-
 function updateHealth() {
   playerHealthDisplay.textContent = `Player Health: ${playerHealth}`;
   enemyHealthDisplay.textContent = `Enemy Health: ${enemyHealth}`;
@@ -86,37 +55,37 @@ const allItems = [
   // COMMON
   { id: "smallSword", name: "Small Sword", description: "+1 Player Attack Count", rarity: RARITY.COMMON, applyEffect() { playerAttackCount += 1; } },
   { id: "leatherShield", name: "Leather Shield", description: "+5 Player HP", rarity: RARITY.COMMON, applyEffect() { playerHealth += 5; updateHealth(); } },
-  { id: "vitalLeaf", name: "Vital Leaf", description: "Recover +3 HP per player attack", rarity: RARITY.COMMON, applyEffect() { playerItems.push({ id: "vitalLeafEffect", name: "Vital Leaf", description: "Recover +3 HP per player attack" }); } },
-  { id: "tinyRing", name: "Tiny Lucky Ring", description: "5% chance to ignore enemy damage", rarity: RARITY.COMMON, applyEffect() { playerItems.push({ id: "tinyRingEffect", name: "Tiny Lucky Ring", description: "5% chance to ignore enemy damage" }); } },
+  { id: "vitalLeaf", name: "Vital Leaf", description: "Recover +3 HP per player attack", rarity: RARITY.COMMON, applyEffect() { playerItems.push({ id: "vitalLeafEffect" }); } },
+  { id: "tinyRing", name: "Tiny Lucky Ring", description: "5% chance to ignore enemy damage", rarity: RARITY.COMMON, applyEffect() { playerItems.push({ id: "tinyRingEffect" }); } },
   { id: "scoutGem", name: "Scout Gem", description: "Guarantees 1 safe number from 35–40", rarity: RARITY.COMMON, range: [35, 40], applyEffect() { playerItems.push(this); } },
-  { id: "steadyBoots", name: "Steady Boots", description: "Take -2 damage from enemy attacks", rarity: RARITY.COMMON, applyEffect() { playerItems.push({ id: "steadyBootsEffect", name: "Steady Boots", description: "Take -2 damage from enemy attacks" }); } },
-  { id: "minorFocus", name: "Minor Focus", description: "+2 Enemy HP damage per hit", rarity: RARITY.COMMON, applyEffect() { playerItems.push({ id: "minorFocusEffect", name: "Minor Focus", description: "+2 Enemy HP damage per hit" }); } },
-  { id: "lightArmor", name: "Light Armor", description: "+1 HP regen each round", rarity: RARITY.COMMON, applyEffect() { playerItems.push({ id: "lightArmorEffect", name: "Light Armor", description: "+1 HP regen each round" }); } },
+  { id: "steadyBoots", name: "Steady Boots", description: "Take -2 damage from enemy attacks", rarity: RARITY.COMMON, applyEffect() { playerItems.push({ id: "steadyBootsEffect" }); } },
+  { id: "minorFocus", name: "Minor Focus", description: "+2 Enemy HP damage per hit", rarity: RARITY.COMMON, applyEffect() { playerItems.push({ id: "minorFocusEffect" }); } },
+  { id: "lightArmor", name: "Light Armor", description: "+1 HP regen each round", rarity: RARITY.COMMON, applyEffect() { playerItems.push({ id: "lightArmorEffect" }); } },
   { id: "crudePotion", name: "Crude Potion", description: "+10 HP instantly", rarity: RARITY.COMMON, applyEffect() { playerHealth = Math.min(playerHealth + 10, BASE_PLAYER_HEALTH_COUNT); updateHealth(); } },
-  { id: "swiftCharm", name: "Swift Charm", description: "+1 extra player attack each even level", rarity: RARITY.COMMON, applyEffect() { playerItems.push({ id: "swiftCharmEffect", name: "Swift Charm", description: "+1 extra player attack each even level" }); } },
+  { id: "swiftCharm", name: "Swift Charm", description: "+1 extra player attack each even level", rarity: RARITY.COMMON, applyEffect() { playerItems.push({ id: "swiftCharmEffect" }); } },
 
   // RARE
   { id: "ironSword", name: "Iron Sword", description: "+2 Player Attack Count", rarity: RARITY.RARE, applyEffect() { playerAttackCount += 2; } },
   { id: "ironShield", name: "Iron Shield", description: "+15 Player HP", rarity: RARITY.RARE, applyEffect() { playerHealth += 15; updateHealth(); } },
-  { id: "luckyRing", name: "Lucky Ring", description: "10% chance to ignore enemy damage", rarity: RARITY.RARE, applyEffect() { playerItems.push({ id: "luckyRingEffect", name: "Lucky Ring", description: "10% chance to ignore enemy damage" }); } },
-  { id: "bloodCharm", name: "Blood Charm", description: "Heal +5 HP when you damage enemy", rarity: RARITY.RARE, applyEffect() { playerItems.push({ id: "bloodCharmEffect", name: "Blood Charm", description: "Heal +5 HP when you damage enemy" }); } },
+  { id: "luckyRing", name: "Lucky Ring", description: "10% chance to ignore enemy damage", rarity: RARITY.RARE, applyEffect() { playerItems.push({ id: "luckyRingEffect" }); } },
+  { id: "bloodCharm", name: "Blood Charm", description: "Heal +5 HP when you damage enemy", rarity: RARITY.RARE, applyEffect() { playerItems.push({ id: "bloodCharmEffect" }); } },
   { id: "radarGem", name: "Radar Gem", description: "Guarantees 1 safe number from 20–25", rarity: RARITY.RARE, range: [20, 25], applyEffect() { playerItems.push(this); } },
-  { id: "strongBoots", name: "Strong Boots", description: "Take -5 damage from enemy attacks", rarity: RARITY.RARE, applyEffect() { playerItems.push({ id: "strongBootsEffect", name: "Strong Boots", description: "Take -5 damage from enemy attacks" }); } },
-  { id: "keenEye", name: "Keen Eye", description: "Shows one random enemy number", rarity: RARITY.RARE, applyEffect() { playerItems.push({ id: "keenEyeEffect", name: "Keen Eye", description: "Shows one random enemy number" }); } },
-  { id: "bronzeArmor", name: "Bronze Armor", description: "+2 HP regen each round", rarity: RARITY.RARE, applyEffect() { playerItems.push({ id: "bronzeArmorEffect", name: "Bronze Armor", description: "+2 HP regen each round" }); } },
-  { id: "ragePotion", name: "Rage Potion", description: "+10 Player Attack for next round", rarity: RARITY.RARE, applyEffect() { playerItems.push({ id: "ragePotionEffect", name: "Rage Potion", description: "+10 Player Attack for next round" }); } },
-  { id: "lifeAmulet", name: "Life Amulet", description: "Revive once with 50% HP", rarity: RARITY.RARE, applyEffect() { playerItems.push({ id: "lifeAmuletEffect", name: "Life Amulet", description: "Revive once with 50% HP" }); } },
+  { id: "strongBoots", name: "Strong Boots", description: "Take -5 damage from enemy attacks", rarity: RARITY.RARE, applyEffect() { playerItems.push({ id: "strongBootsEffect" }); } },
+  { id: "keenEye", name: "Keen Eye", description: "Shows one random enemy number", rarity: RARITY.RARE, applyEffect() { playerItems.push({ id: "keenEyeEffect" }); } },
+  { id: "bronzeArmor", name: "Bronze Armor", description: "+2 HP regen each round", rarity: RARITY.RARE, applyEffect() { playerItems.push({ id: "bronzeArmorEffect" }); } },
+  { id: "ragePotion", name: "Rage Potion", description: "+10 Player Attack for next round", rarity: RARITY.RARE, applyEffect() { playerItems.push({ id: "ragePotionEffect" }); } },
+  { id: "lifeAmulet", name: "Life Amulet", description: "Revive once with 50% HP", rarity: RARITY.RARE, applyEffect() { playerItems.push({ id: "lifeAmuletEffect" }); } },
 
   // EPIC
   { id: "crystalSword", name: "Crystal Sword", description: "+3 Player Attack Count", rarity: RARITY.EPIC, applyEffect() { playerAttackCount += 3; } },
-  { id: "holyCharm", name: "Holy Charm", description: "Heal +10 HP when damaging enemy", rarity: RARITY.EPIC, applyEffect() { playerItems.push({ id: "holyCharmEffect", name: "Holy Charm", description: "Heal +10 HP when damaging enemy" }); } },
+  { id: "holyCharm", name: "Holy Charm", description: "Heal +10 HP when damaging enemy", rarity: RARITY.EPIC, applyEffect() { playerItems.push({ id: "holyCharmEffect" }); } },
   { id: "divineRadar", name: "Divine Radar", description: "Guarantees 2 safe numbers from 10–20", rarity: RARITY.EPIC, range: [10, 20], applyEffect() { playerItems.push(this); } },
-  { id: "adamantArmor", name: "Adamant Armor", description: "Take -8 damage per enemy hit", rarity: RARITY.EPIC, applyEffect() { playerItems.push({ id: "adamantArmorEffect", name: "Adamant Armor", description: "Take -8 damage per enemy hit" }); } },
-  { id: "focusTalisman", name: "Focus Talisman", description: "+5 damage to enemy HP per hit", rarity: RARITY.EPIC, applyEffect() { playerItems.push({ id: "focusTalismanEffect", name: "Focus Talisman", description: "+5 damage to enemy HP per hit" }); } },
+  { id: "adamantArmor", name: "Adamant Armor", description: "Take -8 damage per enemy hit", rarity: RARITY.EPIC, applyEffect() { playerItems.push({ id: "adamantArmorEffect" }); } },
+  { id: "focusTalisman", name: "Focus Talisman", description: "+5 damage to enemy HP per hit", rarity: RARITY.EPIC, applyEffect() { playerItems.push({ id: "focusTalismanEffect" }); } },
 
   // LEGENDARY
-  { id: "phoenixHeart", name: "Phoenix Heart", description: "Revive once with full HP", rarity: RARITY.LEGENDARY, applyEffect() { playerItems.push({ id: "phoenixHeartEffect", name: "Phoenix Heart", description: "Revive once with full HP" }); } },
-  { id: "godblade", name: "Godblade", description: "+5 Attack Count, +10 damage per hit", rarity: RARITY.LEGENDARY, applyEffect() { playerAttackCount += 5; playerItems.push({ id: "godbladeEffect", name: "Godblade", description: "+10 damage per hit" }); } },
+  { id: "phoenixHeart", name: "Phoenix Heart", description: "Revive once with full HP", rarity: RARITY.LEGENDARY, applyEffect() { playerItems.push({ id: "phoenixHeartEffect" }); } },
+  { id: "godblade", name: "Godblade", description: "+5 Attack Count, +10 damage per hit", rarity: RARITY.LEGENDARY, applyEffect() { playerAttackCount += 5; playerItems.push({ id: "godbladeEffect" }); } },
   { id: "omnigem", name: "Omni Gem", description: "Guarantees 3 safe numbers from 1–15", rarity: RARITY.LEGENDARY, range: [1, 15], applyEffect() { playerItems.push(this); } },
 ];
 
@@ -133,7 +102,151 @@ function getRandomUniqueNumbers(count, max, exclude = []) {
 let playerAttackNumbers = [];
 let enemyAttackNumbers = [];
 
-// CHARACTER CREATION OMITTED FOR BREVITY — same as your version...
+const hero = createCharacter(
+  'hero',
+  ['assets/ready_1.png', 'assets/ready_2.png', 'assets/ready_3.png'],
+  ['assets/attack_2.png', 'assets/attack_4.png', 'assets/attack_6.png'],
+  ['assets/death_1.png', 'assets/death_2.png', 'assets/death_3.png'],
+  '.hero-container'
+);
+
+const enemy = createCharacter(
+  'enemy',
+  ['assets/eReady_1.png', 'assets/eReady_2.png', 'assets/eReady_3.png'],
+  ['assets/eAttack_2.png', 'assets/eAttack_4.png', 'assets/eAttack_6.png'],
+  ['assets/eDeath_1.png', 'assets/eDeath_2.png', 'assets/eDeath_3.png'],
+  '.enemy-container'
+);
+
+updateHealth();
+updateLevel();
+
+// === PASSIVE ITEM EFFECTS ===
+function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
+  if (isPlayerAttack) {
+    if (playerItems.find(i => i.id === "minorFocusEffect")) enemyHealth -= 2;
+    if (playerItems.find(i => i.id === "focusTalismanEffect")) enemyHealth -= 5;
+    if (playerItems.find(i => i.id === "godbladeEffect")) enemyHealth -= 10;
+
+    if (playerItems.find(i => i.id === "bloodCharmEffect")) playerHealth = Math.min(playerHealth + 5, BASE_PLAYER_HEALTH_COUNT);
+    if (playerItems.find(i => i.id === "holyCharmEffect")) playerHealth = Math.min(playerHealth + 10, BASE_PLAYER_HEALTH_COUNT);
+    if (playerItems.find(i => i.id === "vitalLeafEffect")) playerHealth = Math.min(playerHealth + 3, BASE_PLAYER_HEALTH_COUNT);
+
+    updateHealth();
+  } else {
+    let damage = 20;
+    if (playerItems.find(i => i.id === "steadyBootsEffect")) damage -= 2;
+    if (playerItems.find(i => i.id === "strongBootsEffect")) damage -= 5;
+    if (playerItems.find(i => i.id === "adamantArmorEffect")) damage -= 8;
+
+    const lucky = playerItems.find(i => i.id === "luckyRingEffect") && Math.random() < 0.1;
+    const tinyLucky = playerItems.find(i => i.id === "tinyRingEffect") && Math.random() < 0.05;
+
+    if (!lucky && !tinyLucky) playerHealth -= damage;
+    updateHealth();
+  }
+}
+
+// === BUILD GRID ===
+function buildGrid() {
+  container.innerHTML = '';
+  container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+  playerAttackNumbers = getRandomUniqueNumbers(playerAttackCount, totalCells);
+  enemyAttackNumbers = getRandomUniqueNumbers(enemyAttackCount, totalCells, playerAttackNumbers);
+
+  // ✅ Radar-type items guarantee safe numbers
+  playerItems
+    .filter(i => i.range)
+    .forEach(i => {
+      const [min, max] = i.range;
+      const rangeNums = Array.from({ length: max - min + 1 }, (_, x) => min + x);
+      const available = rangeNums.filter(n => !playerAttackNumbers.includes(n) && !enemyAttackNumbers.includes(n));
+      const count = i.id === "divineRadar" ? 2 : i.id === "omnigem" ? 3 : 1;
+      const chosen = getRandomUniqueNumbers(Math.min(count, available.length), available.length);
+      chosen.forEach(index => playerAttackNumbers.push(available[index]));
+    });
+
+  let number = 1;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'grid-item';
+      cell.textContent = number++;
+
+      cell.addEventListener('click', () => {
+        if (cell.classList.contains('clicked') || gameOver) return;
+        cell.classList.add('clicked');
+        const cellNumber = parseInt(cell.textContent);
+
+        if (enemyAttackNumbers.includes(cellNumber)) {
+          cell.classList.add('eAttack');
+          applyPassiveItemEffectsOnAttack(false);
+          enemy.playAttack();
+          checkGameOver();
+        } else if (playerAttackNumbers.includes(cellNumber)) {
+          cell.classList.add('attack');
+          enemyHealth -= 20;
+          applyPassiveItemEffectsOnAttack(true);
+          hero.playAttack();
+          checkGameOver();
+        } else {
+          cell.classList.add('active');
+        }
+      });
+
+      container.appendChild(cell);
+    }
+  }
+}
+
+// === CHARACTER CREATION ===
+function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSelector, speed = 250) {
+  const el = document.getElementById(id);
+  const container = document.querySelector(containerSelector);
+  let frames = idleFrames;
+  let frameIndex = 0;
+  let animInterval = null;
+
+  function playAnimation(loop = true) {
+    clearInterval(animInterval);
+    frameIndex = 0;
+    animInterval = setInterval(() => {
+      frameIndex++;
+      if (!loop && frameIndex >= frames.length - 1) {
+        frameIndex = frames.length - 1;
+        el.src = frames[frameIndex];
+        clearInterval(animInterval);
+        return;
+      }
+      frameIndex = frameIndex % frames.length;
+      el.src = frames[frameIndex];
+    }, speed);
+  }
+
+  const character = {
+    playIdle() {
+      frames = idleFrames;
+      playAnimation(true);
+    },
+    playAttack() {
+      frames = attackFrames;
+      playAnimation(true);
+      container.classList.add('attacking');
+      setTimeout(() => {
+        container.classList.remove('attacking');
+        character.playIdle();
+      }, 600);
+    },
+    playDeath() {
+      frames = deathFrames;
+      playAnimation(false);
+    }
+  };
+
+  character.playIdle();
+  return character;
+}
 
 // === GAME END CHECK ===
 function checkGameOver() {
@@ -150,8 +263,8 @@ function checkGameOver() {
   }
 }
 
-// === SHOP SYSTEM ===
-function showShop(afterShopCallback = nextLevel) {
+// === MODIFIED SHOP SYSTEM ===
+function showShop(beforeNextLevel = false) {
   const popup = document.createElement('div');
   popup.className = 'end-screen';
 
@@ -180,11 +293,12 @@ function showShop(afterShopCallback = nextLevel) {
     msg.textContent = "No more items available!";
     msg.style.fontSize = "30px";
     itemContainer.appendChild(msg);
+
     const btn = document.createElement('button');
     btn.textContent = "Continue";
     btn.addEventListener('click', () => {
       popup.remove();
-      afterShopCallback();
+      if (beforeNextLevel) nextLevel();
     });
     itemContainer.appendChild(btn);
     return;
@@ -204,13 +318,53 @@ function showShop(afterShopCallback = nextLevel) {
       popup.remove();
       playerItems.push(item);
       item.applyEffect();
-      afterShopCallback();
+      if (beforeNextLevel) nextLevel();
     });
     itemContainer.appendChild(btn);
   });
 }
 
-// === END SCREEN ===
+
+// === SHOW ITEM INVENTORY POPUP ===
+function createInventoryButton() {
+  const btn = document.createElement('div');
+  btn.id = 'inventory-btn';
+  btn.textContent = '🎒 Items';
+  document.body.appendChild(btn);
+
+  const popup = document.createElement('div');
+  popup.id = 'inventory-popup';
+  popup.style.display = 'none';
+  document.body.appendChild(popup);
+
+  function updateInventoryPopup() {
+    popup.innerHTML = `<h2>Your Items</h2>`;
+    if (playerItems.length === 0) {
+      popup.innerHTML += `<p>No items collected yet.</p>`;
+    } else {
+      popup.innerHTML += playerItems.map(item => {
+        const name = item.name || item.id;
+        const desc = item.description || '(Passive effect)';
+        return `<div class="inventory-item"><strong>${name}</strong><br>${desc}</div>`;
+      }).join('');
+    }
+  }
+
+  btn.addEventListener('mouseenter', () => {
+    updateInventoryPopup();
+    popup.style.display = 'block';
+  });
+  btn.addEventListener('mouseleave', () => {
+    popup.style.display = 'none';
+  });
+  popup.addEventListener('mouseenter', () => popup.style.display = 'block');
+  popup.addEventListener('mouseleave', () => popup.style.display = 'none');
+}
+
+createInventoryButton();
+
+
+// === MODIFIED END SCREEN ===
 function showEndScreen(playerWon) {
   gameOver = true;
 
@@ -220,18 +374,13 @@ function showEndScreen(playerWon) {
     <div class="end-screen-content">
       <h1>${playerWon ? 'You Win!' : 'Game Over'}</h1>
       <p>${playerWon ? 'Prepare for the next battle...' : 'Try again from Level 1'}</p>
-      <div style="display:flex;flex-direction:column;gap:20px;">
+      <div style="display:flex;gap:20px;justify-content:center;">
         <button id="next-level-btn">${playerWon ? 'Next Level' : 'Retry'}</button>
-        <button id="main-menu-btn">Main Menu</button>
+        <button id="return-main-btn">Main Menu</button>
       </div>
     </div>
   `;
   document.body.appendChild(popup);
-
-  document.getElementById('main-menu-btn').addEventListener('click', () => {
-    popup.remove();
-    mainMenu.style.display = 'flex';
-  });
 
   document.getElementById('next-level-btn').addEventListener('click', () => {
     popup.remove();
@@ -241,8 +390,9 @@ function showEndScreen(playerWon) {
       enemyHealth += 10;
       if (level % 2 === 0) playerAttackCount += 1;
 
+      // ✅ Only show shop every 3rd level
       if (level % 3 === 0) {
-        showShop(() => nextLevel());
+        showShop(true); // show shop before next level
       } else {
         nextLevel();
       }
@@ -256,13 +406,19 @@ function showEndScreen(playerWon) {
       nextLevel();
     }
   });
+
+  // ✅ Return to main menu
+  document.getElementById('return-main-btn').addEventListener('click', () => {
+    popup.remove();
+    mainMenu.style.display = 'flex';
+  });
 }
 
 // === NEXT LEVEL FUNCTION ===
 function nextLevel() {
   gameOver = false;
   playerHealth = BASE_PLAYER_HEALTH_COUNT;
-  enemyHealth = BASE_ENEMY_HEALTH_COUNT + (level - 1) * 10;
+  enemyHealth = BASE_ENEMY_HEALTH_COUNT + (level - 1) * 10; // keep scaling visible
   updateHealth();
   updateLevel();
   hero.playIdle();
@@ -272,8 +428,8 @@ function nextLevel() {
 
 // === START GAME BUTTON ===
 startButton.addEventListener('click', () => {
-  mainMenu.style.display = 'none';
-  level = 1;
+  mainMenu.style.display = 'none'; // hide main menu
+  level = 1;                       // ensure starting at level 1
   playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
   enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
   playerHealth = BASE_PLAYER_HEALTH_COUNT;
@@ -281,5 +437,5 @@ startButton.addEventListener('click', () => {
   playerItems = [];
   updateHealth();
   updateLevel();
-  nextLevel();
+  nextLevel();                      // build first level grid
 });

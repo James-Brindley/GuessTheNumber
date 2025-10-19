@@ -87,34 +87,28 @@ html {
 /* === CHARACTERS === */
 .hero-container,
 .enemy-container {
-  position: fixed;
-  bottom: 45%;
-  width: 8vw;
-  height: 8vw;
-  z-index: 10;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: absolute;
+  bottom: 15vh;
+  width: 8vw;       /* scales with viewport */
+  height: 8vw;      /* keeps same aspect ratio */
 }
 
 .hero-container {
-  left: 35%;
-  transform: translateX(-50%);
+  left: 15vw;
 }
 
 .enemy-container {
-  right: 35%;
-  transform: translateX(50%);
+  right: 15vw;
 }
 
 .hero-container img,
 .enemy-container img {
   width: 100%;
   height: auto;
-  transform: scale(6);
-  transform-origin: bottom center;
   image-rendering: pixelated;
+  transform-origin: bottom center;
 }
+
 
 /* === ATTACK MOVEMENT === */
 @keyframes heroAttackMove {

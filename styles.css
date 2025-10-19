@@ -89,8 +89,8 @@ html {
 .enemy-container {
   position: absolute;
   bottom: 15vh;
-  width: 48vw;       /* scales with viewport */
-  height: 48vw;      /* keeps same aspect ratio */
+  width: 30vw;       /* scales with viewport */
+  height: 30vw;      /* keeps same aspect ratio */
 }
 
 .hero-container {
@@ -277,27 +277,4 @@ html {
   background: #66bb6a;
   transform: scale(1.05);
   transition: 0.2s;
-}
-
-/* === MOBILE OPTIMIZATION === */
-@media (max-width: 900px) {
-  html {
-    font-size: calc(1vw + 1vh);
-  }
-
-  .hero-container,
-  .enemy-container {
-    width: 14vw;
-    height: 14vw;
-  }
-
-  #grid-container {
-    width: 95vw;
-    font-size: 2rem;
-  }
-
-  .end-screen h1,
-  .menu-content h1 {
-    font-size: 6rem;
-  }
 }

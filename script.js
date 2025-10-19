@@ -318,7 +318,6 @@ function showShop() {
       popup.remove();
       playerItems.push(item);
       item.applyEffect();
-      nextLevel();
     });
     itemContainer.appendChild(btn);
   });
@@ -327,6 +326,13 @@ function showShop() {
 // === END SCREEN ===
 function showEndScreen(playerWon) {
   gameOver = true;
+  
+  if (level % 3 === 0) {
+        showShop();
+      }
+  else {
+    
+  }
 
   const popup = document.createElement('div');
   popup.className = 'end-screen';
@@ -349,6 +355,7 @@ function showEndScreen(playerWon) {
       if (level % 2 === 0) {
         playerAttackCount += 1; // +1 player attack every 2 levels
       }
+      nextLevel();
     } else {
       // === Reset everything on loss ===
       level = 1;

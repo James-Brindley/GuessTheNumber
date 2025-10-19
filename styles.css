@@ -272,10 +272,6 @@ body {
   padding: 10px 15px;
   font-family: pixelText;
   transition: 0.3s;
-  appearance: none;
-  -webkit-appearance: none;
-  box-shadow: none;
-  outline: none;  
 }
 
 #inventory-button:hover {

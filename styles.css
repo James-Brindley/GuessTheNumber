@@ -88,9 +88,9 @@ html {
 .hero-container,
 .enemy-container {
   position: absolute;
-  bottom: 15vh;
-  width: 30vw;       /* scales with viewport */
-  height: 30vw;      /* keeps same aspect ratio */
+  bottom: 30vh;
+  width: 28vw;       /* scales with viewport */
+  height: 28vw;      /* keeps same aspect ratio */
 }
 
 .hero-container {

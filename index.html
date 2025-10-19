@@ -8,20 +8,28 @@
 </head>
 <body>
 
-    <div class="health-bar-container">
-        <div class="player-health" id="player-health-display">Player Health: 100</div>
-        <div class="enemy-health" id="enemy-health-display">Enemy Health: 100</div>
-    </div>
+  <div class="health-bar-container">
+      <div class="player-health" id="player-health-display">Player Health: 100</div>
+      <div class="enemy-health" id="enemy-health-display">Enemy Health: 100</div>
+  </div>
 
-    <div class="hero-container">
-        <img id="hero" src="assets/ready_1.png" alt="Hero">
-    </div>
+  <div class="hero-container">
+      <img id="hero" src="assets/ready_1.png" alt="Hero">
+  </div>
 
-    <div class="enemy-container">
-      <img id="enemy" src="assets/eReady_1.png" alt="Enemy">
-    </div>
+  <div class="enemy-container">
+    <img id="enemy" src="assets/eReady_1.png" alt="Enemy">
+  </div>
 
   <div id="grid-container"></div>
+
+  <!-- ✅ NEW: main menu container -->
+  <div id="main-menu" class="menu-screen">
+    <div class="menu-content">
+      <h1>Guess The Dungeon</h1>
+      <button id="start-game-btn">Start Game</button>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

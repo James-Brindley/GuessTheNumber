@@ -208,3 +208,48 @@ body {
   text-shadow: 3px 3px 0px black;
   z-index: 100;
 }
+
+/* === MAIN MENU === */
+.menu-screen {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  flex-direction: column;
+  font-family: pixelText;
+  color: white;
+  text-align: center;
+}
+
+.menu-content {
+  background: rgba(0, 0, 0, 0.6);
+  border: 4px solid white;
+  border-radius: 20px;
+  padding: 100px 150px;
+  box-shadow: 0 0 30px #ffffff55;
+}
+
+.menu-content h1 {
+  font-size: 120px;
+  margin-bottom: 40px;
+  text-shadow: 4px 4px 0px #000000aa;
+}
+
+.menu-content button {
+  font-size: 60px;
+  padding: 25px 80px;
+  background: #4CAF50;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-family: pixelText;
+}
+
+.menu-content button:hover {
+  background: #66bb6a;
+  transform: scale(1.05);
+  transition: 0.2s;
+}

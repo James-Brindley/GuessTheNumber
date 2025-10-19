@@ -1,31 +1,30 @@
 const cols = 15;
 const rows = 4;
 
-// --- CHANGED: make these mutable so we can increase them each level ---
-const BASE_PLAYER_ATTACK_COUNT = 10; // base values to reset on death
+const BASE_PLAYER_ATTACK_COUNT = 10;
 const BASE_ENEMY_ATTACK_COUNT = 5;
 
-let playerAttackCount = BASE_PLAYER_ATTACK_COUNT; // was const before
-let enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;   // was const before
+let playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
+let enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
 
 const totalCells = cols * rows;
 
-// === HEALTH ===
 const BASE_PLAYER_HEALTH_COUNT = 100;
 const BASE_ENEMY_HEALTH_COUNT = 100;
 
 let playerHealth = BASE_PLAYER_HEALTH_COUNT;
 let enemyHealth = BASE_ENEMY_HEALTH_COUNT;
 
-// === LEVEL ===
-let level = 1; // ✅ added
+let level = 1;
+let gameOver = false;
 
 // === UI ELEMENTS ===
 const playerHealthDisplay = document.getElementById('player-health-display');
 const enemyHealthDisplay = document.getElementById('enemy-health-display');
 const container = document.getElementById('grid-container');
+const mainMenu = document.getElementById('main-menu');
+const startButton = document.getElementById('start-game-btn');
 
-// ✅ NEW: level display element (keeps changes minimal — created dynamically)
 const levelDisplay = document.createElement('div');
 levelDisplay.id = 'level-display';
 levelDisplay.textContent = `Level ${level}`;
@@ -36,7 +35,6 @@ function updateHealth() {
   enemyHealthDisplay.textContent = `Enemy Health: ${enemyHealth}`;
 }
 
-// ✅ NEW: update level display
 function updateLevel() {
   levelDisplay.textContent = `Level ${level}`;
 }
@@ -74,22 +72,14 @@ const enemy = createCharacter(
 updateHealth();
 updateLevel();
 
-let gameOver = false;
-
-// === BUILD GRID ===
 function buildGrid() {
-  container.innerHTML = ''; // clear old grid
+  container.innerHTML = '';
   container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
 
-  // generate new random attack numbers using current mutable counts
   playerAttackNumbers = getRandomUniqueNumbers(playerAttackCount, totalCells);
   enemyAttackNumbers = getRandomUniqueNumbers(enemyAttackCount, totalCells, playerAttackNumbers);
 
-  console.log(`Player Attack Count: ${playerAttackCount}`);
-  console.log(`Enemy Attack Count: ${enemyAttackCount}`);
-
   let number = 1;
-
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const cell = document.createElement('div');
@@ -98,7 +88,6 @@ function buildGrid() {
 
       cell.addEventListener('click', () => {
         if (cell.classList.contains('clicked') || gameOver) return;
-
         cell.classList.add('clicked');
         const cellNumber = parseInt(cell.textContent);
 
@@ -124,9 +113,6 @@ function buildGrid() {
   }
 }
 
-buildGrid();
-
-// === CHARACTER CREATION FUNCTION ===
 function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSelector, speed = 250) {
   const el = document.getElementById(id);
   const container = document.querySelector(containerSelector);
@@ -137,17 +123,14 @@ function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSel
   function playAnimation(loop = true) {
     clearInterval(animInterval);
     frameIndex = 0;
-
     animInterval = setInterval(() => {
       frameIndex++;
-
       if (!loop && frameIndex >= frames.length - 1) {
         frameIndex = frames.length - 1;
         el.src = frames[frameIndex];
         clearInterval(animInterval);
         return;
       }
-
       frameIndex = frameIndex % frames.length;
       el.src = frames[frameIndex];
     }, speed);
@@ -169,7 +152,7 @@ function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSel
     },
     playDeath() {
       frames = deathFrames;
-      playAnimation(false); // no loop — play once and hold last frame
+      playAnimation(false);
     }
   };
 
@@ -204,52 +187,69 @@ function showEndScreen(playerWon) {
       <p>${(level - 1 % 2) === 0 ? 'Enemy +1 Attack Square' : 'Enemy & Player +1 Attack Square'}</p>
       <p>Enemy +10 HP</p>
       <button id="next-level-btn">${playerWon ? 'Next Level' : 'Restart'}</button>
+      <br><br>
+      <button id="main-menu-btn">Main Menu</button>
     </div>
   `;
   document.body.appendChild(popup);
 
   document.getElementById('next-level-btn').addEventListener('click', () => {
     popup.remove();
-
-    if (playerWon) {
-      level++; // increase level on win
-    } else {
-      level = 1; // reset level on loss
-      // reset attack counts to base when player loses
-      playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
-      enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
-      enemyHealth = BASE_ENEMY_HEALTH_COUNT
-      // optionally reset enemyHealth to base (we'll set health in nextLevel)
-    }
-
+    if (playerWon) level++;
+    else resetGameToBase();
     nextLevel();
+  });
+
+  document.getElementById('main-menu-btn').addEventListener('click', () => {
+    popup.remove();
+    showMainMenu();
   });
 }
 
 // === NEXT LEVEL FUNCTION ===
 function nextLevel() {
   gameOver = false;
-
-  // If level > 1 apply scaling; if level === 1 we've already reset counts above on loss
   if (level > 1) {
-    // increase enemy attack count by 1
     enemyAttackCount += 1;
-
-    // every 2nd level give player +1 attack
-    if ((level - 1) % 2 === 0) {
-      playerAttackCount += 1;
-    }
-
-    console.log(`Level ${level} — Player Attack Count: ${playerAttackCount}, Enemy Attack Count: ${enemyAttackCount}`);
+    if ((level - 1) % 2 === 0) playerAttackCount += 1;
   }
-
-  // reset health each level (player and enemy)
   playerHealth = BASE_PLAYER_HEALTH_COUNT;
-  enemyHealth = BASE_ENEMY_HEALTH_COUNT + (10 * (level-1)); // ensure enemyHealth is at least 100 if not increased
-
+  enemyHealth = BASE_ENEMY_HEALTH_COUNT + (10 * (level - 1));
   updateHealth();
-  updateLevel(); // refresh display
+  updateLevel();
   hero.playIdle();
   enemy.playIdle();
   buildGrid();
+}
+
+// === MAIN MENU HANDLING ===
+startButton.addEventListener('click', () => {
+  mainMenu.style.display = 'none';
+  startNewGame();
+});
+
+function startNewGame() {
+  resetGameToBase();
+  buildGrid();
+  updateHealth();
+  updateLevel();
+  hero.playIdle();
+  enemy.playIdle();
+}
+
+function showMainMenu() {
+  mainMenu.style.display = 'flex';
+  container.innerHTML = '';
+  resetGameToBase();
+}
+
+function resetGameToBase() {
+  playerHealth = BASE_PLAYER_HEALTH_COUNT;
+  enemyHealth = BASE_ENEMY_HEALTH_COUNT;
+  playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
+  enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
+  level = 1;
+  updateHealth();
+  updateLevel();
+  gameOver = false;
 }

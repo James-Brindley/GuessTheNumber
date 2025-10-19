@@ -51,8 +51,6 @@ const bossSprites = {
 
 
 // === UI ELEMENTS ===
-const playerHealthDisplay = document.getElementById('player-health-display');
-const enemyHealthDisplay = document.getElementById('enemy-health-display');
 const container = document.getElementById('grid-container');
 const mainMenu = document.getElementById('main-menu');
 const startButton = document.getElementById('start-game-btn');
@@ -63,8 +61,19 @@ levelDisplay.textContent = `Level ${level}`;
 document.body.appendChild(levelDisplay);
 
 function updateHealth() {
-  playerHealthDisplay.textContent = `Player Health: ${playerHealth}`;
-  enemyHealthDisplay.textContent = `Enemy Health: ${enemyHealth}`;
+  const playerFill = document.querySelector('.player-health-fill');
+  const enemyFill = document.querySelector('.enemy-health-fill');
+  const playerTip = document.querySelector('.player-tooltip');
+  const enemyTip = document.querySelector('.enemy-tooltip');
+
+  const playerPercent = Math.max(0, (playerHealth / playerMaxHealth) * 100);
+  const enemyPercent = Math.max(0, (enemyHealth / enemyMaxHealth) * 100);
+
+  playerFill.style.width = playerPercent + '%';
+  enemyFill.style.width = enemyPercent + '%';
+
+  playerTip.textContent = `${playerHealth} / ${playerMaxHealth}`;
+  enemyTip.textContent = `${enemyHealth} / ${enemyMaxHealth}`;
 }
 
 function updateLevel() {

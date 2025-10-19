@@ -330,3 +330,67 @@ body {
   color: #ff3838 !important;
   text-shadow: 0 0 15px #ff0000;
 }
+
+/* === HEALTH BARS === */
+.health-wrapper {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.health-label {
+  font-size: 28px;
+  margin-bottom: 5px;
+  text-shadow: 2px 2px 0 black;
+}
+
+.health-bar-bg {
+  width: 100%;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 3px solid white;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.health-bar-fill {
+  height: 100%;
+  width: 100%;
+  transition: width 0.3s ease-out;
+  border-radius: 7px;
+}
+
+/* Player health is green, enemy is red */
+.player-health-fill {
+  background: linear-gradient(90deg, #2ecc71, #27ae60);
+}
+
+.enemy-health-fill {
+  background: linear-gradient(90deg, #e74c3c, #c0392b);
+}
+
+/* Tooltip */
+.health-tooltip {
+  display: none;
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 8px 15px;
+  border-radius: 8px;
+  font-size: 22px;
+  pointer-events: none;
+  white-space: nowrap;
+  border: 2px solid white;
+  text-shadow: 1px 1px 0 black;
+  z-index: 50;
+}
+
+.health-bar-bg:hover .health-tooltip {
+  display: block;
+}

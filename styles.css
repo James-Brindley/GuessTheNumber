@@ -253,3 +253,63 @@ body {
   transform: scale(1.05);
   transition: 0.2s;
 }
+
+/* === INVENTORY PANEL === */
+#inventory-wrapper {
+  position: fixed;
+  top: 30%;
+  left: 0;
+  z-index: 2000;
+  font-family: pixelText;
+}
+
+#inventory-button {
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: 3px solid white;
+  border-radius: 0 10px 10px 0;
+  padding: 20px;
+  font-size: 40px;
+  cursor: pointer;
+  transition: 0.3s;
+  text-shadow: 2px 2px 0 black;
+}
+
+#inventory-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#inventory-panel {
+  position: absolute;
+  top: 0;
+  left: 70px;
+  width: 260px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 3px solid white;
+  border-radius: 10px;
+  padding: 15px;
+  color: white;
+  opacity: 0;
+  transform: translateX(-20px);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#inventory-panel h2 {
+  margin-top: 0;
+  font-size: 28px;
+  text-align: center;
+}
+
+#inventory-panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 22px;
+}
+
+#inventory-wrapper:hover #inventory-panel {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}

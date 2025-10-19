@@ -54,6 +54,7 @@ html {
   left: 50%;
   transform: translateX(-50%);
   grid-template-columns: repeat(15, 1fr);
+  height: 80vw;
   width: 80vw;
   max-width: 90vw;
   font-size: 2.8rem;
@@ -88,7 +89,7 @@ html {
 .hero-container,
 .enemy-container {
   position: absolute;
-  bottom: 30vh;
+  bottom: 40vh;
   width: 28vw;       /* scales with viewport */
   height: 28vw;      /* keeps same aspect ratio */
 }

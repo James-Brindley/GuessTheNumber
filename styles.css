@@ -266,7 +266,6 @@ body {
   font-size: 40px;
   background: rgba(0, 0, 0, 0.15);
   color: white;
-  border-radius: 10px;
   cursor: pointer;
   padding: 10px 15px;
   font-family: pixelText;
@@ -283,7 +282,6 @@ body {
   top: 70px;
   left: 0;
   background: rgba(0, 0, 0, 0.15);
-  border-radius: 15px;
   padding: 20px;
   color: white;
   font-family: pixelText;
@@ -291,7 +289,6 @@ body {
   width: 300px;
   max-height: 400px;
   overflow-y: auto;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
   text-align: left;
 }
 

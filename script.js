@@ -17,6 +17,7 @@ let enemyHealth = BASE_ENEMY_HEALTH_COUNT;
 
 let level = 1;
 let gameOver = false;
+let playerItems = []; // ✅ player’s current run items
 
 // === UI ELEMENTS ===
 const playerHealthDisplay = document.getElementById('player-health-display');
@@ -39,6 +40,40 @@ function updateLevel() {
   levelDisplay.textContent = `Level ${level}`;
 }
 
+// === ITEMS ===
+const allItems = [
+  {
+    id: "sword",
+    name: "Sword of Fury",
+    description: "+2 Player Attack Count",
+    applyEffect() { playerAttackCount += 2; }
+  },
+  {
+    id: "shield",
+    name: "Iron Shield",
+    description: "+10 Player HP",
+    applyEffect() { playerHealth += 10; updateHealth(); }
+  },
+  {
+    id: "bloodCharm",
+    name: "Blood Charm",
+    description: "Heal +5 HP when you damage enemy",
+    applyEffect() { /* handled during attack */ }
+  },
+  {
+    id: "luckyRing",
+    name: "Lucky Ring",
+    description: "10% chance to ignore enemy damage",
+    applyEffect() { /* passive effect handled */ }
+  },
+  {
+    id: "radarGem",
+    name: "Radar Gem",
+    description: "Guarantees 1 green safe number per round",
+    applyEffect() { /* applied during grid generation */ }
+  },
+];
+
 // === RANDOM NUMBERS ===
 function getRandomUniqueNumbers(count, max, exclude = []) {
   const numbers = new Set();
@@ -52,7 +87,6 @@ function getRandomUniqueNumbers(count, max, exclude = []) {
 let playerAttackNumbers = [];
 let enemyAttackNumbers = [];
 
-// === CREATE CHARACTERS ===
 const hero = createCharacter(
   'hero',
   ['assets/ready_1.png', 'assets/ready_2.png', 'assets/ready_3.png'],
@@ -79,6 +113,12 @@ function buildGrid() {
   playerAttackNumbers = getRandomUniqueNumbers(playerAttackCount, totalCells);
   enemyAttackNumbers = getRandomUniqueNumbers(enemyAttackCount, totalCells, playerAttackNumbers);
 
+  // ✅ If player has radar gem, add 1 guaranteed safe (green) number
+  if (playerItems.find(i => i.id === "radarGem")) {
+    const safeNum = getRandomUniqueNumbers(1, totalCells, [...playerAttackNumbers, ...enemyAttackNumbers])[0];
+    playerAttackNumbers.push(safeNum);
+  }
+
   let number = 1;
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
@@ -92,14 +132,25 @@ function buildGrid() {
         const cellNumber = parseInt(cell.textContent);
 
         if (enemyAttackNumbers.includes(cellNumber)) {
-          cell.classList.add('eAttack');
-          playerHealth -= 20;
-          updateHealth();
+          // Lucky ring chance to avoid damage
+          const hasLucky = playerItems.find(i => i.id === "luckyRing");
+          const avoid = hasLucky && Math.random() < 0.1;
+
+          if (!avoid) {
+            cell.classList.add('eAttack');
+            playerHealth -= 20;
+            updateHealth();
+          }
           enemy.playAttack();
           checkGameOver();
         } else if (playerAttackNumbers.includes(cellNumber)) {
           cell.classList.add('attack');
           enemyHealth -= 20;
+          // Blood charm healing
+          if (playerItems.find(i => i.id === "bloodCharm")) {
+            playerHealth = Math.min(playerHealth + 5, BASE_PLAYER_HEALTH_COUNT);
+            updateHealth();
+          }
           updateHealth();
           hero.playAttack();
           checkGameOver();
@@ -113,6 +164,7 @@ function buildGrid() {
   }
 }
 
+// === CHARACTER CREATION ===
 function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSelector, speed = 250) {
   const el = document.getElementById(id);
   const container = document.querySelector(containerSelector);
@@ -175,6 +227,40 @@ function checkGameOver() {
   }
 }
 
+// === SHOP SYSTEM ===
+function showShop() {
+  const popup = document.createElement('div');
+  popup.className = 'end-screen';
+
+  // Choose 3 random items the player doesn't have
+  const available = allItems.filter(item => !playerItems.some(pi => pi.id === item.id));
+  const shopChoices = getRandomUniqueNumbers(Math.min(3, available.length), available.length)
+    .map(i => available[i]);
+
+  popup.innerHTML = `
+    <div class="end-screen-content">
+      <h1>Item Shop</h1>
+      <p>Choose one item to aid your journey</p>
+      <div id="shop-items" style="display:flex;flex-direction:column;gap:20px;"></div>
+    </div>
+  `;
+  document.body.appendChild(popup);
+
+  const itemContainer = popup.querySelector('#shop-items');
+  shopChoices.forEach(item => {
+    const btn = document.createElement('button');
+    btn.textContent = `${item.name} - ${item.description}`;
+    btn.style.fontSize = '30px';
+    btn.addEventListener('click', () => {
+      popup.remove();
+      playerItems.push(item);
+      item.applyEffect();
+      nextLevel();
+    });
+    itemContainer.appendChild(btn);
+  });
+}
+
 // === END SCREEN POPUP ===
 function showEndScreen(playerWon) {
   gameOver = true;
@@ -195,9 +281,18 @@ function showEndScreen(playerWon) {
 
   document.getElementById('next-level-btn').addEventListener('click', () => {
     popup.remove();
-    if (playerWon) level++;
-    else resetGameToBase();
-    nextLevel();
+    if (playerWon) {
+      level++;
+      // ✅ Every 3rd level, show the shop instead of directly going next
+      if (level % 3 === 0) {
+        showShop();
+      } else {
+        nextLevel();
+      }
+    } else {
+      resetGameToBase();
+      nextLevel();
+    }
   });
 
   document.getElementById('main-menu-btn').addEventListener('click', () => {
@@ -249,6 +344,7 @@ function resetGameToBase() {
   playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
   enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
   level = 1;
+  playerItems = []; // ✅ reset inventory on new run
   updateHealth();
   updateLevel();
   gameOver = false;

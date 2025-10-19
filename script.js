@@ -334,38 +334,42 @@ function buildGrid() {
   }
 }
 
-// === CHARACTER CREATION ===
 function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSelector, speed = 250) {
   const el = document.getElementById(id);
   const container = document.querySelector(containerSelector);
-  let frames = idleFrames;
   let frameIndex = 0;
   let animInterval = null;
 
-  function playAnimation(loop = true) {
-    clearInterval(animInterval);
-    frameIndex = 0;
-    animInterval = setInterval(() => {
-      frameIndex++;
-      if (!loop && frameIndex >= frames.length - 1) {
-        frameIndex = frames.length - 1;
-        el.src = frames[frameIndex];
-        clearInterval(animInterval);
-        return;
-      }
-      frameIndex = frameIndex % frames.length;
-      el.src = frames[frameIndex];
-    }, speed);
-  }
-
   const character = {
+    idleFrames,
+    attackFrames,
+    deathFrames,
+    currentFrames: idleFrames,
+
+    playAnimation(loop = true) {
+      clearInterval(animInterval);
+      frameIndex = 0;
+      const frames = character.currentFrames;
+      animInterval = setInterval(() => {
+        frameIndex++;
+        if (!loop && frameIndex >= frames.length - 1) {
+          frameIndex = frames.length - 1;
+          el.src = frames[frameIndex];
+          clearInterval(animInterval);
+          return;
+        }
+        frameIndex = frameIndex % frames.length;
+        el.src = frames[frameIndex];
+      }, speed);
+    },
+
     playIdle() {
-      frames = idleFrames;
-      playAnimation(true);
+      character.currentFrames = character.idleFrames;
+      character.playAnimation(true);
     },
     playAttack() {
-      frames = attackFrames;
-      playAnimation(true);
+      character.currentFrames = character.attackFrames;
+      character.playAnimation(true);
       container.classList.add('attacking');
       setTimeout(() => {
         container.classList.remove('attacking');
@@ -373,14 +377,15 @@ function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSel
       }, 600);
     },
     playDeath() {
-      frames = deathFrames;
-      playAnimation(false);
+      character.currentFrames = character.deathFrames;
+      character.playAnimation(false);
     }
   };
 
   character.playIdle();
   return character;
 }
+
 
 function tryRevive() {
   const reviveItemIndex = playerItems.findIndex(i => i.reviveAtPercent);
@@ -567,6 +572,7 @@ function nextLevel() {
     enemy.idleFrames = bossSprites.idle;
     enemy.attackFrames = bossSprites.attack;
     enemy.deathFrames = bossSprites.death;
+    enemy.playIdle();
 
     // === Boss popup ===
     const bossPopup = document.createElement("div");
@@ -583,6 +589,7 @@ function nextLevel() {
     enemy.idleFrames = ['assets/eReady_1.png', 'assets/eReady_2.png', 'assets/eReady_3.png'];
     enemy.attackFrames = ['assets/eAttack_2.png', 'assets/eAttack_4.png', 'assets/eAttack_6.png'];
     enemy.deathFrames = ['assets/eDeath_1.png', 'assets/eDeath_2.png', 'assets/eDeath_3.png'];
+    enemy.playIdle();
   }
 
   // ✅ Always restore player regen and full HP setup

@@ -22,27 +22,7 @@ let level = 1;
 let gameOver = false;
 let playerItems = [];
 
-// === UI ELEMENTS ===
-const playerHealthDisplay = document.getElementById('player-health-display');
-const enemyHealthDisplay = document.getElementById('enemy-health-display');
-const container = document.getElementById('grid-container');
-const mainMenu = document.getElementById('main-menu');
-const startButton = document.getElementById('start-game-btn');
-
-const levelDisplay = document.createElement('div');
-levelDisplay.id = 'level-display';
-levelDisplay.textContent = `Level ${level}`;
-document.body.appendChild(levelDisplay);
-
-function updateHealth() {
-  playerHealthDisplay.textContent = `Player Health: ${playerHealth}`;
-  enemyHealthDisplay.textContent = `Enemy Health: ${enemyHealth}`;
-}
-
-function updateLevel() {
-  levelDisplay.textContent = `Level ${level}`;
-
-  // === BOSS SETTINGS ===
+// === BOSS SETTINGS ===
 let isBossLevel = false;
 
 // Optional: Adjust these as you balance later
@@ -68,6 +48,27 @@ const bossSprites = {
     'assets/bossDeath3.png'
   ]
 };
+
+
+// === UI ELEMENTS ===
+const playerHealthDisplay = document.getElementById('player-health-display');
+const enemyHealthDisplay = document.getElementById('enemy-health-display');
+const container = document.getElementById('grid-container');
+const mainMenu = document.getElementById('main-menu');
+const startButton = document.getElementById('start-game-btn');
+
+const levelDisplay = document.createElement('div');
+levelDisplay.id = 'level-display';
+levelDisplay.textContent = `Level ${level}`;
+document.body.appendChild(levelDisplay);
+
+function updateHealth() {
+  playerHealthDisplay.textContent = `Player Health: ${playerHealth}`;
+  enemyHealthDisplay.textContent = `Enemy Health: ${enemyHealth}`;
+}
+
+function updateLevel() {
+  levelDisplay.textContent = `Level ${level}`;
 }
 
 // === DYNAMIC HEALTH & DAMAGE CALCULATIONS ===
@@ -557,17 +558,17 @@ function nextLevel() {
   playerMaxHealth = getPlayerMaxHealth();
   enemyMaxHealth = getEnemyMaxHealth();
 
-  // ✅ If boss, multiply enemy HP and set boss sprite set
   if (isBossLevel) {
+    // === Boss stats ===
     enemyMaxHealth *= BOSS_MULTIPLIER.health;
     enemyHealth = enemyMaxHealth;
 
-    // Swap enemy animation to boss
+    // === Swap enemy animation to boss ===
     enemy.idleFrames = bossSprites.idle;
     enemy.attackFrames = bossSprites.attack;
     enemy.deathFrames = bossSprites.death;
 
-    // Optional: display boss name popup
+    // === Boss popup ===
     const bossPopup = document.createElement("div");
     bossPopup.className = "revive-popup";
     bossPopup.style.background = "rgba(200, 0, 0, 0.9)";
@@ -575,21 +576,21 @@ function nextLevel() {
     bossPopup.textContent = "⚔️ Boss Appears!";
     document.body.appendChild(bossPopup);
     setTimeout(() => bossPopup.remove(), 2000);
-
   } else {
+    // === Normal enemy ===
     enemyHealth = enemyMaxHealth;
 
-    // Revert enemy to normal after boss level
     enemy.idleFrames = ['assets/eReady_1.png', 'assets/eReady_2.png', 'assets/eReady_3.png'];
     enemy.attackFrames = ['assets/eAttack_2.png', 'assets/eAttack_4.png', 'assets/eAttack_6.png'];
     enemy.deathFrames = ['assets/eDeath_1.png', 'assets/eDeath_2.png', 'assets/eDeath_3.png'];
   }
 
-  // ✅ Regenerate health each level if applicable
+  // ✅ Always restore player regen and full HP setup
   playerHealth = Math.min(playerMaxHealth, playerHealth + stats.regenPerRound);
 
   updateHealth();
 
+  // ✅ Visual boss cue
   if (isBossLevel) {
     enemyHealthDisplay.classList.add("boss-health");
   } else {

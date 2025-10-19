@@ -27,8 +27,8 @@ let isBossLevel = false;
 
 // Optional: Adjust these as you balance later
 const BOSS_MULTIPLIER = {
-  health: 3,     // Boss has 3x normal HP
-  damage: 2,     // Boss deals 2x base damage
+  health: 2,
+  damage: 1.5,
 };
 
 const bossSprites = {
@@ -674,4 +674,19 @@ inventoryButton.addEventListener('mouseenter', () => {
 inventoryContainer = document.getElementById('inventory-container');
 inventoryContainer.addEventListener('mouseleave', () => {
   inventoryPanel.style.display = 'none';
+});
+
+// === HOW TO PLAY MENU HANDLING ===
+const howToPlayBtn = document.getElementById("how-to-play-btn");
+const howToPlayScreen = document.getElementById("how-to-play-screen");
+const backToMenuBtn = document.getElementById("back-to-menu-btn");
+
+howToPlayBtn.addEventListener("click", () => {
+  mainMenu.style.display = "none";
+  howToPlayScreen.style.display = "flex";
+});
+
+backToMenuBtn.addEventListener("click", () => {
+  howToPlayScreen.style.display = "none";
+  mainMenu.style.display = "flex";
 });

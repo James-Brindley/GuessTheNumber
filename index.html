@@ -34,11 +34,35 @@
 
   <div id="grid-container"></div>
 
-  <!-- ✅ NEW: main menu container -->
+  <!-- ✅ MAIN MENU -->
   <div id="main-menu" class="menu-screen">
     <div class="menu-content">
-      <h1>Guess The Dungeon</h1>
-      <button id="start-game-btn">Start Game</button>
+      <h1 class="menu-title">Guess The Dungeon</h1>
+      <div class="menu-buttons">
+        <button id="start-game-btn">Start Game</button>
+        <button id="how-to-play-btn">How To Play</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ HOW TO PLAY SCREEN -->
+  <div id="how-to-play-screen" class="menu-screen" style="display: none;">
+    <div class="menu-content how-to-play">
+      <h1>How To Play</h1>
+      <div class="how-to-text">
+        <p>Welcome to <strong>Guess The Dungeon!</strong></p>
+        <p>You and your enemy each have hidden attack squares.</p>
+        <p>Click tiles to uncover them:</p>
+        <ul>
+          <li>🟩 Green tiles — Your attacks that damage the enemy.</li>
+          <li>🟥 Red tiles — Enemy attacks that damage you.</li>
+          <li>⬛ Gray tiles — Empty spaces.</li>
+        </ul>
+        <p>Defeat enemies to progress through levels.</p>
+        <p>Every few levels, you’ll visit a shop to buy helpful items.</p>
+        <p>Collect items to become stronger and reach the boss!</p>
+      </div>
+      <button id="back-to-menu-btn">Back to Menu</button>
     </div>
   </div>
 

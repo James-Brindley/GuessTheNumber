@@ -394,3 +394,58 @@ body {
 .health-bar-bg:hover .health-tooltip {
   display: block;
 }
+
+/* === MENU REWORK === */
+.menu-title {
+  font-size: 160px;
+  margin-bottom: 100px;
+  text-shadow: 6px 6px 0px #000000aa;
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+.menu-content {
+  position: relative;
+  top: -10vh; /* shifts the block upward slightly */
+  text-align: center;
+}
+
+/* How to Play layout */
+.how-to-play {
+  width: 60%;
+  max-width: 1000px;
+}
+
+.how-to-text {
+  font-size: 28px;
+  text-align: left;
+  color: #ffffff;
+  text-shadow: 2px 2px 0 black;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 15px;
+  padding: 30px;
+  margin-bottom: 50px;
+  line-height: 1.6;
+}
+
+.how-to-text ul {
+  list-style: none;
+  padding: 0;
+}
+
+.how-to-text li {
+  margin: 8px 0;
+}
+
+#back-to-menu-btn {
+  background: #2196F3;
+}
+
+#back-to-menu-btn:hover {
+  background: #42a5f5;
+}

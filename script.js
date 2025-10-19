@@ -298,7 +298,6 @@ function showShop() {
     btn.textContent = "Continue";
     btn.addEventListener('click', () => {
       popup.remove();
-      updateInventoryPanel();
       nextLevel();
     });
     itemContainer.appendChild(btn);
@@ -409,29 +408,47 @@ function resetGame() {
   level = 1;
   updateHealth();
   updateLevel();
-  updateInventoryPanel();
   gameOver = false;
 }
 
-// === INVENTORY PANEL UPDATE ===
-function updateInventoryPanel() {
-  const list = document.getElementById('inventory-list');
-  if (!list) return;
-  list.innerHTML = '';
+// === INVENTORY BUTTON LOGIC ===
+const inventoryButton = document.getElementById('inventory-button');
+const inventoryPanel = document.getElementById('inventory-panel');
 
+inventoryButton.addEventListener('mouseenter', () => {
+  // Build inventory list dynamically
+  inventoryPanel.innerHTML = '';
+  
   if (playerItems.length === 0) {
-    const none = document.createElement('li');
-    none.textContent = 'No items equipped';
-    none.style.color = 'gray';
-    list.appendChild(none);
-    return;
+    const none = document.createElement('div');
+    none.textContent = "No items collected yet!";
+    inventoryPanel.appendChild(none);
+  } else {
+    playerItems.forEach(item => {
+      // Determine rarity class
+      let rarityClass = 'common';
+      if (item.rarity === RARITY.RARE) rarityClass = 'rare';
+      else if (item.rarity === RARITY.EPIC) rarityClass = 'epic';
+      else if (item.rarity === RARITY.LEGENDARY) rarityClass = 'legendary';
+      
+      const div = document.createElement('div');
+      div.className = `inventory-item ${rarityClass}`;
+      div.textContent = `${item.name} – ${item.description}`;
+      inventoryPanel.appendChild(div);
+    });
   }
 
-  playerItems.forEach(item => {
-    const li = document.createElement('li');
-    li.textContent = item.name || item.id;
-    li.style.color = item.rarity ? item.rarity.color : 'white';
-    li.style.textShadow = '2px 2px 0 black';
-    list.appendChild(li);
-  });
-}
+  inventoryPanel.style.display = 'flex';
+});
+
+inventoryButton.addEventListener('mouseleave', () => {
+  inventoryPanel.style.display = 'none';
+});
+
+inventoryPanel.addEventListener('mouseenter', () => {
+  inventoryPanel.style.display = 'flex';
+});
+
+inventoryPanel.addEventListener('mouseleave', () => {
+  inventoryPanel.style.display = 'none';
+});

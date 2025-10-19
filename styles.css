@@ -58,6 +58,7 @@ body {
   cursor: pointer;
   transition: 0.2s;
   user-select: none;
+  border-radius: 15px;
 }
   
 .grid-item:hover {

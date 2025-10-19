@@ -395,11 +395,38 @@ body {
   display: block;
 }
 
-/* === MENU REWORK === */
+/* === FULLSCREEN MENUS === */
+.fullscreen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  flex-direction: column;
+  font-family: pixelText;
+  text-align: center;
+}
+
+/* Center container for content */
+.menu-inner {
+  width: 80%;
+  max-width: 1200px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Title placement: upper third */
 .menu-title {
-  font-size: 160px;
+  font-size: 180px;
   margin-bottom: 100px;
   text-shadow: 6px 6px 0px #000000aa;
+  transform: translateY(-20vh);
 }
 
 .menu-buttons {
@@ -407,30 +434,39 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 40px;
+  transform: translateY(-10vh);
 }
 
-.menu-content {
-  position: relative;
-  top: -10vh; /* shifts the block upward slightly */
-  text-align: center;
+.menu-buttons button {
+  font-size: 60px;
+  padding: 25px 80px;
+  background: #4CAF50;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-family: pixelText;
+  color: white;
+  transition: 0.2s;
 }
 
-/* How to Play layout */
-.how-to-play {
-  width: 60%;
-  max-width: 1000px;
+.menu-buttons button:hover {
+  background: #66bb6a;
+  transform: scale(1.05);
 }
 
+/* How-to screen text */
 .how-to-text {
   font-size: 28px;
   text-align: left;
-  color: #ffffff;
+  color: #fff;
   text-shadow: 2px 2px 0 black;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   border-radius: 15px;
-  padding: 30px;
-  margin-bottom: 50px;
+  padding: 40px 60px;
+  margin-bottom: 60px;
   line-height: 1.6;
+  width: 70%;
+  max-width: 900px;
 }
 
 .how-to-text ul {
@@ -443,9 +479,17 @@ body {
 }
 
 #back-to-menu-btn {
+  font-size: 50px;
+  padding: 20px 60px;
   background: #2196F3;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-family: pixelText;
+  transition: 0.2s;
 }
 
 #back-to-menu-btn:hover {
   background: #42a5f5;
+  transform: scale(1.05);
 }

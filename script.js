@@ -489,9 +489,13 @@ if (stats.regenPerRound > 0) {
 }
 
 
-window.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('start-game-btn').addEventListener('click', () => {
-    mainMenu.style.display = 'none';
+// === START GAME HANDLER ===
+document.addEventListener("DOMContentLoaded", () => {
+  const startButton = document.getElementById("start-game-btn");
+  if (!startButton) return; // safeguard
+  
+  startButton.addEventListener("click", () => {
+    mainMenu.style.display = "none";
     resetGame();
     nextLevel();
   });
@@ -541,16 +545,4 @@ inventoryButton.addEventListener('mouseenter', () => {
 inventoryContainer = document.getElementById('inventory-container');
 inventoryContainer.addEventListener('mouseleave', () => {
   inventoryPanel.style.display = 'none';
-});
-
-// === START GAME HANDLER ===
-document.addEventListener("DOMContentLoaded", () => {
-  const startButton = document.getElementById("start-game-btn");
-  if (!startButton) return; // safeguard
-  
-  startButton.addEventListener("click", () => {
-    mainMenu.style.display = "none";
-    resetGame();
-    nextLevel();
-  });
 });

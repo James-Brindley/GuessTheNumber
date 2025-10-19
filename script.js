@@ -591,6 +591,9 @@ function nextLevel() {
     bossPopup.textContent = "⚔️ Boss Appears!";
     document.body.appendChild(bossPopup);
     setTimeout(() => bossPopup.remove(), 2000);
+
+    // ✅ Optional: make enemy bar glow red
+    document.querySelector('.enemy-health-fill').style.boxShadow = "0 0 25px #ff0000";
   } else {
     // === Normal enemy ===
     enemyHealth = enemyMaxHealth;
@@ -599,21 +602,17 @@ function nextLevel() {
     enemy.attackFrames = ['assets/eAttack_2.png', 'assets/eAttack_4.png', 'assets/eAttack_6.png'];
     enemy.deathFrames = ['assets/eDeath_1.png', 'assets/eDeath_2.png', 'assets/eDeath_3.png'];
     enemy.playIdle();
+
+    // ✅ Remove boss glow when back to normal
+    document.querySelector('.enemy-health-fill').style.boxShadow = "none";
   }
 
   // ✅ Always restore player regen and full HP setup
   playerHealth = Math.min(playerMaxHealth, playerHealth + stats.regenPerRound);
 
   updateHealth();
-
-  // ✅ Visual boss cue
-  if (isBossLevel) {
-    enemyHealthDisplay.classList.add("boss-health");
-  } else {
-    enemyHealthDisplay.classList.remove("boss-health");
-  }
-
   updateLevel();
+
   hero.playIdle();
   enemy.playIdle();
   buildGrid();

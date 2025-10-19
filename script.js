@@ -460,33 +460,27 @@ function showEndScreen(playerWon) {
   });
 }
 
-// === NEXT LEVEL FUNCTION ===
 function nextLevel() {
   gameOver = false;
 
-  const stats = getPlayerStats(); // ✅ get regen and other bonuses
+  // ✅ Get player stats once
+  const stats = getPlayerStats();
 
   // ✅ Apply dynamic max HP and regen
   playerMaxHealth = getPlayerMaxHealth();
   enemyMaxHealth = getEnemyMaxHealth();
 
-  playerHealth = Math.min(getPlayerMaxHealth(), playerHealth + stats.regenPerRound);
-  enemyHealth = getEnemyMaxHealth();
+  // ✅ Regenerate health each level if applicable
+  playerHealth = Math.min(playerMaxHealth, playerHealth + stats.regenPerRound);
+  enemyHealth = enemyMaxHealth;
 
   updateHealth();
-
-  // ✅ Passive regeneration after each action
-const stats = getPlayerStats();
-if (stats.regenPerRound > 0) {
-  playerHealth = Math.min(playerHealth + stats.regenPerRound, getPlayerMaxHealth());
-  updateHealth();
-}
-
   updateLevel();
   hero.playIdle();
   enemy.playIdle();
   buildGrid();
 }
+
 
 
 // === START GAME HANDLER ===

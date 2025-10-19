@@ -119,72 +119,70 @@ const RARITY = {
 // === ALL ITEMS (fully compatible with new stat system) ===
 const allItems = [
   // COMMON
-  { id: "smallSword", name: "Small Sword", description: "+1 Player Attack Count", rarity: RARITY.COMMON,
+  { id: "smallSword", name: "Small Sword", description: "Gain +1 Attack Square", rarity: RARITY.COMMON,
     bonusAttackCount: 1, applyEffect() { playerAttackCount += 1; } },
-  { id: "leatherShield", name: "Leather Shield", description: "+5 Player HP", rarity: RARITY.COMMON,
+  { id: "leatherShield", name: "Leather Shield", description: "+5 Max HP", rarity: RARITY.COMMON,
     bonusHP: 5, applyEffect() {} },
-  { id: "vitalLeaf", name: "Vital Leaf", description: "Recover +3 HP per player attack", rarity: RARITY.COMMON,
+  { id: "vitalLeaf", name: "Vital Leaf", description: "Heal +3 HP Per Attack Dealt", rarity: RARITY.COMMON,
     healOnAttack: 3, applyEffect() {} },
-  { id: "tinyRing", name: "Tiny Lucky Ring", description: "5% chance to ignore enemy damage", rarity: RARITY.COMMON,
+  { id: "tinyRing", name: "Tiny Lucky Ring", description: "5% Chance To Ignore Damage", rarity: RARITY.COMMON,
     ignoreDamageChance: 0.05, applyEffect() {} },
-  { id: "scoutGem", name: "Scout Gem", description: "Guarantees 1 safe number from 35–40", rarity: RARITY.COMMON,
+  { id: "scoutGem", name: "Scout Gem", description: "1 Safe Number Between 35–40", rarity: RARITY.COMMON,
     range: [35, 40], applyEffect() {} },
-  { id: "steadyBoots", name: "Steady Boots", description: "Take -2 damage from enemy attacks", rarity: RARITY.COMMON,
+  { id: "steadyBoots", name: "Steady Boots", description: "Take -2 Damage", rarity: RARITY.COMMON,
     damageReduction: 2, applyEffect() {} },
-  { id: "minorFocus", name: "Minor Focus", description: "+2 Enemy HP damage per hit", rarity: RARITY.COMMON,
+  { id: "minorFocus", name: "Minor Focus", description: "Deal +2 damage", rarity: RARITY.COMMON,
     bonusDamage: 2, applyEffect() {} },
-  { id: "lightArmor", name: "Light Armor", description: "+1 HP regen each round", rarity: RARITY.COMMON,
+  { id: "lightArmor", name: "Light Armor", description: "Heal +1 HP Per Round", rarity: RARITY.COMMON,
     regenPerRound: 1, applyEffect() {} },
-  { id: "crudePotion", name: "Crude Potion", description: "+10 HP instantly", rarity: RARITY.COMMON,
+  { id: "crudePotion", name: "Crude Potion", description: "Heal +10 HP", rarity: RARITY.COMMON,
     isConsumable: true, applyEffect() {
       playerHealth = Math.min(playerHealth + 10, getPlayerMaxHealth());
       updateHealth();
     }},
-  { id: "swiftCharm", name: "Swift Charm", description: "+1 extra player attack each even level", rarity: RARITY.COMMON,
+  { id: "swiftCharm", name: "Swift Charm", description: "Gain +1 Extra Attack Square Every Even Level", rarity: RARITY.COMMON,
     bonusEvenLevelAttack: 1, applyEffect() {} },
 
   // RARE
-  { id: "ironSword", name: "Iron Sword", description: "+2 Player Attack Count", rarity: RARITY.RARE,
+  { id: "ironSword", name: "Iron Sword", description: "Gain +2 Attack Square", rarity: RARITY.RARE,
     bonusAttackCount: 2, applyEffect() { playerAttackCount += 2; } },
-  { id: "ironShield", name: "Iron Shield", description: "+15 Player HP", rarity: RARITY.RARE,
+  { id: "ironShield", name: "Iron Shield", description: "+15 Max HP", rarity: RARITY.RARE,
     bonusHP: 15, applyEffect() {} },
-  { id: "luckyRing", name: "Lucky Ring", description: "10% chance to ignore enemy damage", rarity: RARITY.RARE,
+  { id: "luckyRing", name: "Lucky Ring", description: "10% Chance To Ignore Damage", rarity: RARITY.RARE,
     ignoreDamageChance: 0.1, applyEffect() {} },
-  { id: "bloodCharm", name: "Blood Charm", description: "Heal +5 HP when you damage enemy", rarity: RARITY.RARE,
+  { id: "bloodCharm", name: "Blood Charm", description: "Heal +5 HP Per Attack Dealt", rarity: RARITY.RARE,
     healOnAttack: 5, applyEffect() {} },
-  { id: "radarGem", name: "Radar Gem", description: "Guarantees 1 safe number from 20–25", rarity: RARITY.RARE,
+  { id: "radarGem", name: "Radar Gem", description: "1 Safe Number Between 20–25", rarity: RARITY.RARE,
     range: [20, 25], applyEffect() {} },
-  { id: "strongBoots", name: "Strong Boots", description: "Take -5 damage from enemy attacks", rarity: RARITY.RARE,
+  { id: "strongBoots", name: "Strong Boots", description: "Take -5 Damage", rarity: RARITY.RARE,
     damageReduction: 5, applyEffect() {} },
-  { id: "keenEye", name: "Keen Eye", description: "Reveals one random enemy number", rarity: RARITY.RARE,
-    revealsEnemyNumber: 1, applyEffect() {} },
-  { id: "bronzeArmor", name: "Bronze Armor", description: "+2 HP regen each round", rarity: RARITY.RARE,
+  { id: "bronzeArmor", name: "Bronze Armor", description: "Heal +2 HP Per Round", rarity: RARITY.RARE,
     regenPerRound: 2, applyEffect() {} },
-  { id: "ragePotion", name: "Rage Potion", description: "+10 Attack Damage next round", rarity: RARITY.RARE,
+  { id: "ragePotion", name: "Rage Potion", description: "Deal +10 Damage Next Round", rarity: RARITY.RARE,
     isConsumable: true, temporaryBonusDamage: 10, applyEffect() {
       playerItems.push({ id: "rageBoost", bonusDamage: 10, duration: 1 });
     }},
-  { id: "lifeAmulet", name: "Life Amulet", description: "Revive once with 50% HP", rarity: RARITY.RARE,
+  { id: "lifeAmulet", name: "Life Amulet", description: "Revive Once With 50% HP", rarity: RARITY.RARE,
     reviveAtPercent: 0.5, applyEffect() {} },
 
   // EPIC
-  { id: "crystalSword", name: "Crystal Sword", description: "+3 Player Attack Count", rarity: RARITY.EPIC,
+  { id: "crystalSword", name: "Crystal Sword", description: "Gain +3 Attack Square", rarity: RARITY.EPIC,
     bonusAttackCount: 3, applyEffect() { playerAttackCount += 3; } },
-  { id: "holyCharm", name: "Holy Charm", description: "Heal +10 HP when damaging enemy", rarity: RARITY.EPIC,
+  { id: "holyCharm", name: "Holy Charm", description: "Heal +5 HP Per Attack Dealt", rarity: RARITY.EPIC,
     healOnAttack: 10, applyEffect() {} },
-  { id: "divineRadar", name: "Divine Radar", description: "Guarantees 2 safe numbers from 10–20", rarity: RARITY.EPIC,
+  { id: "divineRadar", name: "Divine Radar", description: "2 Safe Numbers Between 10–20", rarity: RARITY.EPIC,
     range: [10, 20], safeNumbers: 2, applyEffect() {} },
-  { id: "adamantArmor", name: "Adamant Armor", description: "Take -8 damage per enemy hit", rarity: RARITY.EPIC,
+  { id: "adamantArmor", name: "Adamant Armor", description: "Take -8 Damage", rarity: RARITY.EPIC,
     damageReduction: 8, applyEffect() {} },
-  { id: "focusTalisman", name: "Focus Talisman", description: "+5 damage to enemy HP per hit", rarity: RARITY.EPIC,
+  { id: "focusTalisman", name: "Focus Talisman", description: "Deal +5 Damage", rarity: RARITY.EPIC,
     bonusDamage: 5, applyEffect() {} },
 
   // LEGENDARY
-  { id: "phoenixHeart", name: "Phoenix Heart", description: "Revive once with full HP", rarity: RARITY.LEGENDARY,
+  { id: "phoenixHeart", name: "Phoenix Heart", description: "Revive Once With 100% HP", rarity: RARITY.LEGENDARY,
     reviveAtPercent: 1, applyEffect() {} },
-  { id: "godblade", name: "Godblade", description: "+5 Attack Count, +10 damage per hit", rarity: RARITY.LEGENDARY,
+  { id: "godblade", name: "Godblade", description: "Gain +5 Attack Square, Deal +10 Damage", rarity: RARITY.LEGENDARY,
     bonusAttackCount: 5, bonusDamage: 10, applyEffect() { playerAttackCount += 5; } },
-  { id: "omnigem", name: "Omni Gem", description: "Guarantees 3 safe numbers from 1–15", rarity: RARITY.LEGENDARY,
+  { id: "omnigem", name: "Omni Gem", description: "3 Safe Numbers Between 1–15", rarity: RARITY.LEGENDARY,
     range: [1, 15], safeNumbers: 3, applyEffect() {} },
 ];
 
@@ -226,29 +224,29 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
   const stats = getPlayerStats();
 
   if (isPlayerAttack) {
-    // Base player attack damage + bonuses
-    const totalDamage = 20 + stats.bonusDamage;
-    enemyHealth -= totalDamage;
+    // ✅ Player base damage is always 20 + item bonus
+    const totalDamage = 20 + (stats.bonusDamage || 0);
+    enemyHealth = Math.max(0, enemyHealth - totalDamage);
 
-    // Healing on attack
+    // ✅ Heal if player has healing effects
     if (stats.healOnAttack > 0) {
       playerHealth = Math.min(playerHealth + stats.healOnAttack, getPlayerMaxHealth());
     }
 
     updateHealth();
+
   } else {
-    // Enemy attack with reduction & dodge chance
-    let damage = 20 - stats.damageReduction;
+    // ✅ Enemy base damage is always 20 minus reductions
+    let damage = 20 - (stats.damageReduction || 0);
     if (damage < 0) damage = 0;
 
-    if (Math.random() < stats.ignoreDamageChance) {
-      // Damage avoided (Lucky Ring, Tiny Ring, etc.)
+    // ✅ Check ignore damage chance (rings)
+    if (Math.random() < (stats.ignoreDamageChance || 0)) {
       updateHealth();
       return;
     }
 
-    playerHealth -= damage;
-    if (playerHealth < 0) playerHealth = 0;
+    playerHealth = Math.max(0, playerHealth - damage);
     updateHealth();
   }
 }
@@ -287,15 +285,16 @@ function buildGrid() {
 
         if (enemyAttackNumbers.includes(cellNumber)) {
           cell.classList.add('eAttack');
-          applyPassiveItemEffectsOnAttack(false);
           enemy.playAttack();
+          applyPassiveItemEffectsOnAttack(false);
           checkGameOver();
+
         } else if (playerAttackNumbers.includes(cellNumber)) {
           cell.classList.add('attack');
-          enemyHealth -= 20;
-          applyPassiveItemEffectsOnAttack(true);
           hero.playAttack();
+          applyPassiveItemEffectsOnAttack(true);
           checkGameOver();
+
         } else {
           cell.classList.add('active');
         }

@@ -69,7 +69,7 @@ function getPlayerStats() {
     damageReduction: 0,
     healOnAttack: 0,
     ignoreDamageChance: 0,
-    regenPerRound: 0, // ✅ new
+    regenPerRound: 20,
   };
 
   playerItems.forEach(item => {
@@ -77,7 +77,7 @@ function getPlayerStats() {
     if (item.damageReduction) stats.damageReduction += item.damageReduction;
     if (item.healOnAttack) stats.healOnAttack += item.healOnAttack;
     if (item.ignoreDamageChance) stats.ignoreDamageChance += item.ignoreDamageChance;
-    if (item.regenPerRound) stats.regenPerRound += item.regenPerRound; // ✅ accumulate regen
+    if (item.regenPerRound) stats.regenPerRound += item.regenPerRound;
   });
   return stats;
 }

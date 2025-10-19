@@ -26,10 +26,42 @@ const container = document.getElementById('grid-container');
 const mainMenu = document.getElementById('main-menu');
 const startButton = document.getElementById('start-game-btn');
 
+// === LEVEL DISPLAY ===
 const levelDisplay = document.createElement('div');
 levelDisplay.id = 'level-display';
 levelDisplay.textContent = `Level ${level}`;
 document.body.appendChild(levelDisplay);
+
+// === INVENTORY UI ===
+const inventoryButton = document.createElement('div');
+inventoryButton.id = 'inventory-button';
+inventoryButton.textContent = '🧰';
+document.body.appendChild(inventoryButton);
+
+const inventoryPopup = document.createElement('div');
+inventoryPopup.id = 'inventory-popup';
+inventoryPopup.innerHTML = `<h2>Your Items</h2><ul id="inventory-list"></ul>`;
+document.body.appendChild(inventoryPopup);
+
+inventoryButton.addEventListener('mouseenter', updateInventoryPopup);
+inventoryButton.addEventListener('mouseenter', () => inventoryPopup.classList.add('visible'));
+inventoryButton.addEventListener('mouseleave', () => inventoryPopup.classList.remove('visible'));
+inventoryPopup.addEventListener('mouseenter', () => inventoryPopup.classList.add('visible'));
+inventoryPopup.addEventListener('mouseleave', () => inventoryPopup.classList.remove('visible'));
+
+function updateInventoryPopup() {
+  const list = document.getElementById('inventory-list');
+  list.innerHTML = '';
+  if (playerItems.length === 0) {
+    list.innerHTML = '<li>No items collected yet.</li>';
+    return;
+  }
+  playerItems.forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = `${item.name || item.id}: ${item.description || ''}`;
+    list.appendChild(li);
+  });
+}
 
 function updateHealth() {
   playerHealthDisplay.textContent = `Player Health: ${playerHealth}`;
@@ -298,94 +330,128 @@ function showShop() {
     btn.textContent = "Continue";
     btn.addEventListener('click', () => {
       popup.remove();
-      nextLevel();
+      startNextLevel();
     });
     itemContainer.appendChild(btn);
     return;
   }
 
   shopChoices.forEach(item => {
-    const btn = document.createElement('button');
-    btn.textContent = `${item.name} - ${item.description}`;
-    btn.style.fontSize = '28px';
-    btn.style.padding = '20px 40px';
-    btn.style.border = `4px solid ${item.rarity.color}`;
-    btn.style.borderRadius = '15px';
-    btn.style.background = 'rgba(0,0,0,0.6)';
-    btn.style.color = item.rarity.color;
-    btn.style.textShadow = '2px 2px 0 black';
-    btn.addEventListener('click', () => {
-      popup.remove();
-      playerItems.push(item);
+    const button = document.createElement('button');
+    button.className = 'shop-item';
+    button.style.borderColor = item.rarity.color;
+    button.innerHTML = `
+      <strong style="color:${item.rarity.color}">${item.name}</strong>
+      <p>${item.description}</p>
+    `;
+    button.addEventListener('click', () => {
       item.applyEffect();
-      nextLevel();
+      playerItems.push(item);
+      updateInventoryPopup();
+      popup.remove();
+      startNextLevel();
     });
-    itemContainer.appendChild(btn);
+    itemContainer.appendChild(button);
   });
 }
 
 // === END SCREEN ===
-function showEndScreen(playerWon) {
+function showEndScreen(victory) {
   gameOver = true;
-
   const popup = document.createElement('div');
   popup.className = 'end-screen';
-  popup.innerHTML = `
-    <div class="end-screen-content">
-      <h1>${playerWon ? 'You Win!' : 'Game Over'}</h1>
-      <p>${playerWon ? 'Prepare for the next battle...' : 'Try again from Level 1'}</p>
-      <button id="next-level-btn">${playerWon ? 'Next Level' : 'Retry'}</button>
-    </div>
-  `;
-  document.body.appendChild(popup);
 
-  document.getElementById('next-level-btn').addEventListener('click', () => {
+  const content = document.createElement('div');
+  content.className = 'end-screen-content';
+
+  if (victory) {
+    content.innerHTML = `
+      <h1>You Win!</h1>
+      <p>Enemy defeated.</p>
+      <div class="end-buttons"></div>
+    `;
+  } else {
+    content.innerHTML = `
+      <h1>Game Over</h1>
+      <p>You were defeated.</p>
+      <div class="end-buttons"></div>
+    `;
+  }
+
+  const btnContainer = content.querySelector('.end-buttons');
+  const nextBtn = document.createElement('button');
+  nextBtn.textContent = victory ? "Next Level" : "Retry";
+  nextBtn.addEventListener('click', () => {
     popup.remove();
-    if (playerWon) {
-      level++;
-      // === Difficulty scaling ===
-      enemyAttackCount += 1;    // +1 attack number each level
-      enemyHealth += 10;        // +10 HP each level
-      if (level % 2 === 0) {
-        playerAttackCount += 1; // +1 player attack every 2 levels
-      }
-      // After scaling, go to item shop
-      showShop();
+    if (victory) {
+      // Every 3rd level → show shop before next level
+      if (level % 3 === 0) showShop();
+      else startNextLevel();
     } else {
-      // === Reset everything on loss ===
-      level = 1;
-      enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
-      enemyHealth = BASE_ENEMY_HEALTH_COUNT;
-      playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
-      playerHealth = BASE_PLAYER_HEALTH_COUNT;
-      playerItems = [];
-      nextLevel();
+      restartGame();
     }
   });
+
+  const menuBtn = document.createElement('button');
+  menuBtn.textContent = "Return to Main Menu";
+  menuBtn.addEventListener('click', () => {
+    popup.remove();
+    returnToMainMenu();
+  });
+
+  btnContainer.appendChild(nextBtn);
+  btnContainer.appendChild(menuBtn);
+  popup.appendChild(content);
+  document.body.appendChild(popup);
 }
 
-// === NEXT LEVEL FUNCTION ===
-function nextLevel() {
+// === MAIN MENU & GAME FLOW ===
+function returnToMainMenu() {
+  container.innerHTML = '';
+  document.getElementById('level-display').style.display = 'none';
+  document.getElementById('inventory-button').style.display = 'none';
+  document.getElementById('inventory-popup').style.display = 'none';
+  mainMenu.style.display = 'flex';
+}
+
+function startNextLevel() {
   gameOver = false;
-  playerHealth = BASE_PLAYER_HEALTH_COUNT;
-  enemyHealth = BASE_ENEMY_HEALTH_COUNT + (level - 1) * 10; // keep scaling visible
-  updateHealth();
+  level++;
   updateLevel();
-  hero.playIdle();
-  enemy.playIdle();
+  playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
+  enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
+  enemyHealth = BASE_ENEMY_HEALTH_COUNT;
+  playerHealth = Math.min(playerHealth + 10, BASE_PLAYER_HEALTH_COUNT);
+  updateHealth();
+
+  // Passive regen items
+  if (playerItems.find(i => i.id === "lightArmorEffect")) playerHealth = Math.min(playerHealth + 1, BASE_PLAYER_HEALTH_COUNT);
+  if (playerItems.find(i => i.id === "bronzeArmorEffect")) playerHealth = Math.min(playerHealth + 2, BASE_PLAYER_HEALTH_COUNT);
+
+  // Swift Charm effect (extra attack each even level)
+  if (playerItems.find(i => i.id === "swiftCharmEffect") && level % 2 === 0) playerAttackCount += 1;
+
   buildGrid();
 }
 
-// === START GAME BUTTON ===
-startButton.addEventListener('click', () => {
-  mainMenu.style.display = 'none'; // hide main menu
-  level = 1;                       // ensure starting at level 1
-  playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
-  enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
+function restartGame() {
+  gameOver = false;
   playerHealth = BASE_PLAYER_HEALTH_COUNT;
   enemyHealth = BASE_ENEMY_HEALTH_COUNT;
+  playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
+  enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
+  level = 1;
   playerItems = [];
   updateHealth();
   updateLevel();
-  nextLevel();                      // build first level grid
+  buildGrid();
+}
+
+startButton.addEventListener('click', () => {
+  mainMenu.style.display = 'none';
+  document.getElementById('level-display').style.display = 'block';
+  document.getElementById('inventory-button').style.display = 'flex';
+  document.getElementById('inventory-popup').style.display = 'none';
+  buildGrid();
 });
+

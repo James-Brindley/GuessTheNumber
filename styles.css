@@ -350,10 +350,11 @@ body {
   width: 100%;
   height: 40px;
   background: rgba(0, 0, 0, 0.6);
-  border: 3px solid rgb(0, 0, 0);
+  border: 3px solid #fff;      /* optional: white border looks cleaner */
   border-radius: 10px;
   position: relative;
-  overflow: hidden;
+  overflow: visible;           /* ✅ allow tooltip to render outside */
+  cursor: default;
 }
 
 .health-bar-fill {
@@ -374,21 +375,30 @@ body {
 
 /* Tooltip */
 .health-tooltip {
-  display: none;
   position: absolute;
-  top: -50px;
+  top: -60px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.85);
-  color: rgb(0, 0, 0);
+  color: #fff;                 /* ✅ readable on dark bg */
   padding: 8px 15px;
   border-radius: 8px;
   font-size: 22px;
-  pointer-events: none;
   white-space: nowrap;
-  border: 2px solid rgb(0, 0, 0);
-  text-shadow: 1px 1px 0 black;
-  z-index: 50;
+  border: 2px solid #fff;
+  text-shadow: 1px 1px 2px #000;
+  z-index: 5000;               /* ✅ above sprites/menus */
+  pointer-events: none;
+  opacity: 0;                  /* use fade instead of display:none */
+  transition: opacity 0.15s ease-in-out;
+}
+
+.health-bar-bg:hover .health-tooltip {
+  opacity: 1;
+}
+
+.health-bar-container {
+  z-index: 3000;
 }
 
 .health-bar-bg:hover .health-tooltip {

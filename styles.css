@@ -376,7 +376,7 @@ body {
 /* Tooltip */
 .health-tooltip {
   position: absolute;
-  top: -60px;
+  top: 60px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.85);
@@ -387,7 +387,7 @@ body {
   white-space: nowrap;
   border: 2px solid #fff;
   text-shadow: 1px 1px 2px #000;
-  z-index: 5000;               /* ✅ above sprites/menus */
+  z-index: 50;               /* ✅ above sprites/menus */
   pointer-events: none;
   opacity: 0;                  /* use fade instead of display:none */
   transition: opacity 0.15s ease-in-out;
@@ -398,7 +398,7 @@ body {
 }
 
 .health-bar-container {
-  z-index: 3000;
+  z-index: 50;
 }
 
 .health-bar-bg:hover .health-tooltip {

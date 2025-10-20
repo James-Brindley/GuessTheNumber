@@ -562,16 +562,16 @@ function nextLevel() {
   gameOver = false;
 
   // ✅ Determine if this is a boss level
-  isBossLevel = (level % 10 === 0);
+  isBossLevel = ((level - 1) % 10 === 0);
 
   // ✅ Scaling system
   // Every 10th level starting from 5 (5,15,25,35...) → +40 enemy HP
-  if (level >= 5 && (level - 5) % 10 === 0) {
+  if ((level - 1) >= 5 && ((level - 1) - 5) % 10 === 0) {
     enemyBonusHealth += 30;
   }
 
   // Every level immediately after a boss (11,21,31,41...) → +10 enemy damage
-  if ((level - 1) % 10 === 0 && level > 10) {
+  if ((level - 1) % 10 === 0 && (level - 1) > 10) {
     enemyBonusDamage += 10;
   }
 

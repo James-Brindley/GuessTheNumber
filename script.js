@@ -95,7 +95,7 @@ function getPlayerMaxHealth() {
 }
 
 function getEnemyMaxHealth() {
-  let base = BASE_ENEMY_HEALTH_COUNT + (level - 1) * 10;
+  let base = BASE_ENEMY_HEALTH_COUNT;
   let bonus = 0;
   playerItems.forEach(item => {
     if (item.bonusEnemyHP) bonus += item.bonusEnemyHP;
@@ -643,14 +643,12 @@ document.addEventListener("DOMContentLoaded", () => {
 function resetGame() {
   playerItems = [];
   level = 1;
+  enemyBonusHealth = 0;
+  enemyBonusDamage = 0;
   playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
   enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
   playerHealth = getPlayerMaxHealth();
   enemyHealth = getEnemyMaxHealth();
-
-  // ✅ Reset enemy scaling on death or new run
-  enemyBonusHealth = 0;
-  enemyBonusDamage = 0;
 
   updateHealth();
   updateLevel();

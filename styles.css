@@ -550,26 +550,20 @@ body {
   }
 }
 
-/* Simple fade in/out */
-@keyframes fadeInMenu {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes fadeOutMenu {
+@keyframes crossFadeOut {
   from { opacity: 1; }
   to { opacity: 0; }
 }
 
-/* Helper classes to trigger animations */
-.menu-zoom-out {
-  animation: zoomFadeOut 1.2s ease forwards;
-}
-
-.menu-fade-in {
-  animation: fadeInMenu 0.8s ease forwards;
+@keyframes crossFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .menu-fade-out {
-  animation: fadeOutMenu 0.8s ease forwards;
+  animation: crossFadeOut 0.5s ease forwards;
+}
+
+.menu-fade-in {
+  animation: crossFadeIn 0.5s ease forwards;
 }

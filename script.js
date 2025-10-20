@@ -538,14 +538,9 @@ function showEndScreen(playerWon) {
       }
 
     } else {
-      // === Reset everything on loss ===
-      level = 1;
-      enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
-      enemyHealth = BASE_ENEMY_HEALTH_COUNT;
-      playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
-      playerHealth = BASE_PLAYER_HEALTH_COUNT;
-      playerItems = [];
-      nextLevel();
+      // === Proper full reset ===
+      resetGame();     // ✅ Call your existing reset function
+      nextLevel();     // ✅ Start fresh
     }
   });
 

@@ -109,7 +109,7 @@ function getPlayerStats() {
     damageReduction: 0,
     healOnAttack: 0,
     ignoreDamageChance: 0,
-    regenPerRound: 10,
+    regenPerRound: 20,
   };
 
   playerItems.forEach(item => {

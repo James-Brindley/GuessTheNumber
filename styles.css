@@ -541,11 +541,11 @@ body {
     opacity: 1;
   }
   80% {
-    transform: scale(1.5);
+    transform: scale(3);
     opacity: 1;
   }
   100% {
-    transform: scale(1.7);
+    transform: scale(5);
     opacity: 0;
   }
 }

@@ -629,10 +629,17 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!startButton) return; // safeguard
   
   startButton.addEventListener("click", () => {
+  // Add zoom out animation
+  mainMenu.classList.add("menu-zoom-out");
+
+  // Wait for animation to finish
+  setTimeout(() => {
     mainMenu.style.display = "none";
+    mainMenu.classList.remove("menu-zoom-out");
     resetGame();
     nextLevel();
-  });
+  }, 1200); // match zoomFadeOut duration
+});
 });
 
 function resetGame() {
@@ -690,11 +697,29 @@ const howToPlayScreen = document.getElementById("how-to-play-screen");
 const backToMenuBtn = document.getElementById("back-to-menu-btn");
 
 howToPlayBtn.addEventListener("click", () => {
-  mainMenu.style.display = "none";
-  howToPlayScreen.style.display = "flex";
+  // Fade out main menu
+  mainMenu.classList.add("menu-fade-out");
+  setTimeout(() => {
+    mainMenu.style.display = "none";
+    mainMenu.classList.remove("menu-fade-out");
+
+    // Fade in how-to menu
+    howToPlayScreen.style.display = "flex";
+    howToPlayScreen.classList.add("menu-fade-in");
+    setTimeout(() => howToPlayScreen.classList.remove("menu-fade-in"), 800);
+  }, 800);
 });
 
 backToMenuBtn.addEventListener("click", () => {
-  howToPlayScreen.style.display = "none";
-  mainMenu.style.display = "flex";
+  // Fade out how-to menu
+  howToPlayScreen.classList.add("menu-fade-out");
+  setTimeout(() => {
+    howToPlayScreen.style.display = "none";
+    howToPlayScreen.classList.remove("menu-fade-out");
+
+    // Fade main menu back in
+    mainMenu.style.display = "flex";
+    mainMenu.classList.add("menu-fade-in");
+    setTimeout(() => mainMenu.classList.remove("menu-fade-in"), 800);
+  }, 800);
 });

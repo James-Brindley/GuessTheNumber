@@ -18,6 +18,9 @@ let enemyHealth = BASE_ENEMY_HEALTH_COUNT;
 let playerMaxHealth = BASE_PLAYER_HEALTH_COUNT;
 let enemyMaxHealth = BASE_ENEMY_HEALTH_COUNT;
 
+let enemyBonusHealth = 0;
+let enemyBonusDamage = 0;
+
 let level = 1;
 let gameOver = false;
 let playerItems = [];
@@ -274,7 +277,7 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
 
   } else {
     // ✅ Enemy base damage is always 20 minus reductions
-    let baseEnemyDamage = 20 * (isBossLevel ? BOSS_MULTIPLIER.damage : 1);
+    let baseEnemyDamage = (20 + enemyBonusDamage) * (isBossLevel ? BOSS_MULTIPLIER.damage : 1);
     let damage = baseEnemyDamage - (stats.damageReduction || 0);
     if (damage < 0) damage = 0;
 
@@ -565,12 +568,23 @@ function nextLevel() {
   // ✅ Determine if this is a boss level
   isBossLevel = (level % 10 === 0);
 
+  // ✅ Scaling system
+  // Every 10th level starting from 5 (5,15,25,35...) → +40 enemy HP
+  if (level >= 5 && (level - 5) % 10 === 0) {
+    enemyBonusHealth += 40;
+  }
+
+  // Every level immediately after a boss (11,21,31,41...) → +10 enemy damage
+  if ((level - 1) % 10 === 0 && level > 10) {
+    enemyBonusDamage += 10;
+  }
+
   // ✅ Get player stats once
   const stats = getPlayerStats();
 
   // ✅ Apply dynamic max HP and regen
   playerMaxHealth = getPlayerMaxHealth();
-  enemyMaxHealth = getEnemyMaxHealth();
+  enemyMaxHealth = getEnemyMaxHealth() + enemyBonusHealth;
 
   if (isBossLevel) {
     // === Boss stats ===
@@ -637,6 +651,11 @@ function resetGame() {
   enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
   playerHealth = getPlayerMaxHealth();
   enemyHealth = getEnemyMaxHealth();
+
+  // ✅ Reset enemy scaling on death or new run
+  enemyBonusHealth = 0;
+  enemyBonusDamage = 0;
+
   updateHealth();
   updateLevel();
   gameOver = false;

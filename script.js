@@ -30,7 +30,7 @@ let isBossLevel = false;
 
 // Optional: Adjust these as you balance later
 const BOSS_MULTIPLIER = {
-  health: 2,
+  health: 1.5,
   damage: 2,
 };
 

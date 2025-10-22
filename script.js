@@ -273,11 +273,13 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
       playerHealth = Math.min(playerHealth + stats.healOnAttack, getPlayerMaxHealth());
     }
 
-    // ✅ Increase combo but cap it
-    playerCombo = Math.min(playerCombo + COMBO_STEP, MAX_COMBO);
-    enemyCombo = 1.0; // reset enemy combo on player success
+    // ✅ Show popup *only if the hit used a combo*
+    if (playerCombo > 1.0) showComboPopup(true);
 
-    showComboPopup(true); // optional popup (defined below)
+    // ✅ Increase combo but cap it AFTER the popup
+    playerCombo = Math.min(playerCombo + COMBO_STEP, MAX_COMBO);
+    enemyCombo = 1.0;
+
     updateHealth();
 
   } else {
@@ -295,11 +297,13 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
 
     playerHealth = Math.max(0, playerHealth - totalDamage);
 
-    // ✅ Increase enemy combo, reset player combo
+    // ✅ Show popup only if enemy actually hit with combo damage
+    if (enemyCombo > 1.0) showComboPopup(false);
+
+    // ✅ Then increase combo afterward
     enemyCombo = Math.min(enemyCombo + COMBO_STEP, MAX_COMBO);
     playerCombo = 1.0;
 
-    showComboPopup(false);
     updateHealth();
   }
 }
@@ -754,7 +758,7 @@ backToMenuBtn.addEventListener("click", () => {
 
 function showComboPopup(isPlayer) {
   const comboValue = isPlayer ? playerCombo : enemyCombo;
-  if (comboValue <= 1.01) return;
+  if (comboValue <= 1.0) return;
 
   const popup = document.createElement('div');
   popup.className = 'combo-popup';

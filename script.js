@@ -265,43 +265,51 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
   const stats = getPlayerStats();
 
   if (isPlayerAttack) {
-    // ✅ Base damage and combo multiplier
-    const totalDamage = (20 + (stats.bonusDamage || 0)) * playerCombo;
+    // ✅ Base player damage and combo multiplier
+    let totalDamage = (20 + (stats.bonusDamage || 0)) * playerCombo;
+    totalDamage = Math.round(totalDamage); // round to whole number
+
     enemyHealth = Math.max(0, enemyHealth - totalDamage);
 
     // ✅ Heal if player has healing effects
     if (stats.healOnAttack > 0) {
-      playerHealth = Math.min(playerHealth + stats.healOnAttack, getPlayerMaxHealth());
+      const healAmount = Math.round(stats.healOnAttack);
+      playerHealth = Math.min(playerHealth + healAmount, getPlayerMaxHealth());
+      showHitPopup(true, `+${healAmount}`, true);
     }
 
-    // ✅ Show popup *only if the hit used a combo*
+    // ✅ Show hit popup for damage dealt
+    showHitPopup(false, `-${totalDamage}`);
+
+    // ✅ Show combo popup *only if boosted*
     if (playerCombo > 1.0) showComboPopup(true);
 
-    // ✅ Increase combo but cap it AFTER the popup
+    // ✅ Increase combo
     playerCombo = Math.min(playerCombo + COMBO_STEP, MAX_COMBO);
     enemyCombo = 1.0;
 
     updateHealth();
 
   } else {
-    // ✅ Enemy base damage and combo multiplier
+    // ✅ Enemy attack phase
     let baseEnemyDamage = (10 + enemyBonusDamage) * (isBossLevel ? BOSS_MULTIPLIER.damage : 1);
     let totalDamage = baseEnemyDamage * enemyCombo;
-    totalDamage -= (stats.damageReduction || 0);
+    totalDamage = Math.round(totalDamage);
+    totalDamage -= Math.round(stats.damageReduction || 0);
     if (totalDamage < 0) totalDamage = 0;
 
-    // ✅ Check ignore damage chance
+    // ✅ Check ignore chance (MISS)
     if (Math.random() < (stats.ignoreDamageChance || 0)) {
+      showHitPopup(true, "MISS");
       updateHealth();
       return;
     }
 
     playerHealth = Math.max(0, playerHealth - totalDamage);
+    showHitPopup(true, `-${totalDamage}`);
 
-    // ✅ Show popup only if enemy actually hit with combo damage
     if (enemyCombo > 1.0) showComboPopup(false);
 
-    // ✅ Then increase combo afterward
     enemyCombo = Math.min(enemyCombo + COMBO_STEP, MAX_COMBO);
     playerCombo = 1.0;
 
@@ -849,6 +857,31 @@ backToMenuBtn.addEventListener("click", () => {
     mainMenu.classList.remove("menu-fade-in");
   }, 500);
 });
+
+function showHitPopup(isPlayer, text, isHeal = false) {
+  const popup = document.createElement('div');
+  popup.className = 'hit-popup';
+  popup.textContent = text;
+
+  if (isHeal) {
+    popup.style.color = '#00ff66'; // 🟢 Healing
+  } else if (text === 'MISS') {
+    popup.style.color = '#cccccc'; // ⚪ Miss
+  } else {
+    popup.style.color = '#ff4444'; // 🔴 Damage
+  }
+
+  // Position above hero or enemy
+  const target = isPlayer ? document.querySelector('.hero-container') : document.querySelector('.enemy-container');
+  const rect = target.getBoundingClientRect();
+
+  popup.style.left = `${rect.left + rect.width / 2}px`;
+  popup.style.top = `${rect.top - 20}px`;
+
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 1000);
+}
+
 
 function showComboPopup(isPlayer) {
   const comboValue = isPlayer ? playerCombo : enemyCombo;

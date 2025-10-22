@@ -585,7 +585,7 @@ body {
   opacity: 0;
   animation: comboPop 0.8s ease-out forwards;
   pointer-events: none;
-  z-index: 1000;
+  z-index: 70;
 }
 
 @keyframes comboPop {
@@ -613,4 +613,31 @@ body {
 #pause-btn:hover {
   background: rgba(255, 255, 255, 0.336);
   transform: scale(1.05);
+}
+
+.hit-popup {
+  position: fixed;
+  font-family: pixelText;
+  font-size: 50px;
+  text-shadow: 3px 3px 0 #000;
+  pointer-events: none;
+  z-index: 2000;
+  transform: translate(-50%, 0) scale(1);
+  opacity: 0;
+  animation: hitPop 1s ease-out forwards;
+}
+
+@keyframes hitPop {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -80px) scale(1);
+  }
 }

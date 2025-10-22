@@ -569,10 +569,34 @@ function showEndScreen(playerWon) {
 
   // ✅ New: Main Menu Button
   document.getElementById('main-menu-btn').addEventListener('click', () => {
-    popup.remove();
-    mainMenu.style.display = 'flex';
-    container.innerHTML = '';
-    resetGame();
+    // === Create confirmation popup ===
+    const confirmPopup = document.createElement('div');
+    confirmPopup.className = 'end-screen';
+    confirmPopup.innerHTML = `
+      <div class="end-screen-content">
+        <h1>Return to Main Menu?</h1>
+        <p>Your current run will be lost.</p>
+        <div style="display:flex;gap:30px;justify-content:center;margin-top:20px;">
+          <button id="confirm-main-menu-yes">Yes</button>
+          <button id="confirm-main-menu-no" style="background:#E53935;">Cancel</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(confirmPopup);
+  
+    // ✅ Yes → go to main menu
+    document.getElementById('confirm-main-menu-yes').addEventListener('click', () => {
+      popup.remove();
+      confirmPopup.remove();
+      mainMenu.style.display = 'flex';
+      container.innerHTML = '';
+      resetGame();
+    });
+  
+    // ❌ No → close confirmation
+    document.getElementById('confirm-main-menu-no').addEventListener('click', () => {
+      confirmPopup.remove();
+    });
   });
 }
 

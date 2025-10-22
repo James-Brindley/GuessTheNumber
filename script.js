@@ -336,7 +336,8 @@ function buildGrid() {
       cell.textContent = number++;
 
       cell.addEventListener('click', () => {
-        if (cell.classList.contains('clicked') || gameOver) return;
+        if (cell.classList.contains('clicked') || gameOver || isPaused) return;
+
         cell.classList.add('clicked');
         const cellNumber = parseInt(cell.textContent);
 
@@ -600,6 +601,68 @@ function showEndScreen(playerWon) {
   });
 }
 
+// === PAUSE MENU ===
+const pauseBtn = document.getElementById("pause-btn");
+let isPaused = false;
+
+function showPauseMenu() {
+  if (gameOver || isPaused) return; // don't double open or pause during game over
+  isPaused = true;
+
+  const pausePopup = document.createElement('div');
+  pausePopup.className = 'end-screen'; // reuse styling
+  pausePopup.innerHTML = `
+    <div class="end-screen-content">
+      <h1>Game Paused</h1>
+      <p>Take a breather before continuing your dungeon battle.</p>
+      <button id="resume-btn">Resume</button>
+      <br><br>
+      <button id="pause-main-menu-btn">Main Menu</button>
+    </div>
+  `;
+  document.body.appendChild(pausePopup);
+
+  // Resume button
+  document.getElementById('resume-btn').addEventListener('click', () => {
+    pausePopup.remove();
+    isPaused = false;
+  });
+
+  // Main Menu button with confirmation
+  document.getElementById('pause-main-menu-btn').addEventListener('click', () => {
+    const confirmPopup = document.createElement('div');
+    confirmPopup.className = 'end-screen';
+    confirmPopup.innerHTML = `
+      <div class="end-screen-content">
+        <h1>Return to Main Menu?</h1>
+        <p>Your current run will be lost.</p>
+        <div style="display:flex;gap:30px;justify-content:center;margin-top:20px;">
+          <button id="confirm-main-menu-yes">Yes</button>
+          <button id="confirm-main-menu-no" style="background:#E53935;">Cancel</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(confirmPopup);
+
+    document.getElementById('confirm-main-menu-yes').addEventListener('click', () => {
+      confirmPopup.remove();
+      pausePopup.remove();
+      isPaused = false;
+      mainMenu.style.display = 'flex';
+      container.innerHTML = '';
+      resetGame();
+    });
+
+    document.getElementById('confirm-main-menu-no').addEventListener('click', () => {
+      confirmPopup.remove();
+    });
+  });
+}
+
+// Pause button click
+pauseBtn.addEventListener('click', showPauseMenu);
+
+
 function nextLevel() {
   gameOver = false;
 
@@ -797,3 +860,7 @@ function showComboPopup(isPlayer) {
   document.body.appendChild(popup);
   setTimeout(() => popup.remove(), 800);
 }
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') showPauseMenu();
+});

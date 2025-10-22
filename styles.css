@@ -274,7 +274,7 @@ body {
 /* === INVENTORY BUTTON === */
 #inventory-container {
   position: fixed;
-  top: 150px;
+  top: 250px;
   left: 20px;
   z-index: 20;
 }

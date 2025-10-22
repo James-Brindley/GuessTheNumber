@@ -108,6 +108,7 @@ function getEnemyMaxHealth() {
   return base + bonus;
 }
 
+//starting stats
 function getPlayerStats() {
   let stats = {
     bonusDamage: 0,

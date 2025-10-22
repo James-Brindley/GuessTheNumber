@@ -964,7 +964,7 @@ function buildEnemyTooltip() {
   return `
     <strong style="font-size:28px;color:#E53935;">ENEMY STATS</strong><br>
     ❤️ Max Health: ${enemyMaxHealth}<br>
-    ⚔️ Attack Damage: ${getEnemyBaseDamage()}
+    ⚔️ Attack Damage: ${getEnemyBaseDamage()}<br>
     🔢 Attack Squares: ${enemyAttackCount}
   `;
 }

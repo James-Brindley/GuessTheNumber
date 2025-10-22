@@ -593,3 +593,24 @@ body {
   20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
   100% { transform: translate(-50%, -80%) scale(1); opacity: 0; }
 }
+
+/* === PAUSE BUTTON === */
+#pause-btn {
+  position: fixed;
+  top: 150px;
+  right: 20px;
+  font-size: 40px;
+  background: rgba(0, 0, 0, 0.15);
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 10px 15px;
+  font-family: pixelText;
+  transition: 0.3s;
+  z-index: 20;
+}
+
+#pause-btn:hover {
+  background: rgba(255, 255, 255, 0.336);
+  transform: scale(1.05);
+}

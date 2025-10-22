@@ -898,3 +898,64 @@ function showComboPopup(isPlayer) {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') showPauseMenu();
 });
+
+// === PLAYER & ENEMY TOOLTIP HANDLING ===
+const playerTooltipEl = document.getElementById("player-stats-tooltip");
+const enemyTooltipEl = document.getElementById("enemy-stats-tooltip");
+
+function getEnemyBaseDamage() {
+  return Math.round((10 + enemyBonusDamage) * (isBossLevel ? BOSS_MULTIPLIER.damage : 1));
+}
+
+// Helper: Build player tooltip text dynamically
+function buildPlayerTooltip() {
+  const stats = getPlayerStats();
+  return `
+    <strong style="font-size:28px;color:#4CAF50;">PLAYER STATS</strong><br>
+    ❤️ Max Health: ${getPlayerMaxHealth()}<br>
+    ⚔️ Base Attack: 20<br>
+    💪 Bonus Damage: ${stats.bonusDamage}<br>
+    🛡️ Damage Reduction: ${stats.damageReduction}<br>
+    💉 Heal On Attack: ${stats.healOnAttack}<br>
+    ♻️ Regen Per Round: ${stats.regenPerRound}<br>
+    🎲 Ignore Chance: ${(stats.ignoreDamageChance * 100).toFixed(0)}%<br>
+    🔢 Attack Squares: ${playerAttackCount}
+  `;
+}
+
+// Helper: Build enemy tooltip text
+function buildEnemyTooltip() {
+  return `
+    <strong style="font-size:28px;color:#E53935;">ENEMY STATS</strong><br>
+    ❤️ Max Health: ${enemyMaxHealth}<br>
+    ⚔️ Attack Damage: ${getEnemyBaseDamage()}
+  `;
+}
+
+// Show tooltip near target
+function showStatsTooltip(el, tooltipEl, content) {
+  tooltipEl.innerHTML = content;
+  const rect = el.getBoundingClientRect();
+  tooltipEl.style.left = `${rect.left + rect.width / 2}px`;
+  tooltipEl.style.top = `${rect.top - 100}px`;
+  tooltipEl.classList.add("show");
+}
+
+// Hide tooltip
+function hideStatsTooltip(tooltipEl) {
+  tooltipEl.classList.remove("show");
+}
+
+// Player hover
+const heroEl = document.querySelector(".hero-container");
+heroEl.addEventListener("mouseenter", () => {
+  showStatsTooltip(heroEl, playerTooltipEl, buildPlayerTooltip());
+});
+heroEl.addEventListener("mouseleave", () => hideStatsTooltip(playerTooltipEl));
+
+// Enemy hover
+const enemyEl = document.querySelector(".enemy-container");
+enemyEl.addEventListener("mouseenter", () => {
+  showStatsTooltip(enemyEl, enemyTooltipEl, buildEnemyTooltip());
+});
+enemyEl.addEventListener("mouseleave", () => hideStatsTooltip(enemyTooltipEl));

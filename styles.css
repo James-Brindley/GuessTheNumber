@@ -570,7 +570,7 @@ body {
 
 /* Helper classes to trigger animations */
 .menu-zoom-out {
-  animation: zoomFadeOut 0.8s ease forwards;
+  animation: zoomFadeOut 1s ease forwards;
 }
 
 .combo-popup {

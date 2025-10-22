@@ -642,23 +642,28 @@ function nextLevel() {
   buildGrid();
 }
 
-// === START GAME HANDLER ===
-document.addEventListener("DOMContentLoaded", () => {
-  const startButton = document.getElementById("start-game-btn");
-  if (!startButton) return; // safeguard
-  
-  startButton.addEventListener("click", () => {
-  // Add zoom out animation
+startButton.addEventListener("click", () => {
+  const buttons = document.querySelector("#main-menu .menu-buttons");
+
+  // ✅ Instantly hide buttons for clean zoom animation
+  buttons.style.opacity = "0";
+  buttons.style.pointerEvents = "none";
+
+  // Add zoom-out animation
   mainMenu.classList.add("menu-zoom-out");
 
-  // Wait for animation to finish
+  // Wait for animation to finish before starting the game
   setTimeout(() => {
     mainMenu.style.display = "none";
     mainMenu.classList.remove("menu-zoom-out");
+
+    // Reset button visibility when menu returns later
+    buttons.style.opacity = "1";
+    buttons.style.pointerEvents = "auto";
+
     resetGame();
     nextLevel();
-  }, 1200); // match zoomFadeOut duration
-});
+  }, 1200); // match CSS animation duration
 });
 
 function resetGame() {
@@ -749,7 +754,7 @@ backToMenuBtn.addEventListener("click", () => {
 
 function showComboPopup(isPlayer) {
   const comboValue = isPlayer ? playerCombo : enemyCombo;
-  if (comboValue <= 1.0) return;
+  if (comboValue <= 1.01) return;
 
   const popup = document.createElement('div');
   popup.className = 'combo-popup';

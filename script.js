@@ -21,6 +21,11 @@ let enemyMaxHealth = BASE_ENEMY_HEALTH_COUNT;
 let enemyBonusHealth = 0;
 let enemyBonusDamage = 0;
 
+let playerCombo = 1.0;
+let enemyCombo = 1.0;
+const MAX_COMBO = 2.0; // optional cap
+const COMBO_STEP = 0.2;
+
 let level = 1;
 let gameOver = false;
 let playerItems = [];
@@ -255,13 +260,12 @@ const enemy = createCharacter(
 updateHealth();
 updateLevel();
 
-// === PASSIVE ITEM EFFECTS ===
 function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
   const stats = getPlayerStats();
 
   if (isPlayerAttack) {
-    // ✅ Player base damage is always 20 + item bonus
-    const totalDamage = 20 + (stats.bonusDamage || 0);
+    // ✅ Base damage and combo multiplier
+    const totalDamage = (20 + (stats.bonusDamage || 0)) * playerCombo;
     enemyHealth = Math.max(0, enemyHealth - totalDamage);
 
     // ✅ Heal if player has healing effects
@@ -269,21 +273,33 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
       playerHealth = Math.min(playerHealth + stats.healOnAttack, getPlayerMaxHealth());
     }
 
+    // ✅ Increase combo but cap it
+    playerCombo = Math.min(playerCombo + COMBO_STEP, MAX_COMBO);
+    enemyCombo = 1.0; // reset enemy combo on player success
+
+    showComboPopup(true); // optional popup (defined below)
     updateHealth();
 
   } else {
-    // ✅ Enemy base damage is always 20 minus reductions
+    // ✅ Enemy base damage and combo multiplier
     let baseEnemyDamage = (10 + enemyBonusDamage) * (isBossLevel ? BOSS_MULTIPLIER.damage : 1);
-    let damage = baseEnemyDamage - (stats.damageReduction || 0);
-    if (damage < 0) damage = 0;
+    let totalDamage = baseEnemyDamage * enemyCombo;
+    totalDamage -= (stats.damageReduction || 0);
+    if (totalDamage < 0) totalDamage = 0;
 
-    // ✅ Check ignore damage chance (rings)
+    // ✅ Check ignore damage chance
     if (Math.random() < (stats.ignoreDamageChance || 0)) {
       updateHealth();
       return;
     }
 
-    playerHealth = Math.max(0, playerHealth - damage);
+    playerHealth = Math.max(0, playerHealth - totalDamage);
+
+    // ✅ Increase enemy combo, reset player combo
+    enemyCombo = Math.min(enemyCombo + COMBO_STEP, MAX_COMBO);
+    playerCombo = 1.0;
+
+    showComboPopup(false);
     updateHealth();
   }
 }
@@ -334,6 +350,9 @@ function buildGrid() {
 
         } else {
           cell.classList.add('active');
+          // Reset both combos when a non-attack tile is clicked
+          playerCombo = 1.0;
+          enemyCombo = 1.0;
         }
       });
 
@@ -728,3 +747,14 @@ backToMenuBtn.addEventListener("click", () => {
   }, 500);
 });
 
+function showComboPopup(isPlayer) {
+  const comboValue = isPlayer ? playerCombo : enemyCombo;
+  if (comboValue <= 1.0) return;
+
+  const popup = document.createElement('div');
+  popup.className = 'combo-popup';
+  popup.style.color = isPlayer ? '#4CAF50' : '#E53935';
+  popup.textContent = `x${comboValue.toFixed(1)} Combo!`;
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 800);
+}

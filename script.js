@@ -830,7 +830,7 @@ howToPlayBtn.addEventListener("click", () => {
     mainMenu.style.display = "none";
     mainMenu.classList.remove("menu-fade-out");
     howToPlayScreen.classList.remove("menu-fade-in");
-  }, 600); // matches animation duration
+  }, 400); // matches animation duration
 });
 
 backToMenuBtn.addEventListener("click", () => {

@@ -579,6 +579,9 @@ function showEndScreen(playerWon) {
 function nextLevel() {
   gameOver = false;
 
+  playerCombo = 1.0;
+  enemyCombo = 1.0;
+
   // ✅ Determine if this is a boss level
   isBossLevel = (level % 10 === 0);
 
@@ -683,6 +686,9 @@ function resetGame() {
   updateHealth();
   updateLevel();
   gameOver = false;
+
+  playerCombo = 1.0;
+  enemyCombo = 1.0;
 }
 
 // === INVENTORY PANEL HANDLING ===

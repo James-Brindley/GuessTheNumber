@@ -30,8 +30,8 @@ let isBossLevel = false;
 
 // Optional: Adjust these as you balance later
 const BOSS_MULTIPLIER = {
-  health: 1.5,
-  damage: 1.5,
+  health: 2,
+  damage: 2,
 };
 
 const bossSprites = {
@@ -109,7 +109,7 @@ function getPlayerStats() {
     damageReduction: 0,
     healOnAttack: 0,
     ignoreDamageChance: 0,
-    regenPerRound: 20,
+    regenPerRound: 10,
   };
 
   playerItems.forEach(item => {
@@ -273,7 +273,7 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
 
   } else {
     // ✅ Enemy base damage is always 20 minus reductions
-    let baseEnemyDamage = (20 + enemyBonusDamage) * (isBossLevel ? BOSS_MULTIPLIER.damage : 1);
+    let baseEnemyDamage = (10 + enemyBonusDamage) * (isBossLevel ? BOSS_MULTIPLIER.damage : 1);
     let damage = baseEnemyDamage - (stats.damageReduction || 0);
     if (damage < 0) damage = 0;
 

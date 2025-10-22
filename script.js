@@ -26,6 +26,11 @@ let enemyCombo = 1.0;
 const MAX_COMBO = 2.0; // optional cap
 const COMBO_STEP = 0.2;
 
+let totalDamageDealt = 0;
+let totalDamageTaken = 0;
+let totalHealingDone = 0;
+let revivesUsed = 0;
+
 let level = 1;
 let gameOver = false;
 let playerItems = [];
@@ -270,12 +275,14 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
     totalDamage = Math.round(totalDamage); // round to whole number
 
     enemyHealth = Math.max(0, enemyHealth - totalDamage);
+    totalDamageDealt += totalDamage;
 
     // ✅ Heal if player has healing effects
     if (stats.healOnAttack > 0) {
       const healAmount = Math.round(stats.healOnAttack);
       playerHealth = Math.min(playerHealth + healAmount, getPlayerMaxHealth());
       showHitPopup(true, `+${healAmount}`, true);
+      totalHealingDone += healAmount;
     }
 
     // ✅ Show hit popup for damage dealt
@@ -290,12 +297,14 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
 
     updateHealth();
 
+
   } else {
     // ✅ Enemy attack phase
     let baseEnemyDamage = (10 + enemyBonusDamage) * (isBossLevel ? BOSS_MULTIPLIER.damage : 1);
     let totalDamage = baseEnemyDamage * enemyCombo;
     totalDamage = Math.round(totalDamage);
     totalDamage -= Math.round(stats.damageReduction || 0);
+    totalDamageTaken += totalDamage;
     if (totalDamage < 0) totalDamage = 0;
 
     // ✅ Check ignore chance (MISS)
@@ -457,7 +466,10 @@ function tryRevive() {
 function checkGameOver() {
   if (playerHealth <= 0) {
     // Try revive first
-    if (tryRevive()) return; // revival successful, continue playing
+    if (tryRevive()) {
+      revivesUsed++;
+      return;
+    }
 
     // No revive available → true death
     playerHealth = 0;
@@ -542,44 +554,66 @@ function showEndScreen(playerWon) {
 
   const popup = document.createElement('div');
   popup.className = 'end-screen';
-  popup.innerHTML = `
-    <div class="end-screen-content">
-      <h1>${playerWon ? 'You Win!' : 'Game Over'}</h1>
-      <p>${playerWon ? 'Prepare for the next battle...' : 'Try again from Level 1'}</p>
-      <button id="next-level-btn">${playerWon ? 'Next Level' : 'Retry'}</button>
-      <br><br>
-      <button id="main-menu-btn">Main Menu</button>
-    </div>
-  `;
+
+  if (!playerWon) {
+    // 🩸 Player lost — show stats summary
+    popup.innerHTML = `
+      <div class="end-screen-content">
+        <h1>Game Over</h1>
+        <p>You reached <strong>Level ${level}</strong></p>
+        <h2 style="margin-top:40px;">🏹 Run Summary</h2>
+        <p>
+          ❤️ Max Health: ${getPlayerMaxHealth()}<br>
+          ⚔️ Attack Squares: ${playerAttackCount}<br>
+          💥 Total Damage Dealt: ${totalDamageDealt}<br>
+          💢 Total Damage Taken: ${totalDamageTaken}<br>
+          💚 Total Healing Done: ${totalHealingDone}<br>
+          🔁 Revives Used: ${revivesUsed}<br>
+          🧩 Items Collected: ${playerItems.length}
+        </p>
+        <br>
+        <button id="retry-btn">Retry</button>
+        <br><br>
+        <button id="main-menu-btn">Main Menu</button>
+      </div>
+    `;
+  } else {
+    // 🏆 Player won — keep as before
+    popup.innerHTML = `
+      <div class="end-screen-content">
+        <h1>You Win!</h1>
+        <p>Prepare for the next battle...</p>
+        <button id="next-level-btn">Next Level</button>
+        <br><br>
+        <button id="main-menu-btn">Main Menu</button>
+      </div>
+    `;
+  }
+
   document.body.appendChild(popup);
 
   // === Button handlers ===
-  document.getElementById('next-level-btn').addEventListener('click', () => {
-    popup.remove();
-
-    if (playerWon) {
+  if (playerWon) {
+    document.getElementById('next-level-btn').addEventListener('click', () => {
+      popup.remove();
       level++;
-
-      // ✅ Every 3rd level → show shop before next battle
       if ((level - 1) % 3 === 0) {
         showShop();
       } else {
-        // === Normal scaling ===
-        enemyAttackCount += 1;    // +1 attack number each level
-        if (level % 2 === 0) playerAttackCount += 1; // +1 player attack every 2 levels
+        enemyAttackCount += 1;
+        if (level % 2 === 0) playerAttackCount += 1;
         nextLevel();
       }
+    });
+  } else {
+    document.getElementById('retry-btn').addEventListener('click', () => {
+      popup.remove();
+      resetGame();
+      nextLevel();
+    });
+  }
 
-    } else {
-      // === Proper full reset ===
-      resetGame();     // ✅ Call your existing reset function
-      nextLevel();     // ✅ Start fresh
-    }
-  });
-
-  // ✅ New: Main Menu Button
   document.getElementById('main-menu-btn').addEventListener('click', () => {
-    // === Create confirmation popup ===
     const confirmPopup = document.createElement('div');
     confirmPopup.className = 'end-screen';
     confirmPopup.innerHTML = `
@@ -593,17 +627,15 @@ function showEndScreen(playerWon) {
       </div>
     `;
     document.body.appendChild(confirmPopup);
-  
-    // ✅ Yes → go to main menu
+
     document.getElementById('confirm-main-menu-yes').addEventListener('click', () => {
-      popup.remove();
       confirmPopup.remove();
+      popup.remove();
       mainMenu.style.display = 'flex';
       container.innerHTML = '';
       resetGame();
     });
-  
-    // ❌ No → close confirmation
+
     document.getElementById('confirm-main-menu-no').addEventListener('click', () => {
       confirmPopup.remove();
     });
@@ -772,6 +804,10 @@ startButton.addEventListener("click", () => {
 function resetGame() {
   playerItems = [];
   level = 1;
+  totalDamageDealt = 0;
+  totalDamageTaken = 0;
+  totalHealingDone = 0;
+  revivesUsed = 0;
   enemyBonusHealth = 0;
   enemyBonusDamage = 0;
   playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
@@ -929,6 +965,7 @@ function buildEnemyTooltip() {
     <strong style="font-size:28px;color:#E53935;">ENEMY STATS</strong><br>
     ❤️ Max Health: ${enemyMaxHealth}<br>
     ⚔️ Attack Damage: ${getEnemyBaseDamage()}
+    🔢 Attack Squares: ${enemyAttackCount}
   `;
 }
 

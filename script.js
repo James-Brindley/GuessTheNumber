@@ -364,28 +364,44 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
 
 // === BUILD GRID ===
 function buildGrid() {
-  // ✅ Auto-adjust grid width if there aren't enough cells
+  // === Auto-adjust grid size based on attack numbers ===
   let currentCols = cols;
-  let totalCells = currentCols * rows;
-  const requiredCells = playerAttackCount + enemyAttackCount + 5; // +5 buffer for safe cells etc.
+  let currentRows = rows;
+  let totalCells = currentCols * currentRows;
+  const requiredCells = playerAttackCount + enemyAttackCount + 5; // buffer
 
+  // 🧮 Expand grid dynamically:
+  // - +1 column until 3 added
+  // - then +1 row, repeat
+  let addedCols = 0;
   while (totalCells < requiredCells) {
     currentCols++;
-    totalCells = currentCols * rows;
+    addedCols++;
+    if (addedCols >= 3) {
+      currentRows++;
+      addedCols = 0;
+    }
+    totalCells = currentCols * currentRows;
   }
 
-  // ✅ Apply the new column count dynamically
+  // === Build the grid ===
   container.innerHTML = '';
+  // Animate when grid expands
+  container.classList.remove('grid-grow');
+  void container.offsetWidth; // force reflow for re-triggering animation
   container.style.gridTemplateColumns = `repeat(${currentCols}, 1fr)`;
+  container.classList.add('grid-grow');
 
 
+  // ✅ Recalculate attack numbers based on new total cell count
   playerAttackNumbers = getRandomUniqueNumbers(playerAttackCount, totalCells);
   enemyAttackNumbers = getRandomUniqueNumbers(enemyAttackCount, totalCells, playerAttackNumbers);
 
-  // --- Step 1: Create all grid cells first ---
   let number = 1;
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
+  for (let r = 0; r < currentRows; r++) {
+    for (let c = 0; c < currentCols; c++) {
+      if (number > totalCells) break;
+
       const cell = document.createElement('div');
       cell.className = 'grid-item';
       cell.textContent = number++;
@@ -414,10 +430,10 @@ function buildGrid() {
           enemyCombo = 1.0;
         }
 
-        // 🧨 Apply burn every tile click (always)
+        // 🧨 Burn triggers every tile click
         applyBurnEffect();
 
-        // 🔥 Handle simultaneous death correctly
+        // 🔥 Handle simultaneous deaths
         if (playerHealth <= 0 && enemyHealth <= 0) {
           playerHealth = 0;
           enemyHealth = 0;
@@ -428,14 +444,13 @@ function buildGrid() {
         } else {
           checkGameOver();
         }
-
       });
 
       container.appendChild(cell);
     }
   }
 
-  // --- Step 2: Highlight safe ranges AFTER grid creation ---
+  // === Highlight safe number ranges ===
   const gridItems = container.querySelectorAll('.grid-item');
 
   playerItems
@@ -443,15 +458,13 @@ function buildGrid() {
     .forEach(i => {
       const [min, max] = i.range;
 
-      // Highlight all numbers in range for visual feedback
       gridItems.forEach(cell => {
         const num = parseInt(cell.textContent);
         if (num >= min && num <= max) {
-          cell.classList.add('safe-range'); // faint glow
+          cell.classList.add('safe-range');
         }
       });
 
-      // === Safe number guarantee logic ===
       const rangeNums = Array.from({ length: max - min + 1 }, (_, x) => min + x);
       const available = rangeNums.filter(
         n => !playerAttackNumbers.includes(n) && !enemyAttackNumbers.includes(n)
@@ -465,12 +478,10 @@ function buildGrid() {
           const num = available[randomIndex];
           if (!chosen.includes(num)) chosen.push(num);
         }
-
         chosen.forEach(num => playerAttackNumbers.push(num));
       }
     });
 }
-
 
 function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSelector, speed = 250) {
   const el = document.getElementById(id);

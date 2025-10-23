@@ -364,8 +364,20 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
 
 // === BUILD GRID ===
 function buildGrid() {
+  // ✅ Auto-adjust grid width if there aren't enough cells
+  let currentCols = cols;
+  let totalCells = currentCols * rows;
+  const requiredCells = playerAttackCount + enemyAttackCount + 5; // +5 buffer for safe cells etc.
+
+  while (totalCells < requiredCells) {
+    currentCols++;
+    totalCells = currentCols * rows;
+  }
+
+  // ✅ Apply the new column count dynamically
   container.innerHTML = '';
-  container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  container.style.gridTemplateColumns = `repeat(${currentCols}, 1fr)`;
+
 
   playerAttackNumbers = getRandomUniqueNumbers(playerAttackCount, totalCells);
   enemyAttackNumbers = getRandomUniqueNumbers(enemyAttackCount, totalCells, playerAttackNumbers);

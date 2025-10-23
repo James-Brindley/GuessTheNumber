@@ -1,8 +1,8 @@
 const cols = 15;
 const rows = 4;
 
-const BASE_PLAYER_ATTACK_COUNT = 30;
-const BASE_ENEMY_ATTACK_COUNT = 20;
+const BASE_PLAYER_ATTACK_COUNT = 40;
+const BASE_ENEMY_ATTACK_COUNT = 10;
 
 let playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
 let enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;

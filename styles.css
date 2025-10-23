@@ -665,11 +665,15 @@ body {
   opacity: 1;
 }
 
+/* Faint blue pulsing glow for safe number ranges */
 @keyframes safePulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(0, 180, 255, 0.4); }
-  50% { box-shadow: 0 0 14px rgba(0, 220, 255, 0.7); }
+  0%, 100% { box-shadow: 0 0 6px rgba(0, 200, 255, 0.5); }
+  50% { box-shadow: 0 0 14px rgba(0, 255, 255, 0.9); }
 }
 
 .safe-range {
   animation: safePulse 2s infinite ease-in-out;
+  border-radius: 6px;
+  transition: box-shadow 0.3s ease;
 }
+

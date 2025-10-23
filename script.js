@@ -358,42 +358,7 @@ function buildGrid() {
   playerAttackNumbers = getRandomUniqueNumbers(playerAttackCount, totalCells);
   enemyAttackNumbers = getRandomUniqueNumbers(enemyAttackCount, totalCells, playerAttackNumbers);
 
-  // ✅ Radar-type items guarantee safe numbers
-  playerItems
-    .filter(i => i.range)
-    .forEach(i => {
-      const [min, max] = i.range;
-
-      // Highlight all numbers in range for visual feedback
-      const gridItems = container.querySelectorAll('.grid-item');
-      gridItems.forEach(cell => {
-        const num = parseInt(cell.textContent);
-        if (num >= min && num <= max) {
-          cell.classList.add('safe-range'); // faint glow effect
-        }
-      });
-
-      // === Safe number guarantee logic ===
-      const rangeNums = Array.from({ length: max - min + 1 }, (_, x) => min + x);
-      const available = rangeNums.filter(
-        n => !playerAttackNumbers.includes(n) && !enemyAttackNumbers.includes(n)
-      );
-      const count = i.safeNumbers || 1; // default 1 safe number
-
-      if (available.length > 0) {
-        const chosen = [];
-        while (chosen.length < Math.min(count, available.length)) {
-          const randomIndex = Math.floor(Math.random() * available.length);
-          const num = available[randomIndex];
-          if (!chosen.includes(num)) chosen.push(num);
-        }
-
-        chosen.forEach(num => playerAttackNumbers.push(num));
-      }
-    });
-
-
-
+  // --- Step 1: Create all grid cells first ---
   let number = 1;
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
@@ -411,29 +376,61 @@ function buildGrid() {
           cell.classList.add('eAttack');
           enemy.playAttack();
           applyPassiveItemEffectsOnAttack(false);
-          applyBurnEffect();        // burn can finish the enemy
-          resolveDeaths();          // decide outcome once
+          checkGameOver();
 
         } else if (playerAttackNumbers.includes(cellNumber)) {
           cell.classList.add('attack');
           hero.playAttack();
           applyPassiveItemEffectsOnAttack(true);
-          applyBurnEffect();
-          resolveDeaths();
+          checkGameOver();
 
         } else {
           cell.classList.add('active');
-          applyBurnEffect();
-          // Non-attack resets combos
           playerCombo = 1.0;
           enemyCombo = 1.0;
-          resolveDeaths();
         }
       });
+
       container.appendChild(cell);
     }
   }
+
+  // --- Step 2: Highlight safe ranges AFTER grid creation ---
+  const gridItems = container.querySelectorAll('.grid-item');
+
+  playerItems
+    .filter(i => i.range)
+    .forEach(i => {
+      const [min, max] = i.range;
+
+      // Highlight all numbers in range for visual feedback
+      gridItems.forEach(cell => {
+        const num = parseInt(cell.textContent);
+        if (num >= min && num <= max) {
+          cell.classList.add('safe-range'); // faint glow
+        }
+      });
+
+      // === Safe number guarantee logic ===
+      const rangeNums = Array.from({ length: max - min + 1 }, (_, x) => min + x);
+      const available = rangeNums.filter(
+        n => !playerAttackNumbers.includes(n) && !enemyAttackNumbers.includes(n)
+      );
+      const count = i.safeNumbers || 1;
+
+      if (available.length > 0) {
+        const chosen = [];
+        while (chosen.length < Math.min(count, available.length)) {
+          const randomIndex = Math.floor(Math.random() * available.length);
+          const num = available[randomIndex];
+          if (!chosen.includes(num)) chosen.push(num);
+        }
+
+        chosen.forEach(num => playerAttackNumbers.push(num));
+      }
+    });
 }
+
 
 function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSelector, speed = 250) {
   const el = document.getElementById(id);

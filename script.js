@@ -784,7 +784,7 @@ function nextLevel() {
   enemyBonusDamage = Math.floor((level - 1) * ENEMY_SCALING.damagePerLevel);
 
   // Boss scaling every 10 levels
-  if ((level - 1) % 10 === 0) {
+  if (level % 10 === 0) {
     enemyBonusHealth += 40;
     enemyBonusDamage += 8;
   }

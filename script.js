@@ -687,15 +687,15 @@ function nextLevel() {
   isBossLevel = (level % 10 === 0);
 
   // === Attack square scaling ===
-  if (level % 3 === 0 && playerAttackCount < 20) playerAttackCount += 1;
-  if (level % 2 === 0 && enemyAttackCount < 25) enemyAttackCount += 1;
+  if ((level - 1) % 3 === 0 && playerAttackCount < 20) playerAttackCount += 1;
+  if ((level - 1) % 2 === 0 && enemyAttackCount < 25) enemyAttackCount += 1;
 
   // Continuous scaling
   enemyBonusHealth = (level - 1) * ENEMY_SCALING.healthPerLevel;
   enemyBonusDamage = Math.floor((level - 1) * ENEMY_SCALING.damagePerLevel);
 
   // Boss scaling every 10 levels
-  if (level % 10 === 0) {
+  if ((level - 1) % 10 === 0) {
     enemyBonusHealth += 40;
     enemyBonusDamage += 8;
   }

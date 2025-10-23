@@ -772,8 +772,14 @@ function nextLevel() {
   playerCombo = 1.0;
   enemyCombo = 1.0;
 
-  // ✅ Determine if this is a boss level
-  isBossLevel = (level % 10 === 0);
+  // ✅ Determine if this is a boss level (skip level 1)
+  isBossLevel = (level % 10 === 0 && level > 1);
+
+  // ✅ Apply boss scaling only on actual boss levels
+  if (isBossLevel) {
+    enemyBonusHealth += 40;
+    enemyBonusDamage += 8;
+  }
 
   // === Attack square scaling ===
   if ((level - 1) % 3 === 0 && playerAttackCount < 20) playerAttackCount += 1;
@@ -782,12 +788,6 @@ function nextLevel() {
   // Continuous scaling
   enemyBonusHealth = (level - 1) * ENEMY_SCALING.healthPerLevel;
   enemyBonusDamage = Math.floor((level - 1) * ENEMY_SCALING.damagePerLevel);
-
-  // Boss scaling every 10 levels
-  if (level % 10 === 0) {
-    enemyBonusHealth += 40;
-    enemyBonusDamage += 8;
-  }
 
   // ✅ Get player stats once
   const stats = getPlayerStats();

@@ -390,34 +390,33 @@ function buildGrid() {
           cell.classList.add('eAttack');
           enemy.playAttack();
           applyPassiveItemEffectsOnAttack(false);
-          checkGameOver();
 
         } else if (playerAttackNumbers.includes(cellNumber)) {
           cell.classList.add('attack');
           hero.playAttack();
           applyPassiveItemEffectsOnAttack(true);
-          checkGameOver();
 
         } else {
-            cell.classList.add('active');
-            playerCombo = 1.0;
-            enemyCombo = 1.0;
+          cell.classList.add('active');
+          playerCombo = 1.0;
+          enemyCombo = 1.0;
+        }
 
-            // 🧨 Apply burn/poison effect every click
-            applyBurnEffect();
+        // 🧨 Apply burn every tile click (always)
+        applyBurnEffect();
 
-            // 🔥 Check for simultaneous death (player loses ties)
-            if (playerHealth <= 0 && enemyHealth <= 0) {
-              playerHealth = 0;
-              enemyHealth = 0;
-              updateHealth();
-              hero.playDeath();
-              enemy.playDeath();
-              showEndScreen(false);
-            } else {
-              checkGameOver();
-            }
-          }
+        // 🔥 Handle simultaneous death correctly
+        if (playerHealth <= 0 && enemyHealth <= 0) {
+          playerHealth = 0;
+          enemyHealth = 0;
+          updateHealth();
+          hero.playDeath();
+          enemy.playDeath();
+          showEndScreen(false);
+        } else {
+          checkGameOver();
+        }
+
       });
 
       container.appendChild(cell);

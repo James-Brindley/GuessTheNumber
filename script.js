@@ -169,10 +169,9 @@ function applyBurnEffect() {
   if (stats.burnDamage > 0 && enemyHealth > 0) {
     const burn = Math.round(stats.burnDamage);
     enemyHealth = Math.max(0, enemyHealth - burn);
-    showHitPopup(false, `-${burn}`, false); // show burn popup on enemy
-    updateHealth();
     totalDamageDealt += burn;
-    if (enemyHealth <= 0) checkGameOver();
+    showHitPopup(false, `-${burn}`, false);
+    updateHealth();
   }
 }
 
@@ -388,24 +387,25 @@ function buildGrid() {
           cell.classList.add('eAttack');
           enemy.playAttack();
           applyPassiveItemEffectsOnAttack(false);
-          applyBurnEffect(); // 🧪 apply burn
-          checkGameOver();
+          applyBurnEffect();        // burn can finish the enemy
+          resolveDeaths();          // decide outcome once
 
         } else if (playerAttackNumbers.includes(cellNumber)) {
           cell.classList.add('attack');
           hero.playAttack();
           applyPassiveItemEffectsOnAttack(true);
-          applyBurnEffect(); // 🧪 apply burn
-          checkGameOver();
+          applyBurnEffect();
+          resolveDeaths();
 
         } else {
           cell.classList.add('active');
-          applyBurnEffect(); // 🧪 even neutral tiles trigger it
+          applyBurnEffect();
+          // Non-attack resets combos
           playerCombo = 1.0;
           enemyCombo = 1.0;
+          resolveDeaths();
         }
       });
-
       container.appendChild(cell);
     }
   }
@@ -463,6 +463,41 @@ function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSel
   return character;
 }
 
+function resolveDeaths() {
+  // Attempt revive if the player is at/below 0
+  if (playerHealth <= 0) {
+    const revived = tryRevive();
+    if (revived) {
+      revivesUsed++;
+    }
+  }
+
+  updateHealth();
+
+  // Tie rule after any possible revive: player loses ties
+  if (playerHealth <= 0 && enemyHealth <= 0) {
+    playerHealth = 0;
+    hero.playDeath();
+    showEndScreen(false);
+    return true;
+  }
+
+  if (playerHealth <= 0) {
+    playerHealth = 0;
+    hero.playDeath();
+    showEndScreen(false);
+    return true;
+  }
+
+  if (enemyHealth <= 0) {
+    enemyHealth = 0;
+    enemy.playDeath();
+    showEndScreen(true);
+    return true;
+  }
+
+  return false;
+}
 
 function tryRevive() {
   const reviveItemIndex = playerItems.findIndex(i => i.reviveAtPercent);
@@ -616,6 +651,7 @@ function showEndScreen(playerWon) {
           ⚔️ Attack Squares: ${playerAttackCount}<br>
           💥 Total Damage Dealt: ${totalDamageDealt}<br>
           💢 Total Damage Taken: ${totalDamageTaken}<br>
+          🌀 Combo Gain: +${(getPlayerStats().comboBoost || 0).toFixed(1)} / hit<br>
           💚 Total Healing Done: ${totalHealingDone}<br>
           🔁 Revives Used: ${revivesUsed}<br>
           🧩 Items Collected: ${playerItems.length}
@@ -1004,6 +1040,8 @@ function buildPlayerTooltip() {
     💉 Heal On Attack: ${stats.healOnAttack}<br>
     ♻️ Regen Per Round: ${stats.regenPerRound}<br>
     🎲 Ignore Chance: ${(stats.ignoreDamageChance * 100).toFixed(0)}%<br>
+    🌀 Combo Gain: +${(stats.comboBoost || 0).toFixed(1)} / hit<br>
+    ☠️ Burn per Click: ${stats.burnDamage || 0}<br>
     🔢 Attack Squares: ${playerAttackCount}
   `;
 }

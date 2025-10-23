@@ -363,12 +363,24 @@ function buildGrid() {
     .filter(i => i.range)
     .forEach(i => {
       const [min, max] = i.range;
+
+      // Highlight all numbers in range for visual feedback
+      const gridItems = container.querySelectorAll('.grid-item');
+      gridItems.forEach(cell => {
+        const num = parseInt(cell.textContent);
+        if (num >= min && num <= max) {
+          cell.classList.add('safe-range'); // faint glow effect
+        }
+      });
+
+      // === Safe number guarantee logic ===
       const rangeNums = Array.from({ length: max - min + 1 }, (_, x) => min + x);
-      const available = rangeNums.filter(n => !playerAttackNumbers.includes(n) && !enemyAttackNumbers.includes(n));
+      const available = rangeNums.filter(
+        n => !playerAttackNumbers.includes(n) && !enemyAttackNumbers.includes(n)
+      );
       const count = i.safeNumbers || 1; // default 1 safe number
 
       if (available.length > 0) {
-        // pick actual numbers directly, not indices
         const chosen = [];
         while (chosen.length < Math.min(count, available.length)) {
           const randomIndex = Math.floor(Math.random() * available.length);
@@ -379,6 +391,7 @@ function buildGrid() {
         chosen.forEach(num => playerAttackNumbers.push(num));
       }
     });
+
 
 
   let number = 1;

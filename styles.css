@@ -664,3 +664,12 @@ body {
 .stats-tooltip.show {
   opacity: 1;
 }
+
+@keyframes safePulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(0, 180, 255, 0.4); }
+  50% { box-shadow: 0 0 14px rgba(0, 220, 255, 0.7); }
+}
+
+.safe-range {
+  animation: safePulse 2s infinite ease-in-out;
+}

@@ -360,15 +360,26 @@ function buildGrid() {
 
   // ✅ Radar-type items guarantee safe numbers
   playerItems
-  .filter(i => i.range)
-  .forEach(i => {
-    const [min, max] = i.range;
-    const rangeNums = Array.from({ length: max - min + 1 }, (_, x) => min + x);
-    const available = rangeNums.filter(n => !playerAttackNumbers.includes(n) && !enemyAttackNumbers.includes(n));
-    const count = i.safeNumbers || 1; // default 1, can scale up
-    const chosen = getRandomUniqueNumbers(Math.min(count, available.length), available.length);
-    chosen.forEach(index => playerAttackNumbers.push(available[index]));
-  });
+    .filter(i => i.range)
+    .forEach(i => {
+      const [min, max] = i.range;
+      const rangeNums = Array.from({ length: max - min + 1 }, (_, x) => min + x);
+      const available = rangeNums.filter(n => !playerAttackNumbers.includes(n) && !enemyAttackNumbers.includes(n));
+      const count = i.safeNumbers || 1; // default 1 safe number
+
+      if (available.length > 0) {
+        // pick actual numbers directly, not indices
+        const chosen = [];
+        while (chosen.length < Math.min(count, available.length)) {
+          const randomIndex = Math.floor(Math.random() * available.length);
+          const num = available[randomIndex];
+          if (!chosen.includes(num)) chosen.push(num);
+        }
+
+        chosen.forEach(num => playerAttackNumbers.push(num));
+      }
+    });
+
 
   let number = 1;
   for (let r = 0; r < rows; r++) {

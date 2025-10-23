@@ -113,7 +113,6 @@ function getEnemyMaxHealth() {
   return base + bonus;
 }
 
-//starting stats
 function getPlayerStats() {
   let stats = {
     bonusDamage: 0,
@@ -121,6 +120,8 @@ function getPlayerStats() {
     healOnAttack: 0,
     ignoreDamageChance: 0,
     regenPerRound: 10,
+    comboBoost: 0,     // 🆕 new stat for combo gain
+    burnDamage: 0,     // 🆕 new stat for burn/poison effect
   };
 
   playerItems.forEach(item => {
@@ -129,9 +130,13 @@ function getPlayerStats() {
     if (item.healOnAttack) stats.healOnAttack += item.healOnAttack;
     if (item.ignoreDamageChance) stats.ignoreDamageChance += item.ignoreDamageChance;
     if (item.regenPerRound) stats.regenPerRound += item.regenPerRound;
+    if (item.comboBoost) stats.comboBoost += item.comboBoost;
+    if (item.burnDamage) stats.burnDamage += item.burnDamage;
   });
+
   return stats;
 }
+
 
 
 // === DYNAMIC HEALTH CALCULATIONS ===
@@ -157,6 +162,18 @@ function getEnemyMaxHealth() {
   });
 
   return base + bonus;
+}
+
+function applyBurnEffect() {
+  const stats = getPlayerStats();
+  if (stats.burnDamage > 0 && enemyHealth > 0) {
+    const burn = Math.round(stats.burnDamage);
+    enemyHealth = Math.max(0, enemyHealth - burn);
+    showHitPopup(false, `-${burn}`, false); // show burn popup on enemy
+    updateHealth();
+    totalDamageDealt += burn;
+    if (enemyHealth <= 0) checkGameOver();
+  }
 }
 
 // === RARITY SYSTEM ===
@@ -186,6 +203,8 @@ const allItems = [
     bonusDamage: 5, applyEffect() {} },
   { id: "lightArmor", name: "Light Armor", description: "Heal +5 HP Per Round", rarity: RARITY.COMMON,
     regenPerRound: 5, applyEffect() {} },
+  { id: "comboCharm", name: "Combo Charm", description: "Increases combo gain by +0.1", rarity: RARITY.COMMON,
+    comboBoost: 0.1, applyEffect() {} },
   { id: "crudePotion", name: "Crude Potion", description: "Heal +40 HP", rarity: RARITY.COMMON,
     isConsumable: true, applyEffect() {
       playerHealth = Math.min(playerHealth + 40, getPlayerMaxHealth());
@@ -209,6 +228,8 @@ const allItems = [
     damageReduction: 5, applyEffect() {} },
   { id: "bronzeArmor", name: "Bronze Armor", description: "Heal +10 HP Per Round", rarity: RARITY.RARE,
     regenPerRound: 10, applyEffect() {} },
+  { id: "flamePendant", name: "Flame Pendant", description: "Inflicts 1 burn damage every tile clicked", rarity: RARITY.RARE,
+    burnDamage: 1, applyEffect() {} },
   { id: "lifeAmulet", name: "Life Amulet", description: "Revive Once With 25% HP", rarity: RARITY.RARE,
     reviveAtPercent: 0.25, applyEffect() {} },
 
@@ -223,10 +244,14 @@ const allItems = [
     damageReduction: 10, applyEffect() {} },
   { id: "focusTalisman", name: "Focus Talisman", description: "Deal +10 Damage", rarity: RARITY.EPIC,
     bonusDamage: 10, applyEffect() {} },
+  { id: "fireBrand", name: "Firebrand", description: "Combo gain +0.2 and 2 burn damage per tile", rarity: RARITY.EPIC,
+    comboBoost: 0.2, burnDamage: 2, applyEffect() {} },
 
   // LEGENDARY
   { id: "phoenixHeart", name: "Phoenix Heart", description: "Revive Once With 100% HP", rarity: RARITY.LEGENDARY,
     reviveAtPercent: 1, applyEffect() {} },
+  { id: "infernoSoul", name: "Inferno Soul", description: "Combo gain +0.3 and 3 burn damage per tile", rarity: RARITY.LEGENDARY,
+    comboBoost: 0.3, burnDamage: 3, applyEffect() {} },
   { id: "godblade", name: "Godblade", description: "Gain +5 Attack Square, Deal +10 Damage", rarity: RARITY.LEGENDARY,
     bonusAttackCount: 5, bonusDamage: 10, applyEffect() { playerAttackCount += 5; } },
   { id: "omnigem", name: "Omni Gem", description: "3 Safe Numbers Between 1–15", rarity: RARITY.LEGENDARY,
@@ -292,7 +317,7 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
     if (playerCombo > 1.0) showComboPopup(true);
 
     // ✅ Increase combo
-    playerCombo = Math.min(playerCombo + COMBO_STEP, MAX_COMBO);
+    playerCombo = Math.min(playerCombo + COMBO_STEP + (stats.comboBoost || 0), MAX_COMBO);
     enemyCombo = 1.0;
 
     updateHealth();
@@ -363,17 +388,19 @@ function buildGrid() {
           cell.classList.add('eAttack');
           enemy.playAttack();
           applyPassiveItemEffectsOnAttack(false);
+          applyBurnEffect(); // 🧪 apply burn
           checkGameOver();
 
         } else if (playerAttackNumbers.includes(cellNumber)) {
           cell.classList.add('attack');
           hero.playAttack();
           applyPassiveItemEffectsOnAttack(true);
+          applyBurnEffect(); // 🧪 apply burn
           checkGameOver();
 
         } else {
           cell.classList.add('active');
-          // Reset both combos when a non-attack tile is clicked
+          applyBurnEffect(); // 🧪 even neutral tiles trigger it
           playerCombo = 1.0;
           enemyCombo = 1.0;
         }

@@ -485,21 +485,43 @@ function checkGameOver() {
 }
 
 
-// === SHOP SYSTEM ===
+function getDynamicRarityChances(level) {
+  // Linear interpolation between base and max values
+  const progress = Math.min(level / 50, 1);
+
+  return {
+    COMMON: 0.55 - 0.20 * progress,    // 55% → 35%
+    RARE: 0.25 + 0.10 * progress,      // 25% → 35%
+    EPIC: 0.15 + 0.05 * progress,      // 15% → 20%
+    LEGENDARY: 0.05 + 0.05 * progress, // 5% → 10%
+  };
+}
+
 function showShop() {
   const popup = document.createElement('div');
   popup.className = 'end-screen';
 
-  const available = allItems.filter(item => !playerItems.some(pi => pi.id === item.id));
-  const weightedPool = available.flatMap(item => Array(Math.floor(item.rarity.chance * 100)).fill(item));
+  // 🧮 Apply dynamic rarity scaling
+  const chances = getDynamicRarityChances(level);
 
+  const weightedPool = allItems.flatMap(item => {
+    let rarityChance = 0.01;
+    if (item.rarity === RARITY.COMMON) rarityChance = chances.COMMON;
+    else if (item.rarity === RARITY.RARE) rarityChance = chances.RARE;
+    else if (item.rarity === RARITY.EPIC) rarityChance = chances.EPIC;
+    else if (item.rarity === RARITY.LEGENDARY) rarityChance = chances.LEGENDARY;
+    return Array(Math.floor(rarityChance * 100)).fill(item);
+  });
+
+  const available = weightedPool.filter(item => !playerItems.some(pi => pi.id === item.id));
   const shopChoices = [];
-  const count = Math.min(3, weightedPool.length);
+  const count = Math.min(3, available.length);
   const indexes = new Set();
   while (indexes.size < count) {
-    indexes.add(Math.floor(Math.random() * weightedPool.length));
+    indexes.add(Math.floor(Math.random() * available.length));
   }
-  indexes.forEach(i => shopChoices.push(weightedPool[i]));
+  indexes.forEach(i => shopChoices.push(available[i]));
+
 
   popup.innerHTML = `
     <div class="end-screen-content">

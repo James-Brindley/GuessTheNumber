@@ -665,15 +665,25 @@ body {
   opacity: 1;
 }
 
-/* Faint blue pulsing glow for safe number ranges */
-@keyframes safePulse {
-  0%, 100% { box-shadow: 0 0 6px rgba(0, 200, 255, 0.5); }
-  50% { box-shadow: 0 0 14px rgba(0, 255, 255, 0.9); }
+.safe-range {
+  animation: pulse-blue 1.2s infinite;
+  box-shadow: 0 0 12px 3px rgba(0, 180, 255, 0.6);
+  transition: box-shadow 0.4s ease-out;
+  border-radius: 15px;
 }
 
-.safe-range {
-  animation: safePulse 2s infinite ease-in-out;
-  border-radius: 6px;
-  transition: box-shadow 0.3s ease;
+@keyframes pulse-blue {
+  0%, 100% {
+    box-shadow: 0 0 10px 3px rgba(0, 180, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px 5px rgba(0, 220, 255, 0.8);
+  }
+}
+
+
+.burn-flash {
+  filter: brightness(1.8) hue-rotate(-10deg);
+  transition: filter 0.15s ease;
 }
 

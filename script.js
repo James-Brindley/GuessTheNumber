@@ -171,9 +171,21 @@ function applyBurnEffect() {
     enemyHealth = Math.max(0, enemyHealth - burn);
     totalDamageDealt += burn;
     showHitPopup(false, `-${burn}`, false);
+
+    // 🔥 Optional small flash effect
+    const enemyEl = document.querySelector('.enemy-container');
+    enemyEl.classList.add('burn-flash');
+    setTimeout(() => enemyEl.classList.remove('burn-flash'), 150);
+
     updateHealth();
+
+    // 🧨 Check if enemy died from burn
+    if (enemyHealth <= 0) {
+      checkGameOver();
+    }
   }
 }
+
 
 // === RARITY SYSTEM ===
 const RARITY = {
@@ -372,6 +384,8 @@ function buildGrid() {
         cell.classList.add('clicked');
         const cellNumber = parseInt(cell.textContent);
 
+        cell.classList.remove('safe-range');
+
         if (enemyAttackNumbers.includes(cellNumber)) {
           cell.classList.add('eAttack');
           enemy.playAttack();
@@ -385,10 +399,25 @@ function buildGrid() {
           checkGameOver();
 
         } else {
-          cell.classList.add('active');
-          playerCombo = 1.0;
-          enemyCombo = 1.0;
-        }
+            cell.classList.add('active');
+            playerCombo = 1.0;
+            enemyCombo = 1.0;
+
+            // 🧨 Apply burn/poison effect every click
+            applyBurnEffect();
+
+            // 🔥 Check for simultaneous death (player loses ties)
+            if (playerHealth <= 0 && enemyHealth <= 0) {
+              playerHealth = 0;
+              enemyHealth = 0;
+              updateHealth();
+              hero.playDeath();
+              enemy.playDeath();
+              showEndScreen(false);
+            } else {
+              checkGameOver();
+            }
+          }
       });
 
       container.appendChild(cell);

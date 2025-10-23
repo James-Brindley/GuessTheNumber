@@ -50,7 +50,8 @@ body {
   left: 50%;
   transform: translateX(-50%);
   font-size: 50px;
-  transition: all 0.6s ease;
+
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .grid-item {
@@ -92,6 +93,15 @@ body {
   transform: scale(1);
   opacity: 1;
 }
+
+/* ✨ Optional: stagger the fade for a nicer wave effect */
+.grid-item:nth-child(odd) {
+  transition-delay: 0.05s;
+}
+.grid-item:nth-child(even) {
+  transition-delay: 0.1s;
+}
+
 
 .grid-grow {
   animation: gridGrow 0.6s ease;

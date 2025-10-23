@@ -775,12 +775,6 @@ function nextLevel() {
   // ✅ Determine if this is a boss level (skip level 1)
   isBossLevel = (level % 10 === 0 && level > 1);
 
-  // ✅ Apply boss scaling only on actual boss levels
-  if (isBossLevel) {
-    enemyBonusHealth += 40;
-    enemyBonusDamage += 8;
-  }
-
   // === Attack square scaling ===
   if ((level - 1) % 3 === 0 && playerAttackCount < 20) playerAttackCount += 1;
   if ((level - 1) % 2 === 0 && enemyAttackCount < 25) enemyAttackCount += 1;

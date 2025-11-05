@@ -245,12 +245,12 @@ const allItems = [
     reviveAtPercent: 0.25, applyEffect() {} },
 
   // EPIC
-  { id: "crystalSword", name: "Crystal Sword", description: "Gain +3 Attack Squares", rarity: RARITY.EPIC,
-    bonusAttackCount: 3, applyEffect() { playerAttackCount += 3; } },
+  { id: "crystalSword", name: "Crystal Sword", description: "Gain +5 Attack Squares", rarity: RARITY.EPIC,
+    bonusAttackCount: 5, applyEffect() { playerAttackCount += 5; } },
   { id: "holyCharm", name: "Holy Charm", description: "Heal +8 HP Per Attack Dealt", rarity: RARITY.EPIC,
     healOnAttack: 8, applyEffect() {} },
-  { id: "divineRadar", name: "Divine Radar", description: "2 Safe Numbers Between 10–20", rarity: RARITY.EPIC,
-    range: [10, 20], safeNumbers: 2, applyEffect() {} },
+  { id: "divineRadar", name: "Divine Radar", description: "2 Safe Numbers Between 10-15", rarity: RARITY.EPIC,
+    range: [10, 15], safeNumbers: 2, applyEffect() {} },
   { id: "adamantArmor", name: "Adamant Armor", description: "Take -10 Damage", rarity: RARITY.EPIC,
     damageReduction: 10, applyEffect() {} },
   { id: "focusTalisman", name: "Focus Talisman", description: "Deal +10 Damage", rarity: RARITY.EPIC,
@@ -265,8 +265,12 @@ const allItems = [
     comboBoost: 0.3, burnDamage: 3, applyEffect() {} },
   { id: "godblade", name: "Godblade", description: "Gain +5 Attack Square, Deal +10 Damage", rarity: RARITY.LEGENDARY,
     bonusAttackCount: 5, bonusDamage: 10, applyEffect() { playerAttackCount += 5; } },
-  { id: "omnigem", name: "Omni Gem", description: "3 Safe Numbers Between 1–15", rarity: RARITY.LEGENDARY,
-    range: [1, 15], safeNumbers: 3, applyEffect() {} },
+  { id: "omnigem", name: "Omni Gem", description: "5 Safe Numbers Between 1–10", rarity: RARITY.LEGENDARY,
+    range: [1, 10], safeNumbers: 5, applyEffect() {} },
+  { id: "heavySword", name: "Heavy Sword", description: "Combo gain +0.5", rarity: RARITY.LEGENDARY,
+    comboBoost: 0.5, applyEffect() {} },
+  { id: "emberCore", name: "Ember Core", description: "5 burn damage per tile", rarity: RARITY.LEGENDARY,
+      burnDamage: 5, applyEffect() {} },
 ];
 
 

@@ -873,12 +873,12 @@ function nextLevel() {
   // ✅ Scaling system
   // Every 10th level starting from 5 (5,15,25,35...) → +40 enemy HP
   if (level >= 5 && (level - 5) % 10 === 0) {
-    enemyBonusHealth += 30;
+    enemyBonusHealth += 25;
   }
 
   // Every level immediately after a boss (11,21,31,41...) → +10 enemy damage
   if ((level - 1) % 10 === 0 && level > 10) {
-    enemyBonusDamage += 10;
+    enemyBonusDamage += 5;
   }
 
   // ✅ Get player stats once

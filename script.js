@@ -917,7 +917,7 @@ function nextLevel() {
   gameOver = false;
 
   if (level > 1) { // skip the first round (player starts with 40)
-    playerGold += 10;
+    playerGold += 20;
     updateGoldEverywhere();
   }
 

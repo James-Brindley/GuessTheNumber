@@ -385,7 +385,7 @@ function buildGrid() {
   let currentCols = cols;
   let currentRows = rows;
   let totalCells = currentCols * currentRows;
-  const requiredCells = playerAttackCount + enemyAttackCount + 5; // buffer
+  const requiredCells = playerAttackCount + enemyAttackCount + GOLD_TILES_PER_ROUND + 5; // buffer
 
   // 🧮 Expand grid dynamically:
   // - +1 column until 3 added
@@ -456,7 +456,7 @@ function buildGrid() {
           applyPassiveItemEffectsOnAttack(true);
         
         } else if (goldNumbers.includes(cellNumber)) {
-          // 🪙 Gold tile: safe, no combo reset
+
           cell.classList.add('gold');
           playerGold += GOLD_PER_TILE;
           updateGoldEverywhere();

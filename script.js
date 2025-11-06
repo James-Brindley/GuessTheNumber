@@ -1017,7 +1017,7 @@ startButton.addEventListener("click", () => {
 
 function resetGame() {
   playerItems = [];
-  playerGold = 40;
+  playerGold = 50;
   updateGoldEverywhere();
 
 

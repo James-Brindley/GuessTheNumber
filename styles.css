@@ -730,3 +730,17 @@ body {
   color: gold;
   text-shadow: 0 0 8px #000;
 }
+
+.grid-item.gold {
+  background: radial-gradient(circle at 30% 30%, #ffd54f, #ffb300);
+  box-shadow: 0 0 18px 4px rgba(255, 200, 0, 0.6);
+  position: relative;
+}
+.grid-item.gold::after {
+  content: '🪙';
+  position: absolute;
+  right: 8px;
+  top: 6px;
+  font-size: 28px;
+  filter: drop-shadow(0 2px 0 black);
+}

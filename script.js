@@ -40,9 +40,24 @@ const GOLD_TILES_PER_ROUND = 5;     // how many gold tiles per round
 const GOLD_PER_TILE = 5;            // how much each gold tile gives
 
 function updateGoldEverywhere() {
-  const el = document.getElementById('gold-display');
-  if (el) el.textContent = `🪙 ${playerGold}`;
+  // top HUD
+  updateGoldDisplay();
+
+  // if shop not created yet, bail safely
+  if (typeof currentShopPopup === 'undefined' || !currentShopPopup) return;
+
+  // shop (if open)
+  const shopGoldEl = currentShopPopup.querySelector('#shop-gold');
+  if (shopGoldEl) shopGoldEl.textContent = playerGold;
+
+  // enable/disable buttons based on current gold & purchased state
+  currentShopPopup.querySelectorAll('button[data-cost]').forEach(btn => {
+    const cost = Number(btn.dataset.cost);
+    const purchased = btn.dataset.purchased === '1';
+    btn.disabled = purchased || playerGold < cost;
+  });
 }
+
 
 
 // === BOSS SETTINGS ===
@@ -104,6 +119,8 @@ function updateLevel() {
   levelDisplay.textContent = `Level ${level}`;
 }
 
+let currentShopPopup = null;
+
 const goldDisplay = document.createElement('div');
 goldDisplay.id = 'gold-display';
 goldDisplay.textContent = `💰 ${playerGold}`;
@@ -112,7 +129,6 @@ document.body.appendChild(goldDisplay);
 function updateGoldDisplay() {
   goldDisplay.textContent = `💰 ${playerGold}`;
 }
-
 
 // === DYNAMIC HEALTH & DAMAGE CALCULATIONS ===
 function getPlayerMaxHealth() {

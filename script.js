@@ -35,6 +35,8 @@ let level = 1;
 let gameOver = false;
 let playerItems = [];
 
+let playerGold = 40;
+
 // === BOSS SETTINGS ===
 let isBossLevel = false;
 
@@ -92,6 +94,16 @@ function updateHealth() {
 function updateLevel() {
   levelDisplay.textContent = `Level ${level}`;
 }
+
+const goldDisplay = document.createElement('div');
+goldDisplay.id = 'gold-display';
+goldDisplay.textContent = `💰 ${playerGold}`;
+document.body.appendChild(goldDisplay);
+
+function updateGoldDisplay() {
+  goldDisplay.textContent = `💰 ${playerGold}`;
+}
+
 
 // === DYNAMIC HEALTH & DAMAGE CALCULATIONS ===
 function getPlayerMaxHealth() {
@@ -191,6 +203,14 @@ const RARITY = {
   EPIC: { color: "#9C27B0", chance: 0.15 },
   LEGENDARY: { color: "#FFD700", chance: 0.05 },
 };
+
+const RARITY_COST = {
+  COMMON: 10,
+  RARE: 25,
+  EPIC: 50,
+  LEGENDARY: 100,
+};
+
 
 // === ALL ITEMS (fully compatible with new stat system) ===
 const allItems = [
@@ -426,6 +446,8 @@ function buildGrid() {
           cell.classList.add('active');
           playerCombo = 1.0;
           enemyCombo = 1.0;
+          playerGold = Math.max(0, playerGold - 1);
+          updateGoldDisplay();
         }
       
         // Burn triggers on every click
@@ -622,7 +644,7 @@ function showShop() {
   const popup = document.createElement('div');
   popup.className = 'end-screen';
 
-  // 🧮 Apply dynamic rarity scaling
+  // 🧮 Weighted pool for rarity chance
   const chances = getDynamicRarityChances(level);
 
   const weightedPool = allItems.flatMap(item => {
@@ -634,46 +656,46 @@ function showShop() {
     return Array(Math.floor(rarityChance * 100)).fill(item);
   });
 
+  // Randomly select 5 items
   const available = weightedPool.filter(item => !playerItems.some(pi => pi.id === item.id));
   const shopChoices = [];
-  const count = Math.min(3, available.length);
+  const count = Math.min(5, available.length);
   const indexes = new Set();
-  while (indexes.size < count) {
-    indexes.add(Math.floor(Math.random() * available.length));
-  }
+  while (indexes.size < count) indexes.add(Math.floor(Math.random() * available.length));
   indexes.forEach(i => shopChoices.push(available[i]));
-
 
   popup.innerHTML = `
     <div class="end-screen-content">
       <h1>Item Shop</h1>
-      <p>Choose one item to aid your journey</p>
+      <p>You have <strong style="color:gold;">${playerGold} Gold</strong></p>
       <div id="shop-items" style="display:flex;flex-direction:column;gap:20px;align-items:center;"></div>
+      <br>
+      <button id="continue-btn">Continue</button>
     </div>
   `;
   document.body.appendChild(popup);
 
   const itemContainer = popup.querySelector('#shop-items');
+  const continueBtn = popup.querySelector('#continue-btn');
 
   if (shopChoices.length === 0) {
     const msg = document.createElement('p');
-    msg.textContent = "No more items available!";
-    msg.style.fontSize = "30px";
+    msg.textContent = "No items available.";
     itemContainer.appendChild(msg);
-
-    const btn = document.createElement('button');
-    btn.textContent = "Continue";
-    btn.addEventListener('click', () => {
+    continueBtn.addEventListener('click', () => {
       popup.remove();
       nextLevel();
     });
-    itemContainer.appendChild(btn);
     return;
   }
 
   shopChoices.forEach(item => {
+    const cost = RARITY_COST[
+      Object.keys(RARITY).find(key => RARITY[key] === item.rarity)
+    ] || 10;
+
     const btn = document.createElement('button');
-    btn.textContent = `${item.name} - ${item.description}`;
+    btn.textContent = `${item.name} - ${item.description}  (Cost: ${cost}💰)`;
     btn.style.fontSize = '28px';
     btn.style.padding = '20px 40px';
     btn.style.border = `4px solid ${item.rarity.color}`;
@@ -681,15 +703,27 @@ function showShop() {
     btn.style.background = 'rgba(0,0,0,0.6)';
     btn.style.color = item.rarity.color;
     btn.style.textShadow = '2px 2px 0 black';
+    btn.disabled = playerGold < cost;
+
     btn.addEventListener('click', () => {
-      popup.remove();
-      playerItems.push(item);
-      item.applyEffect();
-      nextLevel();
+      if (playerGold >= cost) {
+        playerGold -= cost;
+        updateGoldDisplay();
+        playerItems.push(item);
+        item.applyEffect();
+        btn.disabled = true;
+        btn.textContent = `${item.name} (Purchased)`;
+      }
     });
     itemContainer.appendChild(btn);
   });
+
+  continueBtn.addEventListener('click', () => {
+    popup.remove();
+    nextLevel();
+  });
 }
+
 
 // === END SCREEN ===
 function showEndScreen(playerWon) {
@@ -700,7 +734,7 @@ function showEndScreen(playerWon) {
   popup.className = 'end-screen';
 
   if (!playerWon) {
-    // 🩸 Player lost — show stats summary
+
     popup.innerHTML = `
       <div class="end-screen-content">
         <h1>Game Over</h1>
@@ -739,16 +773,16 @@ function showEndScreen(playerWon) {
 
   // === Button handlers ===
   if (playerWon) {
+
+    playerGold += 10;
+    updateGoldDisplay();
+
     document.getElementById('next-level-btn').addEventListener('click', () => {
       popup.remove();
       level++;
-      if ((level - 1) % 3 === 0) {
-        showShop();
-      } else {
-        enemyAttackCount += 1;
-        if (level % 2 === 0) playerAttackCount += 1;
-        nextLevel();
-      }
+      enemyAttackCount += 1;
+      if (level % 2 === 0) playerAttackCount += 1;
+      showShop(); // 🏪 always show shop after each win
     });
   } else {
     document.getElementById('retry-btn').addEventListener('click', () => {
@@ -948,6 +982,9 @@ startButton.addEventListener("click", () => {
 
 function resetGame() {
   playerItems = [];
+  playerGold = 40;
+  updateGoldDisplay();
+
   level = 1;
   totalDamageDealt = 0;
   totalDamageTaken = 0;

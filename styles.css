@@ -714,3 +714,14 @@ body {
   transition: filter 0.3s ease-out;
 }
 
+#gold-display {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 36px;
+  color: gold;
+  text-shadow: 2px 2px 0px #000;
+  font-family: pixelText;
+  z-index: 100;
+}

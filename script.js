@@ -35,7 +35,15 @@ let level = 1;
 let gameOver = false;
 let playerItems = [];
 
-let playerGold = 50;
+let playerGold = 0;
+const GOLD_TILES_PER_ROUND = 5;     // how many gold tiles per round
+const GOLD_PER_TILE = 5;            // how much each gold tile gives
+
+function updateGoldEverywhere() {
+  const el = document.getElementById('gold-display');
+  if (el) el.textContent = `🪙 ${playerGold}`;
+}
+
 
 // === BOSS SETTINGS ===
 let isBossLevel = false;
@@ -92,6 +100,7 @@ function updateHealth() {
 }
 
 function updateLevel() {
+  updateGoldEverywhere();
   levelDisplay.textContent = `Level ${level}`;
 }
 
@@ -418,6 +427,21 @@ function buildGrid() {
   playerAttackNumbers = getRandomUniqueNumbers(playerAttackCount, totalCells);
   enemyAttackNumbers = getRandomUniqueNumbers(enemyAttackCount, totalCells, playerAttackNumbers);
 
+  // 🪙 Pick gold tiles from cells not used by either side
+  const used = new Set([...playerAttackNumbers, ...enemyAttackNumbers]);
+  const pool = [];
+  for (let i = 1; i <= totalCells; i++) {
+    if (!used.has(i)) pool.push(i);
+  }
+  const goldCount = Math.min(GOLD_TILES_PER_ROUND, pool.length);
+  const goldNumbers = [];
+  while (goldNumbers.length < goldCount) {
+    const i = Math.floor(Math.random() * pool.length);
+    const n = pool.splice(i, 1)[0];
+    goldNumbers.push(n);
+  }
+
+
   let number = 1;
   for (let r = 0; r < currentRows; r++) {
     for (let c = 0; c < currentCols; c++) {
@@ -438,18 +462,25 @@ function buildGrid() {
           cell.classList.add('eAttack');
           enemy.playAttack();
           applyPassiveItemEffectsOnAttack(false);
+        
         } else if (playerAttackNumbers.includes(cellNumber)) {
           cell.classList.add('attack');
           hero.playAttack();
           applyPassiveItemEffectsOnAttack(true);
+        
+        } else if (goldNumbers.includes(cellNumber)) {
+          // 🪙 Gold tile: safe, no combo reset
+          cell.classList.add('gold');
+          playerGold += GOLD_PER_TILE;
+          updateGoldEverywhere();
+          showHitPopup(true, `+${GOLD_PER_TILE}🪙`, true); // reuse green popup
+        
         } else {
+          // Plain grey tile: safe; no gold, and we keep your existing combo reset behavior
           cell.classList.add('active');
           playerCombo = 1.0;
           enemyCombo = 1.0;
-          playerGold = Math.max(0, playerGold - 1);
-          updateGoldEverywhere();
-
-        }
+        }        
       
         // Burn triggers on every click
         applyBurnEffect();
@@ -916,11 +947,6 @@ pauseBtn.addEventListener('click', showPauseMenu);
 function nextLevel() {
   gameOver = false;
 
-  if (level > 1) { // skip the first round (player starts with 40)
-    playerGold += 20;
-    updateGoldEverywhere();
-  }
-
   playerCombo = 1.0;
   enemyCombo = 1.0;
 
@@ -1017,7 +1043,7 @@ startButton.addEventListener("click", () => {
 
 function resetGame() {
   playerItems = [];
-  playerGold = 50;
+  playerGold = 0;
   updateGoldEverywhere();
 
 

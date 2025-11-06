@@ -35,7 +35,7 @@ let level = 1;
 let gameOver = false;
 let playerItems = [];
 
-let playerGold = 40;
+let playerGold = 50;
 
 // === BOSS SETTINGS ===
 let isBossLevel = false;
@@ -447,7 +447,8 @@ function buildGrid() {
           playerCombo = 1.0;
           enemyCombo = 1.0;
           playerGold = Math.max(0, playerGold - 1);
-          updateGoldDisplay();
+          updateGoldEverywhere();
+
         }
       
         // Burn triggers on every click
@@ -640,13 +641,33 @@ function getDynamicRarityChances(level) {
   };
 }
 
+let currentShopPopup = null;
+
+function updateGoldEverywhere() {
+  // top HUD
+  updateGoldDisplay();
+
+  // shop (if open)
+  if (!currentShopPopup) return;
+  const shopGoldEl = currentShopPopup.querySelector('#shop-gold');
+  if (shopGoldEl) shopGoldEl.textContent = playerGold;
+
+  // enable/disable buttons based on current gold & purchased state
+  currentShopPopup.querySelectorAll('button[data-cost]').forEach(btn => {
+    const cost = Number(btn.dataset.cost);
+    const purchased = btn.dataset.purchased === '1';
+    btn.disabled = purchased || playerGold < cost;
+  });
+}
+
+
 function showShop() {
   const popup = document.createElement('div');
   popup.className = 'end-screen';
+  currentShopPopup = popup; // set global ref
 
-  // 🧮 Weighted pool for rarity chance
+  // Weighted pool by rarity
   const chances = getDynamicRarityChances(level);
-
   const weightedPool = allItems.flatMap(item => {
     let rarityChance = 0.01;
     if (item.rarity === RARITY.COMMON) rarityChance = chances.COMMON;
@@ -656,18 +677,20 @@ function showShop() {
     return Array(Math.floor(rarityChance * 100)).fill(item);
   });
 
-  // Randomly select 5 items
+  // pick 5
   const available = weightedPool.filter(item => !playerItems.some(pi => pi.id === item.id));
   const shopChoices = [];
   const count = Math.min(5, available.length);
-  const indexes = new Set();
-  while (indexes.size < count) indexes.add(Math.floor(Math.random() * available.length));
-  indexes.forEach(i => shopChoices.push(available[i]));
+  const usedIdx = new Set();
+  while (usedIdx.size < count && available.length > 0) {
+    usedIdx.add(Math.floor(Math.random() * available.length));
+  }
+  usedIdx.forEach(i => shopChoices.push(available[i]));
 
   popup.innerHTML = `
     <div class="end-screen-content">
       <h1>Item Shop</h1>
-      <p>You have <strong style="color:gold;">${playerGold} Gold</strong></p>
+      <p>You have <strong style="color:gold;">💰 <span id="shop-gold">${playerGold}</span></strong></p>
       <div id="shop-items" style="display:flex;flex-direction:column;gap:20px;align-items:center;"></div>
       <br>
       <button id="continue-btn">Continue</button>
@@ -682,47 +705,57 @@ function showShop() {
     const msg = document.createElement('p');
     msg.textContent = "No items available.";
     itemContainer.appendChild(msg);
-    continueBtn.addEventListener('click', () => {
-      popup.remove();
-      nextLevel();
+  } else {
+    shopChoices.forEach(item => {
+      // price by rarity
+      const rarityKey = Object.keys(RARITY).find(k => RARITY[k] === item.rarity);
+      const cost = (rarityKey && RARITY_COST[rarityKey]) || 10;
+
+      const btn = document.createElement('button');
+      btn.textContent = `${item.name} — ${item.description}  (Cost: ${cost}💰)`;
+      btn.style.fontSize = '28px';
+      btn.style.padding = '20px 40px';
+      btn.style.border = `4px solid ${item.rarity.color}`;
+      btn.style.borderRadius = '15px';
+      btn.style.background = 'rgba(0,0,0,0.6)';
+      btn.style.color = item.rarity.color;
+      btn.style.textShadow = '2px 2px 0 black';
+
+      // mark metadata for live enabling/disabling
+      btn.dataset.cost = String(cost);
+      btn.dataset.purchased = '0';
+
+      btn.addEventListener('click', () => {
+        const price = Number(btn.dataset.cost);
+        if (btn.dataset.purchased === '1') return;        // already bought
+        if (playerGold < price) return;                   // can't afford
+
+        // buy
+        playerGold -= price;
+        playerItems.push(item);
+        item.applyEffect?.();
+
+        // reflect UI
+        btn.dataset.purchased = '1';
+        btn.textContent = `${item.name} — Purchased`;
+        updateGoldEverywhere(); // will also disable/enable other buttons
+      });
+
+      itemContainer.appendChild(btn);
     });
-    return;
   }
 
-  shopChoices.forEach(item => {
-    const cost = RARITY_COST[
-      Object.keys(RARITY).find(key => RARITY[key] === item.rarity)
-    ] || 10;
-
-    const btn = document.createElement('button');
-    btn.textContent = `${item.name} - ${item.description}  (Cost: ${cost}💰)`;
-    btn.style.fontSize = '28px';
-    btn.style.padding = '20px 40px';
-    btn.style.border = `4px solid ${item.rarity.color}`;
-    btn.style.borderRadius = '15px';
-    btn.style.background = 'rgba(0,0,0,0.6)';
-    btn.style.color = item.rarity.color;
-    btn.style.textShadow = '2px 2px 0 black';
-    btn.disabled = playerGold < cost;
-
-    btn.addEventListener('click', () => {
-      if (playerGold >= cost) {
-        playerGold -= cost;
-        updateGoldDisplay();
-        playerItems.push(item);
-        item.applyEffect();
-        btn.disabled = true;
-        btn.textContent = `${item.name} (Purchased)`;
-      }
-    });
-    itemContainer.appendChild(btn);
-  });
-
+  // Close & go next level
   continueBtn.addEventListener('click', () => {
     popup.remove();
+    currentShopPopup = null;
     nextLevel();
   });
+
+  // initial sync (sets correct disabled state)
+  updateGoldEverywhere();
 }
+
 
 
 // === END SCREEN ===
@@ -773,9 +806,6 @@ function showEndScreen(playerWon) {
 
   // === Button handlers ===
   if (playerWon) {
-
-    playerGold += 10;
-    updateGoldDisplay();
 
     document.getElementById('next-level-btn').addEventListener('click', () => {
       popup.remove();
@@ -886,6 +916,11 @@ pauseBtn.addEventListener('click', showPauseMenu);
 function nextLevel() {
   gameOver = false;
 
+  if (level > 1) { // skip the first round (player starts with 40)
+    playerGold += 10;
+    updateGoldEverywhere();
+  }
+
   playerCombo = 1.0;
   enemyCombo = 1.0;
 
@@ -983,7 +1018,8 @@ startButton.addEventListener("click", () => {
 function resetGame() {
   playerItems = [];
   playerGold = 40;
-  updateGoldDisplay();
+  updateGoldEverywhere();
+
 
   level = 1;
   totalDamageDealt = 0;

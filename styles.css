@@ -725,3 +725,8 @@ body {
   font-family: pixelText;
   z-index: 100;
 }
+
+.end-screen-content #shop-gold {
+  color: gold;
+  text-shadow: 0 0 8px #000;
+}

@@ -744,3 +744,19 @@ body {
   font-size: 28px;
   filter: drop-shadow(0 2px 0 black);
 }
+
+/* Green glowing effect for player attack tiles */
+.grid-item.attack {
+  background: radial-gradient(circle at 30% 30%, #4CAF50, #2e7d32);
+  box-shadow: 0 0 18px 4px rgba(76, 175, 80, 0.6);
+  color: white;
+  position: relative;
+}
+
+/* Red glowing effect for enemy attack tiles */
+.grid-item.eAttack {
+  background: radial-gradient(circle at 30% 30%, #e53935, #b71c1c);
+  box-shadow: 0 0 18px 4px rgba(229, 57, 53, 0.6);
+  color: white;
+  position: relative;
+}

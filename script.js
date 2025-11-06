@@ -172,19 +172,16 @@ function applyBurnEffect() {
     totalDamageDealt += burn;
     showHitPopup(false, `-${burn}`, false);
 
-    // 🔥 Optional small flash effect
     const enemyEl = document.querySelector('.enemy-container');
     enemyEl.classList.add('burn-flash');
     setTimeout(() => enemyEl.classList.remove('burn-flash'), 150);
 
     updateHealth();
-
-    // 🧨 Check if enemy died from burn
-    if (enemyHealth <= 0) {
-      checkGameOver();
-    }
+    return enemyHealth <= 0;
   }
+  return false;
 }
+
 
 
 // === RARITY SYSTEM ===
@@ -412,43 +409,31 @@ function buildGrid() {
 
       cell.addEventListener('click', () => {
         if (cell.classList.contains('clicked') || gameOver || isPaused) return;
-
+      
         cell.classList.add('clicked');
         const cellNumber = parseInt(cell.textContent);
-
         cell.classList.remove('safe-range');
-
+      
         if (enemyAttackNumbers.includes(cellNumber)) {
           cell.classList.add('eAttack');
           enemy.playAttack();
           applyPassiveItemEffectsOnAttack(false);
-
         } else if (playerAttackNumbers.includes(cellNumber)) {
           cell.classList.add('attack');
           hero.playAttack();
           applyPassiveItemEffectsOnAttack(true);
-
         } else {
           cell.classList.add('active');
           playerCombo = 1.0;
           enemyCombo = 1.0;
         }
-
-        // 🧨 Burn triggers every tile click
+      
+        // Burn triggers on every click
         applyBurnEffect();
-
-        // 🔥 Handle simultaneous deaths
-        if (playerHealth <= 0 && enemyHealth <= 0) {
-          playerHealth = 0;
-          enemyHealth = 0;
-          updateHealth();
-          hero.playDeath();
-          enemy.playDeath();
-          showEndScreen(false);
-        } else {
-          checkGameOver();
-        }
-      });
+      
+        // ✅ Resolve deaths exactly once (covers ties, revive, wins, losses)
+        resolveDeaths();
+      });      
 
       container.appendChild(cell);
     }
@@ -540,40 +525,38 @@ function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSel
 }
 
 function resolveDeaths() {
-  // Attempt revive if the player is at/below 0
+  if (gameOver) return true;
+
+  // Attempt revive once if needed
   if (playerHealth <= 0) {
     const revived = tryRevive();
-    if (revived) {
-      revivesUsed++;
-    }
+    if (revived) revivesUsed++;
   }
 
   updateHealth();
 
-  // Tie rule after any possible revive: player loses ties
+  // Tie rule: player loses ties (after possible revive)
   if (playerHealth <= 0 && enemyHealth <= 0) {
     playerHealth = 0;
     hero.playDeath();
     showEndScreen(false);
     return true;
   }
-
   if (playerHealth <= 0) {
     playerHealth = 0;
     hero.playDeath();
     showEndScreen(false);
     return true;
   }
-
   if (enemyHealth <= 0) {
     enemyHealth = 0;
     enemy.playDeath();
     showEndScreen(true);
     return true;
   }
-
   return false;
 }
+
 
 function tryRevive() {
   const reviveItemIndex = playerItems.findIndex(i => i.reviveAtPercent);
@@ -602,14 +585,14 @@ function tryRevive() {
 
 // === GAME END CHECK ===
 function checkGameOver() {
+  if (gameOver) return;
+
   if (playerHealth <= 0) {
     // Try revive first
     if (tryRevive()) {
       revivesUsed++;
       return;
     }
-
-    // No revive available → true death
     playerHealth = 0;
     updateHealth();
     hero.playDeath();
@@ -710,6 +693,7 @@ function showShop() {
 
 // === END SCREEN ===
 function showEndScreen(playerWon) {
+  if (gameOver) return;
   gameOver = true;
 
   const popup = document.createElement('div');

@@ -705,44 +705,43 @@ function showShop() {
     msg.textContent = "No items available.";
     itemContainer.appendChild(msg);
   } else {
+    // Sort items by rarity order (Common → Legendary)
+    const rarityOrder = ["COMMON", "RARE", "EPIC", "LEGENDARY"];
+    shopChoices.sort((a, b) => {
+      const rarityA = rarityOrder.indexOf(Object.keys(RARITY).find(k => RARITY[k] === a.rarity));
+      const rarityB = rarityOrder.indexOf(Object.keys(RARITY).find(k => RARITY[k] === b.rarity));
+      return rarityA - rarityB;
+    });
+  
     shopChoices.forEach(item => {
-      // price by rarity
       const rarityKey = Object.keys(RARITY).find(k => RARITY[k] === item.rarity);
       const cost = (rarityKey && RARITY_COST[rarityKey]) || 10;
-
-      const btn = document.createElement('button');
-      btn.textContent = `${item.name} — ${item.description}  (Cost: ${cost}💰)`;
-      btn.style.fontSize = '28px';
-      btn.style.padding = '20px 40px';
-      btn.style.border = `4px solid ${item.rarity.color}`;
-      btn.style.borderRadius = '15px';
-      btn.style.background = 'rgba(0,0,0,0.6)';
-      btn.style.color = item.rarity.color;
-      btn.style.textShadow = '2px 2px 0 black';
-
-      // mark metadata for live enabling/disabling
-      btn.dataset.cost = String(cost);
-      btn.dataset.purchased = '0';
-
-      btn.addEventListener('click', () => {
-        const price = Number(btn.dataset.cost);
-        if (btn.dataset.purchased === '1') return;        // already bought
-        if (playerGold < price) return;                   // can't afford
-
-        // buy
-        playerGold -= price;
+  
+      const div = document.createElement('div');
+      div.className = 'shop-item';
+      div.style.borderColor = item.rarity.color;
+      div.innerHTML = `
+        <strong style="color:${item.rarity.color}; font-size:28px;">${item.name}</strong>
+        <p style="font-size:18px; margin:10px 0;">${item.description}</p>
+        <p style="font-size:20px; color:gold;">Cost: ${cost}💰</p>
+      `;
+  
+      div.addEventListener('click', () => {
+        if (div.classList.contains('purchased')) return;
+        if (playerGold < cost) return;
+  
+        playerGold -= cost;
         playerItems.push(item);
         item.applyEffect?.();
-
-        // reflect UI
-        btn.dataset.purchased = '1';
-        btn.textContent = `${item.name} — Purchased`;
-        updateGoldEverywhere(); // will also disable/enable other buttons
+        div.classList.add('purchased');
+        div.innerHTML = `<strong style="color:${item.rarity.color}; font-size:28px;">${item.name}</strong><p>Purchased!</p>`;
+        updateGoldEverywhere();
       });
-
-      itemContainer.appendChild(btn);
+  
+      itemContainer.appendChild(div);
     });
   }
+  
 
   // Close & go next level
   continueBtn.addEventListener('click', () => {

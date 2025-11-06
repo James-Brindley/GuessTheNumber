@@ -325,6 +325,15 @@ function getRandomUniqueNumbers(count, max, exclude = []) {
   return Array.from(numbers);
 }
 
+function getGoldStats() {
+  const s = getPlayerStats();
+  return {
+    extraGoldPerTile: s.extraGoldPerTile || 0,
+    extraGoldTiles: s.extraGoldTiles || 0,
+    passiveGoldPerRound: s.passiveGoldPerRound || 0,
+  };
+}
+
 let playerAttackNumbers = [];
 let enemyAttackNumbers = [];
 
@@ -437,6 +446,8 @@ function buildGrid() {
   container.style.gridTemplateColumns = `repeat(${currentCols}, 1fr)`;
   container.classList.add('grid-grow');
 
+  playerAttackNumbers = getRandomUniqueNumbers(playerAttackCount, totalCells);
+  enemyAttackNumbers = getRandomUniqueNumbers(enemyAttackCount, totalCells, playerAttackNumbers);
 
   // 🪙 Pick gold tiles from cells not used by either side (now with item bonuses)
   const used = new Set([...playerAttackNumbers, ...enemyAttackNumbers]);
@@ -692,20 +703,9 @@ function getDynamicRarityChances(level) {
 function showShop() {
   const popup = document.createElement('div');
   popup.className = 'end-screen';
-  currentShopPopup = popup; // set global ref
+  currentShopPopup = popup;
 
-  // Weighted pool by rarity
-  const chances = getDynamicRarityChances(level);
-  const weightedPool = allItems.flatMap(item => {
-    let rarityChance = 0.01;
-    if (item.rarity === RARITY.COMMON) rarityChance = chances.COMMON;
-    else if (item.rarity === RARITY.RARE) rarityChance = chances.RARE;
-    else if (item.rarity === RARITY.EPIC) rarityChance = chances.EPIC;
-    else if (item.rarity === RARITY.LEGENDARY) rarityChance = chances.LEGENDARY;
-    return Array(Math.floor(rarityChance * 100)).fill(item);
-  });
-
-  // pick up to 5 unique items (by id), weighted by rarity
+  // Build a weighted pool from items you don't already own
   const available = allItems.filter(item => !playerItems.some(pi => pi.id === item.id));
   const chances = getDynamicRarityChances(level);
   const weightedPool = available.flatMap(item => {
@@ -717,11 +717,11 @@ function showShop() {
     return Array(Math.max(1, Math.floor(rarityChance * 100))).fill(item);
   });
 
+  // Sample up to 5 unique items by id (no duplicates in one shop)
   const shopChoices = [];
   const chosenIds = new Set();
   const count = Math.min(5, available.length);
 
-  // sample without replacement by id
   let attempts = 0;
   while (shopChoices.length < count && weightedPool.length > 0 && attempts < 1000) {
     const idx = Math.floor(Math.random() * weightedPool.length);
@@ -729,7 +729,7 @@ function showShop() {
     if (!chosenIds.has(candidate.id)) {
       chosenIds.add(candidate.id);
       shopChoices.push(candidate);
-      // remove all instances of this id from weightedPool to avoid more picks of same id
+      // remove all instances of this id
       for (let i = weightedPool.length - 1; i >= 0; i--) {
         if (weightedPool[i].id === candidate.id) weightedPool.splice(i, 1);
       }
@@ -737,12 +737,11 @@ function showShop() {
     attempts++;
   }
 
-
   popup.innerHTML = `
     <div class="end-screen-content">
       <h1>Item Shop</h1>
       <p>You have <strong style="color:gold;">💰 <span id="shop-gold">${playerGold}</span></strong></p>
-      <div id="shop-items" style="display:flex;flex-direction:column;gap:20px;align-items:center;"></div>
+      <div id="shop-items" style="display:flex;flex-direction:row;gap:20px;align-items:stretch;justify-content:center;"></div>
       <br>
       <button id="continue-btn">Continue</button>
     </div>
@@ -757,18 +756,17 @@ function showShop() {
     msg.textContent = "No items available.";
     itemContainer.appendChild(msg);
   } else {
-    // Sort items by rarity order (Common → Legendary)
     const rarityOrder = ["COMMON", "RARE", "EPIC", "LEGENDARY"];
     shopChoices.sort((a, b) => {
       const rarityA = rarityOrder.indexOf(Object.keys(RARITY).find(k => RARITY[k] === a.rarity));
       const rarityB = rarityOrder.indexOf(Object.keys(RARITY).find(k => RARITY[k] === b.rarity));
       return rarityA - rarityB;
     });
-  
+
     shopChoices.forEach(item => {
       const rarityKey = Object.keys(RARITY).find(k => RARITY[k] === item.rarity);
       const cost = (rarityKey && RARITY_COST[rarityKey]) || 10;
-  
+
       const div = document.createElement('div');
       div.className = 'shop-item';
       div.style.borderColor = item.rarity.color;
@@ -777,11 +775,11 @@ function showShop() {
         <p style="font-size:18px; margin:10px 0;">${item.description}</p>
         <p style="font-size:20px; color:gold;">Cost: ${cost}💰</p>
       `;
-  
+
       div.addEventListener('click', () => {
         if (div.classList.contains('purchased')) return;
         if (playerGold < cost) return;
-  
+
         playerGold -= cost;
         playerItems.push(item);
         item.applyEffect?.();
@@ -789,24 +787,19 @@ function showShop() {
         div.innerHTML = `<strong style="color:${item.rarity.color}; font-size:28px;">${item.name}</strong><p>Purchased!</p>`;
         updateGoldEverywhere();
       });
-  
+
       itemContainer.appendChild(div);
     });
   }
-  
 
-  // Close & go next level
   continueBtn.addEventListener('click', () => {
     popup.remove();
     currentShopPopup = null;
     nextLevel();
   });
 
-  // initial sync (sets correct disabled state)
   updateGoldEverywhere();
 }
-
-
 
 // === END SCREEN ===
 function showEndScreen(playerWon) {

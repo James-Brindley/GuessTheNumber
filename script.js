@@ -967,13 +967,6 @@ function nextLevel() {
   if (gstats.passiveGoldPerRound > 0) {
     playerGold += gstats.passiveGoldPerRound;
     updateGoldEverywhere();
-    // Optional: tiny popup to show passive income
-    const gp = document.createElement('div');
-    gp.className = 'revive-popup';
-    gp.style.background = "rgba(255, 215, 0, 0.9)";
-    gp.textContent = `+${gstats.passiveGoldPerRound}🪙 Passive Income`;
-    document.body.appendChild(gp);
-    setTimeout(() => gp.remove(), 1200);
   }
 
 

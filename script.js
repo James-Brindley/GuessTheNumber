@@ -502,7 +502,6 @@ function buildGrid() {
           playerGold += gain;
           updateGoldEverywhere();
           showHitPopup(true, `+${gain}🪙`, true);
-        }
         } else {
           // Plain grey tile: safe; no gold, and we keep your existing combo reset behavior
           cell.classList.add('active');

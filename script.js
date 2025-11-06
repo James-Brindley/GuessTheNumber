@@ -58,7 +58,7 @@ function updateGoldEverywhere() {
   });
 }
 
-
+let currentShopPopup = null;
 
 // === BOSS SETTINGS ===
 let isBossLevel = false;
@@ -119,8 +119,6 @@ function updateLevel() {
   levelDisplay.textContent = `Level ${level}`;
 }
 
-let currentShopPopup = null;
-
 const goldDisplay = document.createElement('div');
 goldDisplay.id = 'gold-display';
 goldDisplay.textContent = `💰 ${playerGold}`;
@@ -172,33 +170,6 @@ function getPlayerStats() {
   });
 
   return stats;
-}
-
-
-
-// === DYNAMIC HEALTH CALCULATIONS ===
-function getPlayerMaxHealth() {
-  let bonus = 0;
-
-  // Loop through all player items and apply bonuses dynamically
-  playerItems.forEach(item => {
-    if (item.bonusHP) bonus += item.bonusHP;
-  });
-
-  return BASE_PLAYER_HEALTH_COUNT + bonus;
-}
-
-function getEnemyMaxHealth() {
-  // Base enemy health scales by level
-  let base = BASE_ENEMY_HEALTH_COUNT;
-  let bonus = 0;
-
-  // Allow items or future effects to modify enemy HP
-  playerItems.forEach(item => {
-    if (item.bonusEnemyHP) bonus += item.bonusEnemyHP;
-  });
-
-  return base + bonus;
 }
 
 function applyBurnEffect() {
@@ -686,25 +657,6 @@ function getDynamicRarityChances(level) {
     EPIC: 0.15 + 0.05 * progress,      // 15% → 20%
     LEGENDARY: 0.05 + 0.05 * progress, // 5% → 10%
   };
-}
-
-let currentShopPopup = null;
-
-function updateGoldEverywhere() {
-  // top HUD
-  updateGoldDisplay();
-
-  // shop (if open)
-  if (!currentShopPopup) return;
-  const shopGoldEl = currentShopPopup.querySelector('#shop-gold');
-  if (shopGoldEl) shopGoldEl.textContent = playerGold;
-
-  // enable/disable buttons based on current gold & purchased state
-  currentShopPopup.querySelectorAll('button[data-cost]').forEach(btn => {
-    const cost = Number(btn.dataset.cost);
-    const purchased = btn.dataset.purchased === '1';
-    btn.disabled = purchased || playerGold < cost;
-  });
 }
 
 

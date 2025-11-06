@@ -494,14 +494,15 @@ function buildGrid() {
           applyPassiveItemEffectsOnAttack(true);
         
         } else if (goldNumbers.includes(cellNumber)) {
-
+          // make it look like a gold tile that’s been revealed
+          cell.classList.add('gold');
+        
           const gstats = getGoldStats();
           const gain = GOLD_PER_TILE + (gstats.extraGoldPerTile || 0);
           playerGold += gain;
           updateGoldEverywhere();
           showHitPopup(true, `+${gain}🪙`, true);
-
-        
+        }
         } else {
           // Plain grey tile: safe; no gold, and we keep your existing combo reset behavior
           cell.classList.add('active');

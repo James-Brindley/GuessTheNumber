@@ -155,8 +155,11 @@ function getPlayerStats() {
     healOnAttack: 0,
     ignoreDamageChance: 0,
     regenPerRound: 10,
-    comboBoost: 0,     // 🆕 new stat for combo gain
-    burnDamage: 0,     // 🆕 new stat for burn/poison effect
+    comboBoost: 0,
+    burnDamage: 0,
+    extraGoldPerTile: 0,
+    extraGoldTiles: 0,
+    passiveGoldPerRound: 0,
   };
 
   playerItems.forEach(item => {
@@ -167,6 +170,9 @@ function getPlayerStats() {
     if (item.regenPerRound) stats.regenPerRound += item.regenPerRound;
     if (item.comboBoost) stats.comboBoost += item.comboBoost;
     if (item.burnDamage) stats.burnDamage += item.burnDamage;
+    if (item.extraGoldPerTile) stats.extraGoldPerTile   += item.extraGoldPerTile;
+    if (item.extraGoldTiles) stats.extraGoldTiles     += item.extraGoldTiles;
+    if (item.passiveGoldPerRound)stats.passiveGoldPerRound+= item.passiveGoldPerRound;
   });
 
   return stats;
@@ -227,6 +233,12 @@ const allItems = [
     bonusDamage: 5, applyEffect() {} },
   { id: "lightArmor", name: "Light Armor", description: "Heal +5 HP Per Round", rarity: RARITY.COMMON,
     regenPerRound: 5, applyEffect() {} },
+  { id: "coinPouch", name: "Coin Pouch", description: "+1 gold per gold tile", rarity: RARITY.COMMON,
+    extraGoldPerTile: 1, applyEffect() {} },
+  { id: "minersMap", name: "Miner's Map", description: "+1 gold tile each round", rarity: RARITY.COMMON,
+    extraGoldTiles: 1, applyEffect() {} },
+  { id: "streetTithe", name: "Street Tithe", description: "+2 passive gold per level", rarity: RARITY.COMMON,
+  passiveGoldPerRound: 2, applyEffect() {} },
   { id: "comboCharm", name: "Combo Charm", description: "Increases combo gain by +0.1", rarity: RARITY.COMMON,
     comboBoost: 0.1, applyEffect() {} },
   { id: "crudePotion", name: "Crude Potion", description: "Heal +40 HP", rarity: RARITY.COMMON,
@@ -250,6 +262,12 @@ const allItems = [
     range: [20, 25], applyEffect() {} },
   { id: "strongBoots", name: "Strong Boots", description: "Take -5 Damage", rarity: RARITY.RARE,
     damageReduction: 5, applyEffect() {} },
+  { id: "huntersRing", name: "Treasure Hunter's Ring", description: "+2 gold per gold tile", rarity: RARITY.RARE,
+    extraGoldPerTile: 2, applyEffect() {} },
+  { id: "prospectorsPick", name: "Prospector's Pick", description: "+2 gold tiles each round", rarity: RARITY.RARE,
+    extraGoldTiles: 2, applyEffect() {} },
+  { id: "guildStipend", name: "Guild Stipend", description: "+5 passive gold per level", rarity: RARITY.RARE,
+    passiveGoldPerRound: 5, applyEffect() {} },
   { id: "bronzeArmor", name: "Bronze Armor", description: "Heal +10 HP Per Round", rarity: RARITY.RARE,
     regenPerRound: 10, applyEffect() {} },
   { id: "flamePendant", name: "Flame Pendant", description: "Inflicts 1 burn damage every tile clicked", rarity: RARITY.RARE,
@@ -270,6 +288,12 @@ const allItems = [
     bonusDamage: 10, applyEffect() {} },
   { id: "fireBrand", name: "Firebrand", description: "Combo gain +0.2 and 2 burn damage per tile", rarity: RARITY.EPIC,
     comboBoost: 0.2, burnDamage: 2, applyEffect() {} },
+  { id: "goldenTouch", name: "Golden Touch", description: "+3 gold per gold tile", rarity: RARITY.EPIC,
+    extraGoldPerTile: 3, applyEffect() {} },
+  { id: "royalCharter", name: "Royal Charter", description: "+10 passive gold per level", rarity: RARITY.EPIC,
+    passiveGoldPerRound: 10, applyEffect() {} },
+  { id: "gildedCompass", name: "Gilded Compass", description: "+3 gold tiles each round", rarity: RARITY.EPIC,
+    extraGoldTiles: 3, applyEffect() {} },
 
   // LEGENDARY
   { id: "phoenixHeart", name: "Phoenix Heart", description: "Revive Once With 100% HP", rarity: RARITY.LEGENDARY,
@@ -284,6 +308,10 @@ const allItems = [
     comboBoost: 0.5, applyEffect() {} },
   { id: "emberCore", name: "Ember Core", description: "5 burn damage per tile", rarity: RARITY.LEGENDARY,
       burnDamage: 5, applyEffect() {} },
+  { id: "dragonsHoard", name: "Dragon's Hoard", description: "+5 gold/tile & +2 tiles/round", rarity: RARITY.LEGENDARY,
+    extraGoldPerTile: 5, extraGoldTiles: 2, applyEffect() {} },
+  { id: "ancientBank", name: "Bank of the Ancients", description: "+20 passive gold per level", rarity: RARITY.LEGENDARY,
+    passiveGoldPerRound: 20, applyEffect() {} },
 ];
 
 
@@ -410,23 +438,22 @@ function buildGrid() {
   container.classList.add('grid-grow');
 
 
-  // ✅ Recalculate attack numbers based on new total cell count
-  playerAttackNumbers = getRandomUniqueNumbers(playerAttackCount, totalCells);
-  enemyAttackNumbers = getRandomUniqueNumbers(enemyAttackCount, totalCells, playerAttackNumbers);
-
-  // 🪙 Pick gold tiles from cells not used by either side
+  // 🪙 Pick gold tiles from cells not used by either side (now with item bonuses)
   const used = new Set([...playerAttackNumbers, ...enemyAttackNumbers]);
   const pool = [];
   for (let i = 1; i <= totalCells; i++) {
     if (!used.has(i)) pool.push(i);
   }
-  const goldCount = Math.min(GOLD_TILES_PER_ROUND, pool.length);
+
+  const goldStats = getGoldStats();
+  const goldCount = Math.min(GOLD_TILES_PER_ROUND + (goldStats.extraGoldTiles || 0), pool.length);
   const goldNumbers = [];
-  while (goldNumbers.length < goldCount) {
+  while (goldNumbers.length < goldCount && pool.length > 0) {
     const i = Math.floor(Math.random() * pool.length);
     const n = pool.splice(i, 1)[0];
     goldNumbers.push(n);
   }
+
 
 
   let number = 1;
@@ -457,10 +484,12 @@ function buildGrid() {
         
         } else if (goldNumbers.includes(cellNumber)) {
 
-          cell.classList.add('gold');
-          playerGold += GOLD_PER_TILE;
+          const gstats = getGoldStats();
+          const gain = GOLD_PER_TILE + (gstats.extraGoldPerTile || 0);
+          playerGold += gain;
           updateGoldEverywhere();
-          showHitPopup(true, `+${GOLD_PER_TILE}🪙`, true); // reuse green popup
+          showHitPopup(true, `+${gain}🪙`, true);
+
         
         } else {
           // Plain grey tile: safe; no gold, and we keep your existing combo reset behavior
@@ -676,15 +705,38 @@ function showShop() {
     return Array(Math.floor(rarityChance * 100)).fill(item);
   });
 
-  // pick 5
-  const available = weightedPool.filter(item => !playerItems.some(pi => pi.id === item.id));
+  // pick up to 5 unique items (by id), weighted by rarity
+  const available = allItems.filter(item => !playerItems.some(pi => pi.id === item.id));
+  const chances = getDynamicRarityChances(level);
+  const weightedPool = available.flatMap(item => {
+    let rarityChance = 0.01;
+    if (item.rarity === RARITY.COMMON) rarityChance = chances.COMMON;
+    else if (item.rarity === RARITY.RARE) rarityChance = chances.RARE;
+    else if (item.rarity === RARITY.EPIC) rarityChance = chances.EPIC;
+    else if (item.rarity === RARITY.LEGENDARY) rarityChance = chances.LEGENDARY;
+    return Array(Math.max(1, Math.floor(rarityChance * 100))).fill(item);
+  });
+
   const shopChoices = [];
+  const chosenIds = new Set();
   const count = Math.min(5, available.length);
-  const usedIdx = new Set();
-  while (usedIdx.size < count && available.length > 0) {
-    usedIdx.add(Math.floor(Math.random() * available.length));
+
+  // sample without replacement by id
+  let attempts = 0;
+  while (shopChoices.length < count && weightedPool.length > 0 && attempts < 1000) {
+    const idx = Math.floor(Math.random() * weightedPool.length);
+    const candidate = weightedPool[idx];
+    if (!chosenIds.has(candidate.id)) {
+      chosenIds.add(candidate.id);
+      shopChoices.push(candidate);
+      // remove all instances of this id from weightedPool to avoid more picks of same id
+      for (let i = weightedPool.length - 1; i >= 0; i--) {
+        if (weightedPool[i].id === candidate.id) weightedPool.splice(i, 1);
+      }
+    }
+    attempts++;
   }
-  usedIdx.forEach(i => shopChoices.push(available[i]));
+
 
   popup.innerHTML = `
     <div class="end-screen-content">
@@ -916,6 +968,21 @@ function nextLevel() {
 
   playerCombo = 1.0;
   enemyCombo = 1.0;
+  
+  // Passive gold income each level start
+  const gstats = getGoldStats();
+  if (gstats.passiveGoldPerRound > 0) {
+    playerGold += gstats.passiveGoldPerRound;
+    updateGoldEverywhere();
+    // Optional: tiny popup to show passive income
+    const gp = document.createElement('div');
+    gp.className = 'revive-popup';
+    gp.style.background = "rgba(255, 215, 0, 0.9)";
+    gp.textContent = `+${gstats.passiveGoldPerRound}🪙 Passive Income`;
+    document.body.appendChild(gp);
+    setTimeout(() => gp.remove(), 1200);
+  }
+
 
   // ✅ Determine if this is a boss level
   isBossLevel = (level % 10 === 0);

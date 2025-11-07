@@ -511,10 +511,13 @@ function buildGrid() {
 
         } else if (goldNumbers.includes(cellNumber)) {
           cell.classList.add('gold');
+          const gstats = getGoldStats();
           const gain = GOLD_PER_TILE + (gstats.extraGoldPerTile || 0);
           playerGold += gain;
           updateGoldEverywhere();
           showHitPopup(true, `+${gain}🪙`, true);
+          playerCombo = 1.0;
+          enemyCombo = 1.0;        
 
         } else {
           cell.classList.add('active');

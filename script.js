@@ -53,7 +53,7 @@ function initGridBox(baseCols = cols, baseRows = rows) {
 
   // Respect viewport caps (same visual frame as before)
   const capW = Math.min(window.innerWidth * 0.90);
-  const capH = Math.min(window.innerHeight * 0.68, 680);
+  const capH = Math.min(window.innerHeight * 0.75, 750);
 
   // If the wanted box is too big for the caps, shrink proportionally
   const scale = Math.min(capW / wantedW, capH / wantedH, 1);

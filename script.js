@@ -40,7 +40,7 @@ const GOLD_TILES_PER_ROUND = 5;     // how many gold tiles per round
 const GOLD_PER_TILE = 5;            // how much each gold tile gives
 
 const GAP_PX = 5;
-const BASE_CELL_PX = 80;   // <- your desired starting tile size (was ~80px)
+const BASE_CELL_PX = 180;   // <- your desired starting tile size (was ~80px)
 const MIN_CELL_PX  = 28;   // floor for readability
 
 let gridBoxW = 0; // pixels

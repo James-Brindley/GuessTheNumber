@@ -496,7 +496,7 @@ function buildGrid() {
         if (cell.classList.contains('clicked') || gameOver || isPaused) return;
 
         cell.classList.add('clicked');
-        const cellNumber = number; // careful: use the captured `number` value
+        const cellNumber = parseInt(cell.textContent, 10);
         cell.classList.remove('safe-range');
 
         if (enemyAttackNumbers.includes(cellNumber)) {

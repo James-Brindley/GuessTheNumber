@@ -41,27 +41,48 @@ body {
 }
 
 #grid-container {
-  display: grid;
-  gap: 5px;
-  justify-content: center;
-  padding: 20px;
   position: fixed;
   bottom: 5%;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 50px;
+
+  /* The grid “box” stays the same, tiles shrink/grow inside it */
+  width: min(90vw, 1000px);
+  height: min(52vh, 520px);
+
+  display: grid;
+  place-content: center;
+  gap: 5px;
+
+  /* Driven by JS */
+  grid-template-columns: repeat(var(--grid-cols, 15), var(--cell-size, 64px));
+  grid-auto-rows: var(--cell-size, 64px);
 
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+/* Tiles now size from --cell-size, no padding inflation */
 .grid-item {
+  width: var(--cell-size, 64px);
+  height: var(--cell-size, 64px);
+  display: grid;
+  place-items: center;
+
+  /* readable number scale based on tile size */
+  font-size: calc(var(--cell-size, 64px) * 0.35);
+
   color: white;
-  padding: 20px;
   cursor: pointer;
-  transition: 0.2s;
   user-select: none;
   border-radius: 15px;
+  transform: scale(0.8);
+  opacity: 0;
+  transition: transform 0.4s ease, opacity 0.4s ease, background 0.2s;
 }
+
+/* keep your existing states (active, attack, eAttack, gold, etc.) */
+.grid-grow .grid-item { transform: scale(1); opacity: 1; }
+
   
 .grid-item:hover {
   background-color: #0000001b;

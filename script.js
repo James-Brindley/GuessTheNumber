@@ -87,6 +87,24 @@ const bossSprites = {
   ]
 };
 
+let currentGridCols = cols;
+let currentGridRows = rows;
+
+function sizeGridBox(cols, rows) {
+  // match CSS: width min(90vw, 1000px), height min(52vh, 520px)
+  const maxW = Math.min(window.innerWidth * 0.90, 1000);
+  const maxH = Math.min(window.innerHeight * 0.52, 520);
+
+  const gap = 5; // matches CSS gap
+  const cellW = (maxW - (cols - 1) * gap) / cols;
+  const cellH = (maxH - (rows - 1) * gap) / rows;
+
+  // square tiles; keep a floor for readability
+  const cell = Math.max(28, Math.floor(Math.min(cellW, cellH)));
+
+  container.style.setProperty('--grid-cols', cols);
+  container.style.setProperty('--cell-size', `${cell}px`);
+}
 
 // === UI ELEMENTS ===
 const container = document.getElementById('grid-container');
@@ -416,35 +434,31 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
   }
 }
 
+window.addEventListener('resize', () => {
+  sizeGridBox(currentGridCols, currentGridRows);
+});
+
+
 // === BUILD GRID ===
-function buildGrid() {
+  function buildGrid() {
   // === Auto-adjust grid size based on attack numbers ===
   let currentCols = cols;
   let currentRows = rows;
   let totalCells = currentCols * currentRows;
 
-  // include dynamic extra gold tiles from items
-  const goldExtras = getGoldStats().extraGoldTiles || 0;
-  const requiredCells = playerAttackCount + enemyAttackCount + (GOLD_TILES_PER_ROUND + goldExtras) + 5; // buffer
+  /* ... your expansion loop ... */
 
-  // 🧮 Expand grid dynamically:
-  // - +1 column until 3 added, then +1 row, repeat
-  let addedCols = 0;
-  while (totalCells < requiredCells) {
-    currentCols++;
-    addedCols++;
-    if (addedCols >= 3) {
-      currentRows++;
-      addedCols = 0;
-    }
-    totalCells = currentCols * currentRows;
-  }
+  currentGridCols = currentCols;
+  currentGridRows = currentRows;
+
+  // Fix the grid *box* and compute tile size to fit
+  sizeGridBox(currentCols, currentRows);
 
   // === Build the grid ===
   container.innerHTML = '';
   container.classList.remove('grid-grow');
   void container.offsetWidth; // reflow
-  container.style.gridTemplateColumns = `repeat(${currentCols}, 1fr)`;
+  // no need to set gridTemplateColumns here anymore; CSS uses variables
   container.classList.add('grid-grow');
 
   // Base attack picks

@@ -48,7 +48,7 @@ body {
 
   /* The grid box stays ~the same visual area; we’ll size it precisely from JS */
   width: var(--grid-box-w, 1000px);
-  height: var(--grid-box-h, 520px);
+  height: var(--grid-box-h, 800px);
 
   display: grid;
   place-content: center;

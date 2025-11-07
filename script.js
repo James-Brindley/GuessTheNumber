@@ -422,7 +422,10 @@ function buildGrid() {
   let currentCols = cols;
   let currentRows = rows;
   let totalCells = currentCols * currentRows;
-  const requiredCells = playerAttackCount + enemyAttackCount + GOLD_TILES_PER_ROUND + 5; // buffer
+  
+  // include dynamic extra gold tiles from items
+  const goldExtras = getGoldStats().extraGoldTiles || 0;
+  const requiredCells = playerAttackCount + enemyAttackCount + (GOLD_TILES_PER_ROUND + goldExtras) + 5; // buffer
 
   // 🧮 Expand grid dynamically:
   // - +1 column until 3 added
@@ -446,8 +449,46 @@ function buildGrid() {
   container.style.gridTemplateColumns = `repeat(${currentCols}, 1fr)`;
   container.classList.add('grid-grow');
 
+  // after computing player & enemy attack numbers...
   playerAttackNumbers = getRandomUniqueNumbers(playerAttackCount, totalCells);
   enemyAttackNumbers = getRandomUniqueNumbers(enemyAttackCount, totalCells, playerAttackNumbers);
+
+  // === Inject safe-number items BEFORE we pick gold tiles ===
+  const applySafeNumbersFromItems = () => {
+    const taken = new Set([...playerAttackNumbers, ...enemyAttackNumbers]);
+    playerItems
+      .filter(i => i.range)
+      .forEach(i => {
+        const [min, max] = i.range;
+        const rangeNums = Array.from({ length: max - min + 1 }, (_, x) => min + x);
+        const available = rangeNums.filter(n => !taken.has(n) && n >= 1 && n <= totalCells);
+        const count = i.safeNumbers || 1;
+        if (available.length > 0) {
+          const chosen = [];
+          while (chosen.length < Math.min(count, available.length)) {
+            const idx = Math.floor(Math.random() * available.length);
+            const n = available.splice(idx, 1)[0];
+            chosen.push(n);
+            taken.add(n);
+          }
+          playerAttackNumbers.push(...chosen);
+        }
+      });
+  };
+  applySafeNumbersFromItems();
+
+  // === NOW pick gold tiles from cells not used by either side ===
+  const used = new Set([...playerAttackNumbers, ...enemyAttackNumbers]);
+  const pool = [];
+  for (let i = 1; i <= totalCells; i++) if (!used.has(i)) pool.push(i);
+
+  const goldStats = getGoldStats();
+  const goldCount = Math.min(GOLD_TILES_PER_ROUND + (goldStats.extraGoldTiles || 0), pool.length);
+  const goldNumbers = [];
+  while (goldNumbers.length < goldCount && pool.length > 0) {
+    const i = Math.floor(Math.random() * pool.length);
+    goldNumbers.push(pool.splice(i, 1)[0]);
+  }
 
   // 🪙 Pick gold tiles from cells not used by either side (now with item bonuses)
   const used = new Set([...playerAttackNumbers, ...enemyAttackNumbers]);
@@ -520,36 +561,16 @@ function buildGrid() {
     }
   }
 
-  // === Highlight safe number ranges ===
+  // === Highlight safe number ranges (visual only) ===
   const gridItems = container.querySelectorAll('.grid-item');
-
   playerItems
     .filter(i => i.range)
     .forEach(i => {
       const [min, max] = i.range;
-
       gridItems.forEach(cell => {
         const num = parseInt(cell.textContent);
-        if (num >= min && num <= max) {
-          cell.classList.add('safe-range');
-        }
+        if (num >= min && num <= max) cell.classList.add('safe-range');
       });
-
-      const rangeNums = Array.from({ length: max - min + 1 }, (_, x) => min + x);
-      const available = rangeNums.filter(
-        n => !playerAttackNumbers.includes(n) && !enemyAttackNumbers.includes(n)
-      );
-      const count = i.safeNumbers || 1;
-
-      if (available.length > 0) {
-        const chosen = [];
-        while (chosen.length < Math.min(count, available.length)) {
-          const randomIndex = Math.floor(Math.random() * available.length);
-          const num = available[randomIndex];
-          if (!chosen.includes(num)) chosen.push(num);
-        }
-        chosen.forEach(num => playerAttackNumbers.push(num));
-      }
     });
 }
 
@@ -820,8 +841,6 @@ function showEndScreen(playerWon) {
       nextLevel();
     });
   } else {
-    // ——— WIN SCREEN + SHOP MERGED ———
-    // Boss reward FIRST (only on win)
     if (isBossLevel) {
       const bossReward = 50;
       playerGold += bossReward;
@@ -1204,6 +1223,10 @@ function getEnemyBaseDamage() {
 // Helper: Build player tooltip text dynamically
 function buildPlayerTooltip() {
   const stats = getPlayerStats();
+  const g = getGoldStats();
+  const goldPerTile = GOLD_PER_TILE + (g.extraGoldPerTile || 0);
+  const goldTilesPerRound = GOLD_TILES_PER_ROUND + (g.extraGoldTiles || 0);
+
   return `
     <strong style="font-size:28px;color:#4CAF50;">PLAYER STATS</strong><br>
     ❤️ Max Health: ${getPlayerMaxHealth()}<br>
@@ -1215,9 +1238,12 @@ function buildPlayerTooltip() {
     🎲 Ignore Chance: ${(stats.ignoreDamageChance * 100).toFixed(0)}%<br>
     🌀 Combo Gain: +${(stats.comboBoost || 0).toFixed(1)} / hit<br>
     ☠️ Burn per Click: ${stats.burnDamage || 0}<br>
-    🔢 Attack Squares: ${playerAttackCount}
+    🔢 Attack Squares: ${playerAttackCount}<br>
+    🪙 Gold per Tile: ${goldPerTile}<br>
+    🟨 Gold Tiles / Round: ${goldTilesPerRound}
   `;
 }
+
 
 // Helper: Build enemy tooltip text
 function buildEnemyTooltip() {

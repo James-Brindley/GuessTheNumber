@@ -699,11 +699,8 @@ function getDynamicRarityChances(level) {
   };
 }
 
-
-function showShop() {
-  const popup = document.createElement('div');
-  popup.className = 'end-screen';
-  currentShopPopup = popup;
+function buildShopUI(intoPopup) {
+  currentShopPopup = intoPopup; // so updateGoldEverywhere() keeps working
 
   // Build a weighted pool from items you don't already own
   const available = allItems.filter(item => !playerItems.some(pi => pi.id === item.id));
@@ -737,71 +734,54 @@ function showShop() {
     attempts++;
   }
 
-  popup.innerHTML = `
-    <div class="end-screen-content">
-      <h1>Item Shop</h1>
-      <p>You have <strong style="color:gold;">💰 <span id="shop-gold">${playerGold}</span></strong></p>
-      <div id="shop-items" style="display:flex;flex-direction:row;gap:20px;align-items:stretch;justify-content:center;"></div>
-      <br>
-      <button id="continue-btn">Continue</button>
-    </div>
-  `;
-  document.body.appendChild(popup);
-
-  const itemContainer = popup.querySelector('#shop-items');
-  const continueBtn = popup.querySelector('#continue-btn');
+  const itemContainer = intoPopup.querySelector('#shop-items');
 
   if (shopChoices.length === 0) {
     const msg = document.createElement('p');
     msg.textContent = "No items available.";
     itemContainer.appendChild(msg);
-  } else {
-    const rarityOrder = ["COMMON", "RARE", "EPIC", "LEGENDARY"];
-    shopChoices.sort((a, b) => {
-      const rarityA = rarityOrder.indexOf(Object.keys(RARITY).find(k => RARITY[k] === a.rarity));
-      const rarityB = rarityOrder.indexOf(Object.keys(RARITY).find(k => RARITY[k] === b.rarity));
-      return rarityA - rarityB;
-    });
-
-    shopChoices.forEach(item => {
-      const rarityKey = Object.keys(RARITY).find(k => RARITY[k] === item.rarity);
-      const cost = (rarityKey && RARITY_COST[rarityKey]) || 10;
-
-      const div = document.createElement('div');
-      div.className = 'shop-item';
-      div.style.borderColor = item.rarity.color;
-      div.innerHTML = `
-        <strong style="color:${item.rarity.color}; font-size:28px;">${item.name}</strong>
-        <p style="font-size:18px; margin:10px 0;">${item.description}</p>
-        <p style="font-size:20px; color:gold;">Cost: ${cost}💰</p>
-      `;
-
-      div.addEventListener('click', () => {
-        if (div.classList.contains('purchased')) return;
-        if (playerGold < cost) return;
-
-        playerGold -= cost;
-        playerItems.push(item);
-        item.applyEffect?.();
-        div.classList.add('purchased');
-        div.innerHTML = `<strong style="color:${item.rarity.color}; font-size:28px;">${item.name}</strong><p>Purchased!</p>`;
-        updateGoldEverywhere();
-      });
-
-      itemContainer.appendChild(div);
-    });
+    return;
   }
 
-  continueBtn.addEventListener('click', () => {
-    popup.remove();
-    currentShopPopup = null;
-    nextLevel();
+  const rarityOrder = ["COMMON", "RARE", "EPIC", "LEGENDARY"];
+  shopChoices.sort((a, b) => {
+    const rarityA = rarityOrder.indexOf(Object.keys(RARITY).find(k => RARITY[k] === a.rarity));
+    const rarityB = rarityOrder.indexOf(Object.keys(RARITY).find(k => RARITY[k] === b.rarity));
+    return rarityA - rarityB;
+  });
+
+  shopChoices.forEach(item => {
+    const rarityKey = Object.keys(RARITY).find(k => RARITY[k] === item.rarity);
+    const cost = (rarityKey && RARITY_COST[rarityKey]) || 10;
+
+    const div = document.createElement('div');
+    div.className = 'shop-item';
+    div.style.borderColor = item.rarity.color;
+    div.innerHTML = `
+      <strong style="color:${item.rarity.color}; font-size:28px;">${item.name}</strong>
+      <p style="font-size:18px; margin:10px 0;">${item.description}</p>
+      <p style="font-size:20px; color:gold;">Cost: ${cost}💰</p>
+    `;
+
+    div.addEventListener('click', () => {
+      if (div.classList.contains('purchased')) return;
+      if (playerGold < cost) return;
+
+      playerGold -= cost;
+      playerItems.push(item);
+      item.applyEffect?.();
+      div.classList.add('purchased');
+      div.innerHTML = `<strong style="color:${item.rarity.color}; font-size:28px;">${item.name}</strong><p>Purchased!</p>`;
+      updateGoldEverywhere();
+    });
+
+    itemContainer.appendChild(div);
   });
 
   updateGoldEverywhere();
 }
 
-// === END SCREEN ===
+
 function showEndScreen(playerWon) {
   if (gameOver) return;
   gameOver = true;
@@ -810,7 +790,7 @@ function showEndScreen(playerWon) {
   popup.className = 'end-screen';
 
   if (!playerWon) {
-
+    // ——— LOSS SCREEN (unchanged) ———
     popup.innerHTML = `
       <div class="end-screen-content">
         <h1>Game Over</h1>
@@ -832,54 +812,60 @@ function showEndScreen(playerWon) {
         <button id="main-menu-btn">Main Menu</button>
       </div>
     `;
-  } else {
-    // 🏆 Player won — keep as before
-    popup.innerHTML = `
-      <div class="end-screen-content">
-        <h1>You Win!</h1>
-        <p>Prepare for the next battle...</p>
-        <button id="next-level-btn">Next Level</button>
-        <br><br>
-        <button id="main-menu-btn">Main Menu</button>
-      </div>
-    `;
-  }
+    document.body.appendChild(popup);
 
-  document.body.appendChild(popup);
-
-  // === Button handlers ===
-  if (playerWon) {
-
-    document.getElementById('next-level-btn').addEventListener('click', () => {
-      popup.remove();
-      level++;
-      enemyAttackCount += 1;
-      if (level % 2 === 0) playerAttackCount += 1;
-      showShop(); // 🏪 always show shop after each win
-    });
-  } else {
     document.getElementById('retry-btn').addEventListener('click', () => {
       popup.remove();
       resetGame();
       nextLevel();
     });
+  } else {
+    // ——— WIN SCREEN + SHOP MERGED ———
+    // Boss reward FIRST (only on win)
+    if (isBossLevel) {
+      const bossReward = 50;
+      playerGold += bossReward;
+      updateGoldEverywhere();
+
+      const rewardPopup = document.createElement("div");
+      rewardPopup.className = "revive-popup";
+      rewardPopup.style.background = "rgba(255, 215, 0, 0.9)";
+      rewardPopup.textContent = `🏆 Boss Defeated! +${bossReward}🪙`;
+      document.body.appendChild(rewardPopup);
+      setTimeout(() => rewardPopup.remove(), 1200);
+    }
+
+    popup.innerHTML = `
+      <div class="end-screen-content">
+        <h1>You Win!</h1>
+        <p>Level ${level} cleared. Spend your gold, then continue.</p>
+
+        <p>You have <strong style="color:gold;">💰 <span id="shop-gold">${playerGold}</span></strong></p>
+        <div id="shop-items"></div>
+
+        <br>
+        <button id="continue-btn">Continue</button>
+        <br><br>
+        <button id="main-menu-btn">Main Menu</button>
+      </div>
+    `;
+    document.body.appendChild(popup);
+
+    // Build the shop right into this popup
+    buildShopUI(popup);
+
+    // Continue → advance level and start next
+    popup.querySelector('#continue-btn').addEventListener('click', () => {
+      popup.remove();
+      currentShopPopup = null;
+      level++;
+      enemyAttackCount += 1;
+      if (level % 2 === 0) playerAttackCount += 1;
+      nextLevel();
+    });
   }
 
-  if (isBossLevel) {
-    const bossReward = 50;
-    playerGold += bossReward;
-    updateGoldEverywhere();
-  
-    // Optional: small reward popup
-    const rewardPopup = document.createElement("div");
-    rewardPopup.className = "revive-popup";
-    rewardPopup.style.background = "rgba(255, 215, 0, 0.9)";
-    rewardPopup.textContent = `🏆 Boss Defeated! +${bossReward}🪙`;
-    document.body.appendChild(rewardPopup);
-    setTimeout(() => rewardPopup.remove(), 1500);
-  }
-  
-
+  // Main Menu (shared)
   document.getElementById('main-menu-btn').addEventListener('click', () => {
     const confirmPopup = document.createElement('div');
     confirmPopup.className = 'end-screen';

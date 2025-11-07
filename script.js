@@ -233,13 +233,13 @@ const allItems = [
     bonusDamage: 5, applyEffect() {} },
   { id: "lightArmor", name: "Light Armor", description: "Heal +5 HP Per Round", rarity: RARITY.COMMON,
     regenPerRound: 5, applyEffect() {} },
-  { id: "coinPouch", name: "Coin Pouch", description: "+1 gold per gold tile", rarity: RARITY.COMMON,
+  { id: "coinPouch", name: "Coin Pouch", description: "+1 Gold Per Square", rarity: RARITY.COMMON,
     extraGoldPerTile: 1, applyEffect() {} },
-  { id: "minersMap", name: "Miner's Map", description: "+1 gold tile each round", rarity: RARITY.COMMON,
+  { id: "minersMap", name: "Miner's Map", description: "+1 Gold Squares", rarity: RARITY.COMMON,
     extraGoldTiles: 1, applyEffect() {} },
-  { id: "streetTithe", name: "Street Tithe", description: "+5 passive gold per level", rarity: RARITY.COMMON,
+  { id: "streetTithe", name: "Street Tithe", description: "+5 Gold Per Level", rarity: RARITY.COMMON,
   passiveGoldPerRound: 5, applyEffect() {} },
-  { id: "comboCharm", name: "Combo Charm", description: "Increases combo gain by +0.1", rarity: RARITY.COMMON,
+  { id: "comboCharm", name: "Combo Charm", description: "Increases Combo +0.1", rarity: RARITY.COMMON,
     comboBoost: 0.1, applyEffect() {} },
   { id: "crudePotion", name: "Crude Potion", description: "Heal +40 HP", rarity: RARITY.COMMON,
     isConsumable: true, applyEffect() {
@@ -262,15 +262,15 @@ const allItems = [
     range: [20, 25], applyEffect() {} },
   { id: "strongBoots", name: "Strong Boots", description: "Take -5 Damage", rarity: RARITY.RARE,
     damageReduction: 5, applyEffect() {} },
-  { id: "huntersRing", name: "Treasure Hunter's Ring", description: "+2 gold per gold tile", rarity: RARITY.RARE,
+  { id: "huntersRing", name: "Treasure Hunter's Ring", description: "+2 Gold Per Square", rarity: RARITY.RARE,
     extraGoldPerTile: 2, applyEffect() {} },
-  { id: "prospectorsPick", name: "Prospector's Pick", description: "+2 gold tiles each round", rarity: RARITY.RARE,
+  { id: "prospectorsPick", name: "Prospector's Pick", description: "+2 Gold Squares", rarity: RARITY.RARE,
     extraGoldTiles: 2, applyEffect() {} },
-  { id: "guildStipend", name: "Guild Stipend", description: "+7 passive gold per level", rarity: RARITY.RARE,
+  { id: "guildStipend", name: "Guild Stipend", description: "+7 Gold Per Level", rarity: RARITY.RARE,
     passiveGoldPerRound: 7, applyEffect() {} },
   { id: "bronzeArmor", name: "Bronze Armor", description: "Heal +10 HP Per Round", rarity: RARITY.RARE,
     regenPerRound: 10, applyEffect() {} },
-  { id: "flamePendant", name: "Flame Pendant", description: "Inflicts 1 burn damage every tile clicked", rarity: RARITY.RARE,
+  { id: "flamePendant", name: "Flame Pendant", description: "Inflicts 1 Burn Per Square", rarity: RARITY.RARE,
     burnDamage: 1, applyEffect() {} },
   { id: "lifeAmulet", name: "Life Amulet", description: "Revive Once With 25% HP", rarity: RARITY.RARE,
     reviveAtPercent: 0.25, applyEffect() {} },
@@ -286,19 +286,19 @@ const allItems = [
     damageReduction: 10, applyEffect() {} },
   { id: "focusTalisman", name: "Focus Talisman", description: "Deal +10 Damage", rarity: RARITY.EPIC,
     bonusDamage: 10, applyEffect() {} },
-  { id: "fireBrand", name: "Firebrand", description: "Combo gain +0.2 and 2 burn damage per tile", rarity: RARITY.EPIC,
+  { id: "fireBrand", name: "Firebrand", description: "Combo Gain +0.2 And 2 Burn per Square", rarity: RARITY.EPIC,
     comboBoost: 0.2, burnDamage: 2, applyEffect() {} },
-  { id: "goldenTouch", name: "Golden Touch", description: "+3 gold per gold tile", rarity: RARITY.EPIC,
+  { id: "goldenTouch", name: "Golden Touch", description: "+3 Gold Per Square", rarity: RARITY.EPIC,
     extraGoldPerTile: 3, applyEffect() {} },
-  { id: "royalCharter", name: "Royal Charter", description: "+10 passive gold per level", rarity: RARITY.EPIC,
+  { id: "royalCharter", name: "Royal Charter", description: "+10 Gold Per Level", rarity: RARITY.EPIC,
     passiveGoldPerRound: 10, applyEffect() {} },
-  { id: "gildedCompass", name: "Gilded Compass", description: "+3 gold tiles each round", rarity: RARITY.EPIC,
+  { id: "gildedCompass", name: "Gilded Compass", description: "+3 Gold Squares", rarity: RARITY.EPIC,
     extraGoldTiles: 3, applyEffect() {} },
 
   // LEGENDARY
   { id: "phoenixHeart", name: "Phoenix Heart", description: "Revive Once With 100% HP", rarity: RARITY.LEGENDARY,
     reviveAtPercent: 1, applyEffect() {} },
-  { id: "infernoSoul", name: "Inferno Soul", description: "Combo gain +0.3 and 3 burn damage per tile", rarity: RARITY.LEGENDARY,
+  { id: "infernoSoul", name: "Inferno Soul", description: "Combo Gain +0.3 And 3 Burn Per Squares", rarity: RARITY.LEGENDARY,
     comboBoost: 0.3, burnDamage: 3, applyEffect() {} },
   { id: "godblade", name: "Godblade", description: "Gain +5 Attack Square, Deal +10 Damage", rarity: RARITY.LEGENDARY,
     bonusAttackCount: 5, bonusDamage: 10, applyEffect() { playerAttackCount += 5; } },
@@ -306,11 +306,11 @@ const allItems = [
     range: [1, 10], safeNumbers: 5, applyEffect() {} },
   { id: "heavySword", name: "Heavy Sword", description: "Combo gain +0.5", rarity: RARITY.LEGENDARY,
     comboBoost: 0.5, applyEffect() {} },
-  { id: "emberCore", name: "Ember Core", description: "5 burn damage per tile", rarity: RARITY.LEGENDARY,
+  { id: "emberCore", name: "Ember Core", description: "5 Burn Per Square", rarity: RARITY.LEGENDARY,
       burnDamage: 5, applyEffect() {} },
-  { id: "dragonsHoard", name: "Dragon's Hoard", description: "+5 gold/tile & +2 tiles/round", rarity: RARITY.LEGENDARY,
+  { id: "dragonsHoard", name: "Dragon's Hoard", description: "+5 Gold Per Square & +2 Gold Squares", rarity: RARITY.LEGENDARY,
     extraGoldPerTile: 5, extraGoldTiles: 2, applyEffect() {} },
-  { id: "ancientBank", name: "Bank of the Ancients", description: "+20 passive gold per level", rarity: RARITY.LEGENDARY,
+  { id: "ancientBank", name: "Bank of the Ancients", description: "+20 Gold Per Level", rarity: RARITY.LEGENDARY,
     passiveGoldPerRound: 20, applyEffect() {} },
 ];
 
@@ -1214,7 +1214,7 @@ function buildPlayerTooltip() {
     ☠️ Burn per Click: ${stats.burnDamage || 0}<br>
     🔢 Attack Squares: ${playerAttackCount}<br>
     🪙 Gold per Tile: ${goldPerTile}<br>
-    🟨 Gold Tiles / Round: ${goldTilesPerRound}
+    🟨 Gold Tiles: ${goldTilesPerRound}
   `;
 }
 

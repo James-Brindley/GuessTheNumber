@@ -40,7 +40,7 @@ const GOLD_TILES_PER_ROUND = 5;     // how many gold tiles per round
 const GOLD_PER_TILE = 5;            // how much each gold tile gives
 
 const GAP_PX = 5;
-const BASE_CELL_PX = 180;   // <- your desired starting tile size (was ~80px)
+const BASE_CELL_PX = 80;   // <- your desired starting tile size (was ~80px)
 const MIN_CELL_PX  = 28;   // floor for readability
 
 let gridBoxW = 0; // pixels
@@ -53,7 +53,7 @@ function initGridBox(baseCols = cols, baseRows = rows) {
 
   // Respect viewport caps (same visual frame as before)
   const capW = Math.min(window.innerWidth * 0.90, 1000);
-  const capH = Math.min(window.innerHeight * 0.52, 520);
+  const capH = Math.min(window.innerHeight * 0.52, 700);
 
   // If the wanted box is too big for the caps, shrink proportionally
   const scale = Math.min(capW / wantedW, capH / wantedH, 1);

@@ -826,13 +826,6 @@ function showEndScreen(playerWon) {
       const bossReward = 50;
       playerGold += bossReward;
       updateGoldEverywhere();
-
-      const rewardPopup = document.createElement("div");
-      rewardPopup.className = "revive-popup";
-      rewardPopup.style.background = "rgba(255, 215, 0, 0.9)";
-      rewardPopup.textContent = `🏆 Boss Defeated! +${bossReward}🪙`;
-      document.body.appendChild(rewardPopup);
-      setTimeout(() => rewardPopup.remove(), 1200);
     }
 
     popup.innerHTML = `

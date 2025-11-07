@@ -39,6 +39,32 @@ let playerGold = 0;
 const GOLD_TILES_PER_ROUND = 5;     // how many gold tiles per round
 const GOLD_PER_TILE = 5;            // how much each gold tile gives
 
+const GAP_PX = 5;
+const BASE_CELL_PX = 80;   // <- your desired starting tile size (was ~80px)
+const MIN_CELL_PX  = 28;   // floor for readability
+
+let gridBoxW = 0; // pixels
+let gridBoxH = 0; // pixels
+
+function initGridBox(baseCols = cols, baseRows = rows) {
+  // What box size would we need to show baseCols x baseRows at BASE_CELL_PX?
+  let wantedW = baseCols * BASE_CELL_PX + (baseCols - 1) * GAP_PX;
+  let wantedH = baseRows * BASE_CELL_PX + (baseRows - 1) * GAP_PX;
+
+  // Respect viewport caps (same visual frame as before)
+  const capW = Math.min(window.innerWidth * 0.90, 1000);
+  const capH = Math.min(window.innerHeight * 0.52, 520);
+
+  // If the wanted box is too big for the caps, shrink proportionally
+  const scale = Math.min(capW / wantedW, capH / wantedH, 1);
+  gridBoxW = Math.floor(wantedW * scale);
+  gridBoxH = Math.floor(wantedH * scale);
+
+  // Push to CSS vars
+  container.style.setProperty('--grid-box-w', `${gridBoxW}px`);
+  container.style.setProperty('--grid-box-h', `${gridBoxH}px`);
+}
+
 function updateGoldEverywhere() {
   // top HUD
   updateGoldDisplay();
@@ -114,33 +140,6 @@ const levelDisplay = document.createElement('div');
 levelDisplay.id = 'level-display';
 levelDisplay.textContent = `Level ${level}`;
 document.body.appendChild(levelDisplay);
-
-const GAP_PX = 5;
-const BASE_CELL_PX = 80;   // <- your desired starting tile size (was ~80px)
-const MIN_CELL_PX  = 28;   // floor for readability
-
-let gridBoxW = 0; // pixels
-let gridBoxH = 0; // pixels
-
-function initGridBox(baseCols = cols, baseRows = rows) {
-  // What box size would we need to show baseCols x baseRows at BASE_CELL_PX?
-  let wantedW = baseCols * BASE_CELL_PX + (baseCols - 1) * GAP_PX;
-  let wantedH = baseRows * BASE_CELL_PX + (baseRows - 1) * GAP_PX;
-
-  // Respect viewport caps (same visual frame as before)
-  const capW = Math.min(window.innerWidth * 0.90, 1000);
-  const capH = Math.min(window.innerHeight * 0.52, 520);
-
-  // If the wanted box is too big for the caps, shrink proportionally
-  const scale = Math.min(capW / wantedW, capH / wantedH, 1);
-  gridBoxW = Math.floor(wantedW * scale);
-  gridBoxH = Math.floor(wantedH * scale);
-
-  // Push to CSS vars
-  container.style.setProperty('--grid-box-w', `${gridBoxW}px`);
-  container.style.setProperty('--grid-box-h', `${gridBoxH}px`);
-}
-
 
 function updateHealth() {
   const playerFill = document.querySelector('.player-health-fill');

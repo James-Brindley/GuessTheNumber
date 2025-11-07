@@ -246,8 +246,6 @@ const allItems = [
       playerHealth = Math.min(playerHealth + 40, getPlayerMaxHealth());
       updateHealth();
     }},
-  { id: "swiftCharm", name: "Swift Charm", description: "Gain +1 Extra Attack Square Every Even Level", rarity: RARITY.COMMON,
-    bonusEvenLevelAttack: 1, applyEffect() {} },
 
   // RARE
   { id: "ironSword", name: "Iron Sword", description: "Gain +2 Attack Squares", rarity: RARITY.RARE,
@@ -294,6 +292,8 @@ const allItems = [
     passiveGoldPerRound: 10, applyEffect() {} },
   { id: "gildedCompass", name: "Gilded Compass", description: "+3 Gold Squares", rarity: RARITY.EPIC,
     extraGoldTiles: 3, applyEffect() {} },
+  { id: "swiftCharm", name: "Swift Charm", description: "Gain +1 Extra Attack Square Every Even Level", rarity: RARITY.EPIC,
+    bonusEvenLevelAttack: 1, applyEffect() {} },
 
   // LEGENDARY
   { id: "phoenixHeart", name: "Phoenix Heart", description: "Revive Once With 100% HP", rarity: RARITY.LEGENDARY,

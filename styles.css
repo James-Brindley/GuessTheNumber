@@ -695,7 +695,7 @@ body {
 
 .safe-range {
   animation: pulse-blue 1.2s infinite;
-  box-shadow: 0 0 12px 3px rgba(0, 180, 255, 0.6);
+  box-shadow: 0 0 12px 3px #4CAF50;
   transition: box-shadow 0.4s ease-out;
   border-radius: 15px;
 }

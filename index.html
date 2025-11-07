@@ -50,89 +50,82 @@
     </div>
   </div>
 
-  <!-- ✅ HOW TO PLAY SCREEN (Full Screen) -->
   <div id="how-to-play-screen" class="menu-screen fullscreen" style="display: none;">
     <div class="menu-inner">
       <h1 class="menu-title">How To Play</h1>
       <div class="how-to-text">
-        <p>Welcome to <strong>Guess The Dungeon!</strong> — a mix of luck, strategy, and risk-taking.</p>
-      
+        <p>Welcome to <strong>Guess The Dungeon</strong> — a mix of luck, risk, and clever choices!</p>
+  
         <h2>🎯 Your Goal</h2>
-        <p>Each level, you and an enemy take turns revealing tiles on the grid. Some tiles are safe, while others trigger attacks!</p>
+        <p>Click tiles on the grid to uncover attacks, gold, or nothing at all. Defeat the enemy before they defeat you!</p>
         <ul>
-          <li>🟩 <strong>Green tiles</strong> — Your attacks! Deal damage to the enemy.</li>
-          <li>🟥 <strong>Red tiles</strong> — Enemy attacks! You take damage.</li>
-          <li>⬛ <strong>Blank tiles</strong> — Safe. Nothing happens.</li>
+          <li>🟩 <strong>Green:</strong> Your attack — deal damage to the enemy.</li>
+          <li>🟥 <strong>Red:</strong> Enemy attack — you take damage.</li>
+          <li>⬛ <strong>Blank:</strong> Safe but resets your combo.</li>
+          <li>🟨 <strong>Gold:</strong> Earn gold used to buy items in shops.</li>
         </ul>
-      
-        <h2>⚔️ Combos</h2>
-        <p>Each time you land a hit without missing, your damage increases slightly. This is called your <strong>combo multiplier</strong>.</p>
+  
+        <h2>⚔️ Combat & Combos</h2>
         <ul>
-          <li>Every successful hit raises your combo (up to 2× damage max).</li>
-          <li>Missing a tile or getting hit resets your combo back to 1×.</li>
-          <li>Watch for the glowing “Combo!” popup when you strike with boosted power.</li>
+          <li>Each successful hit raises your <strong>combo</strong>, increasing your damage up to ×2.</li>
+          <li>Taking damage or hitting a blank/gold tile resets your combo.</li>
+          <li>Both you and the enemy have separate combos — stay consistent to outpace them!</li>
         </ul>
-      
-        <h2>🧱 Levels and Difficulty</h2>
-        <p>As you climb through the dungeon, enemies get stronger:</p>
+  
+        <h2>💰 Gold & Shops</h2>
         <ul>
-          <li>Enemies gain more health and deal more damage every few levels.</li>
-          <li>Every <strong>10th level</strong> is a <strong>Boss Battle</strong> — tougher enemies with extra health and higher attack power!</li>
-          <li>After a boss, enemies become stronger in future fights.</li>
+          <li>Find <strong>gold tiles</strong> during battles to earn coins.</li>
+          <li>Defeating <strong>Bosses</strong> rewards extra gold 💰.</li>
+          <li>Spend gold between rounds in the <strong>Shop</strong> to buy powerful items.</li>
+          <li>Items come in rarities: 
+            <span style="color:#4CAF50;">Common</span>, 
+            <span style="color:#2196F3;">Rare</span>, 
+            <span style="color:#9C27B0;">Epic</span>, 
+            and <span style="color:#FFD700;">Legendary</span>.
+          </li>
         </ul>
-      
-        <h2>💎 Items and the Shop</h2>
-        <p>Every <strong>3 levels</strong>, you visit a shop and can pick one item to keep for the rest of your run.</p>
+  
+        <h2>🧾 Items & Effects</h2>
+        <p>Items give passive bonuses for your entire run — more attacks, healing, defense, gold gain, or special effects like <strong>Burn</strong> or <strong>Revive</strong>.</p>
         <ul>
-          <li>Each item gives you a special bonus, such as more health, more attacks, healing, or defense.</li>
-          <li>You can only choose <strong>one item</strong> per shop visit — choose wisely!</li>
+          <li>Hover the 🎒 button to view your collected items.</li>
+          <li>Some items add <strong>safe numbers</strong> — glowing blue tiles that will never hurt you.</li>
+          <li>Revive items automatically trigger when you die (once each).</li>
         </ul>
-      
-        <h3>Item Rarities</h3>
-        <p>Items come in different rarities, which affect their power and how often you find them:</p>
+  
+        <h2>🔥 Status Effects</h2>
         <ul>
-          <li><span style="color:#4CAF50;">🟩 Common</span> — 55% chance, simple small boosts.</li>
-          <li><span style="color:#2196F3;">🟦 Rare</span> — 25% chance, better effects.</li>
-          <li><span style="color:#9C27B0;">🟪 Epic</span> — 15% chance, powerful bonuses.</li>
-          <li><span style="color:#FFD700;">🟨 Legendary</span> — 5% chance, the best and rarest items!</li>
+          <li><strong>Burn:</strong> Deals extra damage each time you click a tile.</li>
+          <li><strong>Regen:</strong> Heals you slightly at the start of each round.</li>
+          <li><strong>Damage Reduction:</strong> Lowers how much damage you take per hit.</li>
         </ul>
-      
-        <h2>❤️ Health and Healing</h2>
-        <ul>
-          <li>Your health is shown at the top of the screen in green.</li>
-          <li>The enemy’s health is red.</li>
-          <li>Some items heal you after attacking or between levels.</li>
-          <li>If your health reaches zero, you lose — unless you have an item that revives you!</li>
-        </ul>
-      
-        <h2>🔁 Revives</h2>
-        <p>Special items like the <strong>Life Amulet</strong> or <strong>Phoenix Heart</strong> can bring you back from defeat:</p>
-        <ul>
-          <li>Each revive item works only <strong>once</strong>.</li>
-          <li>When it activates, you’ll return to life with a portion (or all) of your health restored.</li>
-        </ul>
-      
+  
         <h2>🏆 Progression</h2>
         <ul>
-          <li>Each level, you’ll face a new challenge with stronger enemies.</li>
-          <li>Win to advance and earn new items.</li>
-          <li>Lose, and your run restarts from Level 1 — but you’ll be better prepared next time!</li>
+          <li>Enemies grow stronger with each level.</li>
+          <li>Every <strong>10th level</strong> is a <strong>Boss Fight</strong> with higher health and damage.</li>
+          <li>After a boss, enemies permanently scale up in strength.</li>
         </ul>
-      
-        <h2>⏸️ Tips</h2>
+  
+        <h2>🩸 Stats & Info</h2>
         <ul>
-          <li>Use the <strong>Pause Button</strong> (⏸️) to take a break during battle.</li>
-          <li>Hover over your <strong>Health Bars</strong> to see exact HP numbers.</li>
-          <li>Open your <strong>Inventory (🎒)</strong> to view all collected items during your run.</li>
+          <li>Hover over your hero or the enemy to see detailed <strong>stats</strong> like attack, health, regen, and gold bonuses.</li>
+          <li>Hover over the health bars for exact HP values.</li>
         </ul>
-      
-        <p style="text-align:center; margin-top:20px;">Good luck, adventurer. The dungeon awaits!</p>
+  
+        <h2>⏸️ Controls</h2>
+        <ul>
+          <li>Press <strong>⏸️</strong> or hit <strong>ESC</strong> to pause the game.</li>
+          <li>Click <strong>Main Menu</strong> only when you’re sure — it resets your current run.</li>
+        </ul>
+  
+        <p style="text-align:center; margin-top:20px;">Good luck, adventurer — uncover the tiles, master your luck, and conquer the dungeon!</p>
       </div>
-      
+  
       <button id="back-to-menu-btn">Back to Menu</button>
     </div>
   </div>
-
+  
   <!-- ✅ Inventory Button + Panel -->
   <div id="inventory-container">
     <button id="inventory-button">🎒</button>

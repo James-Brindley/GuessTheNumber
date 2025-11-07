@@ -739,12 +739,13 @@ body {
   box-shadow: 0 0 18px 4px rgba(255, 200, 0, 0.6);
   position: relative;
 }
+
 .grid-item.gold::after {
   content: '🪙';
   position: absolute;
-  right: 8px;
-  top: 6px;
-  font-size: 28px;
+  right: calc(var(--cell-size) * 0.1);
+  top: calc(var(--cell-size) * 0.08);
+  font-size: calc(var(--cell-size) * 0.35);
   filter: drop-shadow(0 2px 0 black);
 }
 

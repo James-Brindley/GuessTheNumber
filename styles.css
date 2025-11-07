@@ -46,30 +46,30 @@ body {
   left: 50%;
   transform: translateX(-50%);
 
-  /* The grid “box” stays the same, tiles shrink/grow inside it */
-  width: min(90vw, 1000px);
-  height: min(52vh, 520px);
+  /* The grid box stays ~the same visual area; we’ll size it precisely from JS */
+  width: var(--grid-box-w, 1000px);
+  height: var(--grid-box-h, 520px);
 
   display: grid;
   place-content: center;
   gap: 5px;
 
   /* Driven by JS */
-  grid-template-columns: repeat(var(--grid-cols, 15), var(--cell-size, 64px));
-  grid-auto-rows: var(--cell-size, 64px);
+  grid-template-columns: repeat(var(--grid-cols, 15), var(--cell-size, 80px));
+  grid-auto-rows: var(--cell-size, 80px);
 
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-/* Tiles now size from --cell-size, no padding inflation */
+/* Single .grid-item rule */
 .grid-item {
-  width: var(--cell-size, 64px);
-  height: var(--cell-size, 64px);
+  width: var(--cell-size, 80px);
+  height: var(--cell-size, 80px);
   display: grid;
   place-items: center;
 
-  /* readable number scale based on tile size */
-  font-size: calc(var(--cell-size, 64px) * 0.35);
+  /* Legible numbers; adjust as you like */
+  font-size: calc(var(--cell-size) * 0.42);
 
   color: white;
   cursor: pointer;
@@ -80,7 +80,6 @@ body {
   transition: transform 0.4s ease, opacity 0.4s ease, background 0.2s;
 }
 
-/* keep your existing states (active, attack, eAttack, gold, etc.) */
 .grid-grow .grid-item { transform: scale(1); opacity: 1; }
 
   
@@ -102,23 +101,6 @@ body {
 .grid-item.eAttack {
   background-color: #e44444b5;
   color: white;
-}
-
-.grid-item {
-  color: white;
-  padding: 20px;
-  cursor: pointer;
-  user-select: none;
-  border-radius: 15px;
-  transform: scale(0.8);
-  opacity: 0;
-  transition: transform 0.4s ease, opacity 0.4s ease;
-}
-
-/* When gridGrow class is added, all tiles fade & pop in */
-.grid-grow .grid-item {
-  transform: scale(1);
-  opacity: 1;
 }
 
 /* ✨ Small stagger for a subtle wave */

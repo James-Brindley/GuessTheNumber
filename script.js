@@ -865,6 +865,21 @@ function showEndScreen(playerWon) {
     });
   }
 
+  if (isBossLevel) {
+    const bossReward = 50;
+    playerGold += bossReward;
+    updateGoldEverywhere();
+  
+    // Optional: small reward popup
+    const rewardPopup = document.createElement("div");
+    rewardPopup.className = "revive-popup";
+    rewardPopup.style.background = "rgba(255, 215, 0, 0.9)";
+    rewardPopup.textContent = `🏆 Boss Defeated! +${bossReward}🪙`;
+    document.body.appendChild(rewardPopup);
+    setTimeout(() => rewardPopup.remove(), 1500);
+  }
+  
+
   document.getElementById('main-menu-btn').addEventListener('click', () => {
     const confirmPopup = document.createElement('div');
     confirmPopup.className = 'end-screen';

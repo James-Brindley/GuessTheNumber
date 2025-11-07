@@ -422,14 +422,13 @@ function buildGrid() {
   let currentCols = cols;
   let currentRows = rows;
   let totalCells = currentCols * currentRows;
-  
+
   // include dynamic extra gold tiles from items
   const goldExtras = getGoldStats().extraGoldTiles || 0;
   const requiredCells = playerAttackCount + enemyAttackCount + (GOLD_TILES_PER_ROUND + goldExtras) + 5; // buffer
 
   // 🧮 Expand grid dynamically:
-  // - +1 column until 3 added
-  // - then +1 row, repeat
+  // - +1 column until 3 added, then +1 row, repeat
   let addedCols = 0;
   while (totalCells < requiredCells) {
     currentCols++;
@@ -443,71 +442,46 @@ function buildGrid() {
 
   // === Build the grid ===
   container.innerHTML = '';
-  // Animate when grid expands
   container.classList.remove('grid-grow');
-  void container.offsetWidth; // force reflow for re-triggering animation
+  void container.offsetWidth; // reflow
   container.style.gridTemplateColumns = `repeat(${currentCols}, 1fr)`;
   container.classList.add('grid-grow');
 
-  // after computing player & enemy attack numbers...
+  // Base attack picks
   playerAttackNumbers = getRandomUniqueNumbers(playerAttackCount, totalCells);
-  enemyAttackNumbers = getRandomUniqueNumbers(enemyAttackCount, totalCells, playerAttackNumbers);
+  enemyAttackNumbers  = getRandomUniqueNumbers(enemyAttackCount,  totalCells, playerAttackNumbers);
 
-  // === Inject safe-number items BEFORE we pick gold tiles ===
-  const applySafeNumbersFromItems = () => {
-    const taken = new Set([...playerAttackNumbers, ...enemyAttackNumbers]);
-    playerItems
-      .filter(i => i.range)
-      .forEach(i => {
-        const [min, max] = i.range;
-        const rangeNums = Array.from({ length: max - min + 1 }, (_, x) => min + x);
-        const available = rangeNums.filter(n => !taken.has(n) && n >= 1 && n <= totalCells);
-        const count = i.safeNumbers || 1;
-        if (available.length > 0) {
-          const chosen = [];
-          while (chosen.length < Math.min(count, available.length)) {
-            const idx = Math.floor(Math.random() * available.length);
-            const n = available.splice(idx, 1)[0];
-            chosen.push(n);
-            taken.add(n);
-          }
-          playerAttackNumbers.push(...chosen);
-        }
-      });
-  };
-  applySafeNumbersFromItems();
+  // === Inject safe-number items BEFORE picking gold ===
+  const taken = new Set([...playerAttackNumbers, ...enemyAttackNumbers]);
+  playerItems
+    .filter(i => i.range)
+    .forEach(i => {
+      const [min, max] = i.range;
+      const rangeNums = Array.from({ length: max - min + 1 }, (_, x) => min + x);
+      const available = rangeNums.filter(n => !taken.has(n) && n >= 1 && n <= totalCells);
+      const count = i.safeNumbers || 1;
 
-  // === NOW pick gold tiles from cells not used by either side ===
-  const used = new Set([...playerAttackNumbers, ...enemyAttackNumbers]);
+      for (let k = 0; k < Math.min(count, available.length); k++) {
+        const idx = Math.floor(Math.random() * available.length);
+        const n = available.splice(idx, 1)[0];
+        playerAttackNumbers.push(n);
+        taken.add(n);
+      }
+    });
+
+  // === Pick gold tiles from cells not used by either side ===
   const pool = [];
-  for (let i = 1; i <= totalCells; i++) if (!used.has(i)) pool.push(i);
+  for (let i = 1; i <= totalCells; i++) if (!taken.has(i)) pool.push(i);
 
-  const goldStats = getGoldStats();
-  const goldCount = Math.min(GOLD_TILES_PER_ROUND + (goldStats.extraGoldTiles || 0), pool.length);
+  const gstats = getGoldStats();
+  const goldCount = Math.min(GOLD_TILES_PER_ROUND + (gstats.extraGoldTiles || 0), pool.length);
   const goldNumbers = [];
   while (goldNumbers.length < goldCount && pool.length > 0) {
     const i = Math.floor(Math.random() * pool.length);
     goldNumbers.push(pool.splice(i, 1)[0]);
   }
 
-  // 🪙 Pick gold tiles from cells not used by either side (now with item bonuses)
-  const used = new Set([...playerAttackNumbers, ...enemyAttackNumbers]);
-  const pool = [];
-  for (let i = 1; i <= totalCells; i++) {
-    if (!used.has(i)) pool.push(i);
-  }
-
-  const goldStats = getGoldStats();
-  const goldCount = Math.min(GOLD_TILES_PER_ROUND + (goldStats.extraGoldTiles || 0), pool.length);
-  const goldNumbers = [];
-  while (goldNumbers.length < goldCount && pool.length > 0) {
-    const i = Math.floor(Math.random() * pool.length);
-    const n = pool.splice(i, 1)[0];
-    goldNumbers.push(n);
-  }
-
-
-
+  // === Render cells ===
   let number = 1;
   for (let r = 0; r < currentRows; r++) {
     for (let c = 0; c < currentCols; c++) {
@@ -515,49 +489,48 @@ function buildGrid() {
 
       const cell = document.createElement('div');
       cell.className = 'grid-item';
-      cell.textContent = number++;
+      cell.textContent = number;
 
+      // click handler
       cell.addEventListener('click', () => {
         if (cell.classList.contains('clicked') || gameOver || isPaused) return;
-      
+
         cell.classList.add('clicked');
-        const cellNumber = parseInt(cell.textContent);
+        const cellNumber = number; // careful: use the captured `number` value
         cell.classList.remove('safe-range');
-      
+
         if (enemyAttackNumbers.includes(cellNumber)) {
           cell.classList.add('eAttack');
           enemy.playAttack();
           applyPassiveItemEffectsOnAttack(false);
-        
+
         } else if (playerAttackNumbers.includes(cellNumber)) {
           cell.classList.add('attack');
           hero.playAttack();
           applyPassiveItemEffectsOnAttack(true);
-        
+
         } else if (goldNumbers.includes(cellNumber)) {
-          // make it look like a gold tile that’s been revealed
           cell.classList.add('gold');
-        
-          const gstats = getGoldStats();
           const gain = GOLD_PER_TILE + (gstats.extraGoldPerTile || 0);
           playerGold += gain;
           updateGoldEverywhere();
           showHitPopup(true, `+${gain}🪙`, true);
+
         } else {
-          // Plain grey tile: safe; no gold, and we keep your existing combo reset behavior
           cell.classList.add('active');
           playerCombo = 1.0;
           enemyCombo = 1.0;
-        }        
-      
+        }
+
         // Burn triggers on every click
         applyBurnEffect();
-      
-        // ✅ Resolve deaths exactly once (covers ties, revive, wins, losses)
+
+        // Resolve deaths (ties, revive, wins, losses)
         resolveDeaths();
-      });      
+      });
 
       container.appendChild(cell);
+      number++;
     }
   }
 
@@ -573,6 +546,7 @@ function buildGrid() {
       });
     });
 }
+
 
 function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSelector, speed = 250) {
   const el = document.getElementById(id);

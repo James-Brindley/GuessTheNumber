@@ -443,6 +443,7 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
     // ✅ Check ignore chance (MISS)
     if (Math.random() < (stats.ignoreDamageChance || 0)) {
       showHitPopup(true, "MISS");
+      enemyCombo = 1.0;
       updateHealth();
       return;
     }

@@ -258,8 +258,11 @@ const RARITY_COST = {
 
 
 // === ALL ITEMS (fully compatible with new stat system) ===
+// === ALL ITEMS (no consumables; purchase-heal items are repeatable & skip inventory) ===
 const allItems = [
-  // COMMON
+  // =====================================================================
+  // ============================ COMMON =================================
+  // =====================================================================
   { id: "smallSword", name: "Small Sword", description: "Gain +1 Attack Square", rarity: RARITY.COMMON,
     bonusAttackCount: 1, applyEffect() { playerAttackCount += 1; } },
   { id: "leatherShield", name: "Leather Shield", description: "+20 Max HP", rarity: RARITY.COMMON,
@@ -272,25 +275,86 @@ const allItems = [
     range: [35, 40], applyEffect() {} },
   { id: "steadyBoots", name: "Steady Boots", description: "Take -3 Damage", rarity: RARITY.COMMON,
     damageReduction: 3, applyEffect() {} },
-  { id: "minorFocus", name: "Minor Focus", description: "Deal +5 damage", rarity: RARITY.COMMON,
+  { id: "minorFocus", name: "Minor Focus", description: "Deal +5 Damage", rarity: RARITY.COMMON,
     bonusDamage: 5, applyEffect() {} },
   { id: "lightArmor", name: "Light Armor", description: "Heal +5 HP Per Round", rarity: RARITY.COMMON,
     regenPerRound: 5, applyEffect() {} },
   { id: "coinPouch", name: "Coin Pouch", description: "+1 Gold Per Square", rarity: RARITY.COMMON,
     extraGoldPerTile: 1, applyEffect() {} },
-  { id: "minersMap", name: "Miner's Map", description: "+1 Gold Squares", rarity: RARITY.COMMON,
+  { id: "minersMap", name: "Miner's Map", description: "+1 Gold Tiles", rarity: RARITY.COMMON,
     extraGoldTiles: 1, applyEffect() {} },
   { id: "streetTithe", name: "Street Tithe", description: "+5 Gold Per Level", rarity: RARITY.COMMON,
-  passiveGoldPerRound: 5, applyEffect() {} },
+    passiveGoldPerRound: 5, applyEffect() {} },
   { id: "comboCharm", name: "Combo Charm", description: "Increases Combo +0.1", rarity: RARITY.COMMON,
     comboBoost: 0.1, applyEffect() {} },
-  { id: "crudePotion", name: "Crude Potion", description: "Heal +40 HP", rarity: RARITY.COMMON,
-    isConsumable: true, applyEffect() {
-      playerHealth = Math.min(playerHealth + 40, getPlayerMaxHealth());
-      updateHealth();
-    }},
+  { id: "crudePotion", name: "Crude Potion", description: "Instantly heal 40 HP on purchase (repeatable)", rarity: RARITY.COMMON,
+    onPurchaseHeal: 40, repeatable: true, noInventory: true },
+  { id: "sturdyBuckle", name: "Sturdy Buckle", description: "+10 Max HP", rarity: RARITY.COMMON,
+    bonusHP: 10, applyEffect() {} },
+  { id: "whetstone", name: "Whetstone", description: "Deal +3 Damage", rarity: RARITY.COMMON,
+    bonusDamage: 3, applyEffect() {} },
+  { id: "woolCloak", name: "Wool Cloak", description: "Take -2 Damage", rarity: RARITY.COMMON,
+    damageReduction: 2, applyEffect() {} },
+  { id: "rabbitFoot", name: "Rabbit’s Foot", description: "2% Chance To Ignore Damage", rarity: RARITY.COMMON,
+    ignoreDamageChance: 0.02, applyEffect() {} },
+  { id: "trailMap", name: "Trail Map", description: "1 Attack Number Between 28–32", rarity: RARITY.COMMON,
+    range: [28, 32], applyEffect() {} },
+  { id: "quickstep", name: "Quickstep Anklet", description: "Combo Gain +0.05", rarity: RARITY.COMMON,
+    comboBoost: 0.05, applyEffect() {} },
+  { id: "sawbonesKit", name: "Sawbones Kit", description: "Heal +1 HP Per Attack Dealt", rarity: RARITY.COMMON,
+    healOnAttack: 1, applyEffect() {} },
+  { id: "campRations", name: "Camp Rations", description: "Heal +4 HP Per Round", rarity: RARITY.COMMON,
+    regenPerRound: 4, applyEffect() {} },
+  { id: "tinderSpark", name: "Tinder Spark", description: "1 Burn Per Square", rarity: RARITY.COMMON,
+    burnDamage: 1, applyEffect() {} },
+  { id: "purseStrings", name: "Purse Strings", description: "+1 Gold Per Square", rarity: RARITY.COMMON,
+    extraGoldPerTile: 1, applyEffect() {} },
+  { id: "scavengerSatchel", name: "Scavenger Satchel", description: "+1 Gold Tile", rarity: RARITY.COMMON,
+    extraGoldTiles: 1, applyEffect() {} },
+  { id: "streetTips", name: "Street Tips", description: "+3 Gold Per Level", rarity: RARITY.COMMON,
+    passiveGoldPerRound: 3, applyEffect() {} },
+  { id: "practiceBlade", name: "Practice Blade", description: "Gain +1 Attack Square", rarity: RARITY.COMMON,
+    bonusAttackCount: 1, applyEffect() { playerAttackCount += 1; } },
+  { id: "bandage", name: "Bandage", description: "Instantly heal 25 HP on purchase (repeatable)", rarity: RARITY.COMMON,
+    onPurchaseHeal: 25, repeatable: true, noInventory: true },
+  { id: "ironRations", name: "Iron Rations", description: "Instantly heal 35 HP on purchase (repeatable)", rarity: RARITY.COMMON,
+    onPurchaseHeal: 35, repeatable: true, noInventory: true },
+  { id: "barkShield", name: "Bark Shield", description: "+15 Max HP", rarity: RARITY.COMMON,
+    bonusHP: 15, applyEffect() {} },
+  { id: "paddedVambrace", name: "Padded Vambrace", description: "Take -1 Damage", rarity: RARITY.COMMON,
+    damageReduction: 1, applyEffect() {} },
+  { id: "clearMind", name: "Clear Mind", description: "Combo Gain +0.1", rarity: RARITY.COMMON,
+    comboBoost: 0.1, applyEffect() {} },
+  { id: "luckyPenny", name: "Lucky Penny", description: "3% Chance To Ignore Damage", rarity: RARITY.COMMON,
+    ignoreDamageChance: 0.03, applyEffect() {} },
+  { id: "lantern", name: "Miner’s Lantern", description: "1 Attack Number Between 41–45", rarity: RARITY.COMMON,
+    range: [41, 45], applyEffect() {} },
+  { id: "aloeSalve", name: "Aloe Salve", description: "Instantly heal 20 HP on purchase (repeatable)", rarity: RARITY.COMMON,
+    onPurchaseHeal: 20, repeatable: true, noInventory: true },
+  { id: "woodenHammer", name: "Wooden Hammer", description: "Deal +4 Damage", rarity: RARITY.COMMON,
+    bonusDamage: 4, applyEffect() {} },
+  { id: "corkCharm", name: "Cork Charm", description: "Take -1 Damage", rarity: RARITY.COMMON,
+    damageReduction: 1, applyEffect() {} },
+  { id: "copperRing", name: "Copper Ring", description: "+1 Gold Per Square", rarity: RARITY.COMMON,
+    extraGoldPerTile: 1, applyEffect() {} },
+  { id: "gamblerToken", name: "Gambler’s Token", description: "4% Chance To Ignore Damage", rarity: RARITY.COMMON,
+    ignoreDamageChance: 0.04, applyEffect() {} },
+  { id: "ashSmudge", name: "Ash Smudge", description: "1 Burn Per Square", rarity: RARITY.COMMON,
+    burnDamage: 1, applyEffect() {} },
+  { id: "threadbareCloak", name: "Threadbare Cloak", description: "Heal +3 HP Per Round", rarity: RARITY.COMMON,
+    regenPerRound: 3, applyEffect() {} },
+  { id: "brightTally", name: "Bright Tally", description: "1 Attack Number Between 12–16", rarity: RARITY.COMMON,
+    range: [12, 16], applyEffect() {} },
+  { id: "tinyTonic", name: "Tiny Tonic", description: "Instantly heal 15 HP on purchase (repeatable)", rarity: RARITY.COMMON,
+    onPurchaseHeal: 15, repeatable: true, noInventory: true },
+  { id: "spareBlade", name: "Spare Blade", description: "Gain +1 Attack Square", rarity: RARITY.COMMON,
+    bonusAttackCount: 1, applyEffect() { playerAttackCount += 1; } },
+  { id: "leadCharm", name: "Lead Charm", description: "Deal +2 Damage", rarity: RARITY.COMMON,
+    bonusDamage: 2, applyEffect() {} },
 
-  // RARE
+  // =====================================================================
+  // ============================== RARE =================================
+  // =====================================================================
   { id: "ironSword", name: "Iron Sword", description: "Gain +2 Attack Squares", rarity: RARITY.RARE,
     bonusAttackCount: 2, applyEffect() { playerAttackCount += 2; } },
   { id: "ironShield", name: "Iron Shield", description: "+30 Max HP", rarity: RARITY.RARE,
@@ -305,7 +369,7 @@ const allItems = [
     damageReduction: 5, applyEffect() {} },
   { id: "huntersRing", name: "Treasure Hunter's Ring", description: "+2 Gold Per Square", rarity: RARITY.RARE,
     extraGoldPerTile: 2, applyEffect() {} },
-  { id: "prospectorsPick", name: "Prospector's Pick", description: "+2 Gold Squares", rarity: RARITY.RARE,
+  { id: "prospectorsPick", name: "Prospector's Pick", description: "+2 Gold Tiles", rarity: RARITY.RARE,
     extraGoldTiles: 2, applyEffect() {} },
   { id: "guildStipend", name: "Guild Stipend", description: "+7 Gold Per Level", rarity: RARITY.RARE,
     passiveGoldPerRound: 7, applyEffect() {} },
@@ -315,13 +379,55 @@ const allItems = [
     burnDamage: 1, applyEffect() {} },
   { id: "lifeAmulet", name: "Life Amulet", description: "Revive Once With 25% HP", rarity: RARITY.RARE,
     reviveAtPercent: 0.25, applyEffect() {} },
+  { id: "steelEdge", name: "Steel Edge", description: "Deal +8 Damage", rarity: RARITY.RARE,
+    bonusDamage: 8, applyEffect() {} },
+  { id: "soldierMail", name: "Soldier’s Mail", description: "Take -6 Damage", rarity: RARITY.RARE,
+    damageReduction: 6, applyEffect() {} },
+  { id: "vigorCharm", name: "Vigor Charm", description: "Heal +3 HP Per Attack Dealt", rarity: RARITY.RARE,
+    healOnAttack: 3, applyEffect() {} },
+  { id: "eagleGem", name: "Eagle Gem", description: "1 Attack Number Between 18–22", rarity: RARITY.RARE,
+    range: [18, 22], applyEffect() {} },
+  { id: "guardianBand", name: "Guardian Band", description: "12% Chance To Ignore Damage", rarity: RARITY.RARE,
+    ignoreDamageChance: 0.12, applyEffect() {} },
+  { id: "warmCloak", name: "Warm Cloak", description: "Heal +8 HP Per Round", rarity: RARITY.RARE,
+    regenPerRound: 8, applyEffect() {} },
+  { id: "glowingBrand", name: "Glowing Brand", description: "2 Burn Per Square", rarity: RARITY.RARE,
+    burnDamage: 2, applyEffect() {} },
+  { id: "duelistGrip", name: "Duelist’s Grip", description: "Combo Gain +0.15", rarity: RARITY.RARE,
+    comboBoost: 0.15, applyEffect() {} },
+  { id: "steelBrooch", name: "Steel Brooch", description: "+25 Max HP", rarity: RARITY.RARE,
+    bonusHP: 25, applyEffect() {} },
+  { id: "silverPouch", name: "Silver Pouch", description: "+2 Gold Per Square", rarity: RARITY.RARE,
+    extraGoldPerTile: 2, applyEffect() {} },
+  { id: "townLedgers", name: "Town Ledgers", description: "+8 Gold Per Level", rarity: RARITY.RARE,
+    passiveGoldPerRound: 8, applyEffect() {} },
+  { id: "tealCompass", name: "Teal Compass", description: "+2 Gold Tiles", rarity: RARITY.RARE,
+    extraGoldTiles: 2, applyEffect() {} },
+  { id: "secondWind", name: "Second Wind", description: "Instantly heal 55 HP on purchase (repeatable)", rarity: RARITY.RARE,
+    onPurchaseHeal: 55, repeatable: true, noInventory: true },
+  { id: "honedEdge", name: "Honed Edge", description: "Gain +2 Attack Squares", rarity: RARITY.RARE,
+    bonusAttackCount: 2, applyEffect() { playerAttackCount += 2; } },
+  { id: "riverStone", name: "River Stone", description: "Take -4 Damage", rarity: RARITY.RARE,
+    damageReduction: 4, applyEffect() {} },
+  { id: "hunterSigil", name: "Hunter’s Sigil", description: "1 Attack Number Between 22–26", rarity: RARITY.RARE,
+    range: [22, 26], applyEffect() {} },
+  { id: "amberRing", name: "Amber Ring", description: "Combo Gain +0.2", rarity: RARITY.RARE,
+    comboBoost: 0.2, applyEffect() {} },
+  { id: "emberVial", name: "Ember Vial", description: "Instantly heal 25 HP on purchase (repeatable)", rarity: RARITY.RARE,
+    onPurchaseHeal: 25, repeatable: true, noInventory: true },
+  { id: "scoutCharm", name: "Scout’s Charm", description: "+20 Max HP & Heal +5/round", rarity: RARITY.RARE,
+    bonusHP: 20, regenPerRound: 5, applyEffect() {} },
+  { id: "strikeBelt", name: "Strike Belt", description: "Deal +6 Damage & +0.05 Combo", rarity: RARITY.RARE,
+    bonusDamage: 6, comboBoost: 0.05, applyEffect() {} },
 
-  // EPIC
+  // =====================================================================
+  // =============================== EPIC ================================
+  // =====================================================================
   { id: "crystalSword", name: "Crystal Sword", description: "Gain +5 Attack Squares", rarity: RARITY.EPIC,
     bonusAttackCount: 5, applyEffect() { playerAttackCount += 5; } },
   { id: "holyCharm", name: "Holy Charm", description: "Heal +8 HP Per Attack Dealt", rarity: RARITY.EPIC,
     healOnAttack: 8, applyEffect() {} },
-  { id: "divineRadar", name: "Divine Radar", description: "2 Attack Numbers Between 10-15", rarity: RARITY.EPIC,
+  { id: "divineRadar", name: "Divine Radar", description: "2 Attack Numbers Between 10–15", rarity: RARITY.EPIC,
     range: [10, 15], safeNumbers: 2, applyEffect() {} },
   { id: "adamantArmor", name: "Adamant Armor", description: "Take -10 Damage", rarity: RARITY.EPIC,
     damageReduction: 10, applyEffect() {} },
@@ -333,29 +439,62 @@ const allItems = [
     extraGoldPerTile: 3, applyEffect() {} },
   { id: "royalCharter", name: "Royal Charter", description: "+10 Gold Per Level", rarity: RARITY.EPIC,
     passiveGoldPerRound: 10, applyEffect() {} },
-  { id: "gildedCompass", name: "Gilded Compass", description: "+3 Gold Squares", rarity: RARITY.EPIC,
+  { id: "gildedCompass", name: "Gilded Compass", description: "+3 Gold Tiles", rarity: RARITY.EPIC,
     extraGoldTiles: 3, applyEffect() {} },
-  { id: "swiftCharm", name: "Swift Charm", description: "Gain +1 Extra Attack Square Every Even Level", rarity: RARITY.EPIC,
-    bonusEvenLevelAttack: 1, applyEffect() {} },
+  { id: "swiftCharm", name: "Swift Charm", description: "Gain +1 Attack Square & +0.1 Combo Gain", rarity: RARITY.EPIC,
+    bonusAttackCount: 1, comboBoost: 0.1, applyEffect() { playerAttackCount += 1; } },
+  { id: "runedBlade", name: "Runed Blade", description: "Gain +3 Attack Squares & +8 Damage", rarity: RARITY.EPIC,
+    bonusAttackCount: 3, bonusDamage: 8, applyEffect() { playerAttackCount += 3; } },
+  { id: "titanPlate", name: "Titan Plate", description: "Take -12 Damage", rarity: RARITY.EPIC,
+    damageReduction: 12, applyEffect() {} },
+  { id: "vampTalisman", name: "Vampiric Talisman", description: "Heal +10 HP Per Attack Dealt", rarity: RARITY.EPIC,
+    healOnAttack: 10, applyEffect() {} },
+  { id: "seerStone", name: "Seer Stone", description: "2 Attack Numbers Between 8–12", rarity: RARITY.EPIC,
+    range: [8, 12], safeNumbers: 2, applyEffect() {} },
+  { id: "stormBand", name: "Storm Band", description: "Combo Gain +0.25", rarity: RARITY.EPIC,
+    comboBoost: 0.25, applyEffect() {} },
+  { id: "pyreHeart", name: "Pyre Heart", description: "3 Burn Per Square", rarity: RARITY.EPIC,
+    burnDamage: 3, applyEffect() {} },
+  { id: "kingsPurse", name: "King’s Purse", description: "+4 Gold Per Square", rarity: RARITY.EPIC,
+    extraGoldPerTile: 4, applyEffect() {} },
+  { id: "royalDecree", name: "Royal Decree", description: "+12 Gold Per Level", rarity: RARITY.EPIC,
+    passiveGoldPerRound: 12, applyEffect() {} },
+  { id: "orienteerKit", name: "Orienteer Kit", description: "+4 Gold Tiles", rarity: RARITY.EPIC,
+    extraGoldTiles: 4, applyEffect() {} },
+  { id: "ironWill", name: "Iron Will", description: "+40 Max HP & Heal +8/round", rarity: RARITY.EPIC,
+    bonusHP: 40, regenPerRound: 8, applyEffect() {} },
 
-  // LEGENDARY
+  // =====================================================================
+  // ============================= LEGENDARY ==============================
+  // =====================================================================
   { id: "phoenixHeart", name: "Phoenix Heart", description: "Revive Once With 100% HP", rarity: RARITY.LEGENDARY,
     reviveAtPercent: 1, applyEffect() {} },
-  { id: "infernoSoul", name: "Inferno Soul", description: "Combo Gain +0.3 And 3 Burn Per Squares", rarity: RARITY.LEGENDARY,
+  { id: "infernoSoul", name: "Inferno Soul", description: "Combo Gain +0.3 And 3 Burn Per Square", rarity: RARITY.LEGENDARY,
     comboBoost: 0.3, burnDamage: 3, applyEffect() {} },
-  { id: "godblade", name: "Godblade", description: "Gain +5 Attack Square, Deal +10 Damage", rarity: RARITY.LEGENDARY,
+  { id: "godblade", name: "Godblade", description: "Gain +5 Attack Squares, Deal +10 Damage", rarity: RARITY.LEGENDARY,
     bonusAttackCount: 5, bonusDamage: 10, applyEffect() { playerAttackCount += 5; } },
   { id: "omnigem", name: "Omni Gem", description: "5 Attack Numbers Between 1–10", rarity: RARITY.LEGENDARY,
     range: [1, 10], safeNumbers: 5, applyEffect() {} },
-  { id: "heavySword", name: "Heavy Sword", description: "Combo gain +0.5", rarity: RARITY.LEGENDARY,
+  { id: "heavySword", name: "Heavy Sword", description: "Combo Gain +0.5", rarity: RARITY.LEGENDARY,
     comboBoost: 0.5, applyEffect() {} },
   { id: "emberCore", name: "Ember Core", description: "5 Burn Per Square", rarity: RARITY.LEGENDARY,
-      burnDamage: 5, applyEffect() {} },
-  { id: "dragonsHoard", name: "Dragon's Hoard", description: "+5 Gold Per Square & +2 Gold Squares", rarity: RARITY.LEGENDARY,
+    burnDamage: 5, applyEffect() {} },
+  { id: "dragonsHoard", name: "Dragon's Hoard", description: "+5 Gold Per Square & +2 Gold Tiles", rarity: RARITY.LEGENDARY,
     extraGoldPerTile: 5, extraGoldTiles: 2, applyEffect() {} },
   { id: "ancientBank", name: "Bank of the Ancients", description: "+20 Gold Per Level", rarity: RARITY.LEGENDARY,
     passiveGoldPerRound: 20, applyEffect() {} },
+  { id: "secondLife", name: "Second Life", description: "Revive Once With 50% HP", rarity: RARITY.LEGENDARY,
+    reviveAtPercent: 0.5, applyEffect() {} },
+  { id: "blazingCrown", name: "Blazing Crown", description: "4 Burn Per Square & +0.2 Combo", rarity: RARITY.LEGENDARY,
+    burnDamage: 4, comboBoost: 0.2, applyEffect() {} },
+  { id: "warDrum", name: "War Drum", description: "Gain +4 Attack Squares", rarity: RARITY.LEGENDARY,
+    bonusAttackCount: 4, applyEffect() { playerAttackCount += 4; } },
+  { id: "goldenSceptre", name: "Golden Sceptre", description: "+6 Gold Per Square & +2 Gold Tiles", rarity: RARITY.LEGENDARY,
+    extraGoldPerTile: 6, extraGoldTiles: 2, applyEffect() {} },
+  { id: "colossusHeart", name: "Colossus Heart", description: "+80 Max HP & Heal +12/round", rarity: RARITY.LEGENDARY,
+    bonusHP: 80, regenPerRound: 12, applyEffect() {} },
 ];
+
 
 
 // === RANDOM NUMBERS ===
@@ -743,11 +882,18 @@ function getDynamicRarityChances(level) {
 }
 
 function buildShopUI(intoPopup) {
-  currentShopPopup = intoPopup; // so updateGoldEverywhere() keeps working
+  currentShopPopup = intoPopup;
 
-  // Build a weighted pool from items you don't already own
-  const available = allItems.filter(item => !playerItems.some(pi => pi.id === item.id));
+  // Build a weighted pool from items you don't already own (but keep repeatables available)
   const chances = getDynamicRarityChances(level);
+
+  const available = allItems.filter(item => {
+    // repeatables always available
+    if (item.repeatable) return true;
+    // non-repeatables: hide if already owned
+    return !playerItems.some(pi => pi.id === item.id);
+  });
+
   const weightedPool = available.flatMap(item => {
     let rarityChance = 0.01;
     if (item.rarity === RARITY.COMMON) rarityChance = chances.COMMON;
@@ -757,7 +903,7 @@ function buildShopUI(intoPopup) {
     return Array(Math.max(1, Math.floor(rarityChance * 100))).fill(item);
   });
 
-  // Sample up to 5 unique items by id (no duplicates in one shop)
+  // Sample up to 5 unique items by id
   const shopChoices = [];
   const chosenIds = new Set();
   const count = Math.min(5, available.length);
@@ -769,7 +915,7 @@ function buildShopUI(intoPopup) {
     if (!chosenIds.has(candidate.id)) {
       chosenIds.add(candidate.id);
       shopChoices.push(candidate);
-      // remove all instances of this id
+      // remove all instances of this id from pool
       for (let i = weightedPool.length - 1; i >= 0; i--) {
         if (weightedPool[i].id === candidate.id) weightedPool.splice(i, 1);
       }
@@ -778,6 +924,7 @@ function buildShopUI(intoPopup) {
   }
 
   const itemContainer = intoPopup.querySelector('#shop-items');
+  itemContainer.innerHTML = "";
 
   if (shopChoices.length === 0) {
     const msg = document.createElement('p');
@@ -786,11 +933,12 @@ function buildShopUI(intoPopup) {
     return;
   }
 
+  // Group by rarity visually (already grouped in data, but we add a subtle badge)
   const rarityOrder = ["COMMON", "RARE", "EPIC", "LEGENDARY"];
   shopChoices.sort((a, b) => {
-    const rarityA = rarityOrder.indexOf(Object.keys(RARITY).find(k => RARITY[k] === a.rarity));
-    const rarityB = rarityOrder.indexOf(Object.keys(RARITY).find(k => RARITY[k] === b.rarity));
-    return rarityA - rarityB;
+    const ra = rarityOrder.indexOf(Object.keys(RARITY).find(k => RARITY[k] === a.rarity));
+    const rb = rarityOrder.indexOf(Object.keys(RARITY).find(k => RARITY[k] === b.rarity));
+    return ra - rb;
   });
 
   shopChoices.forEach(item => {
@@ -800,21 +948,55 @@ function buildShopUI(intoPopup) {
     const div = document.createElement('div');
     div.className = 'shop-item';
     div.style.borderColor = item.rarity.color;
+
+    const repeatableBadge = item.repeatable ? `<div style="font-size:14px;color:#ffd54f;margin-top:6px;">Repeatable</div>` : ``;
+
     div.innerHTML = `
       <strong style="color:${item.rarity.color}; font-size:28px;">${item.name}</strong>
       <p style="font-size:18px; margin:10px 0;">${item.description}</p>
+      ${repeatableBadge}
       <p style="font-size:20px; color:gold;">Cost: ${cost}💰</p>
     `;
 
     div.addEventListener('click', () => {
-      if (div.classList.contains('purchased')) return;
+      // If non-repeatable and already purchased in this shop view
+      if (!item.repeatable && div.classList.contains('purchased')) return;
+
       if (playerGold < cost) return;
 
+      // Pay cost
       playerGold -= cost;
-      playerItems.push(item);
-      item.applyEffect?.();
-      div.classList.add('purchased');
-      div.innerHTML = `<strong style="color:${item.rarity.color}; font-size:28px;">${item.name}</strong><p>Purchased!</p>`;
+
+      // Purchase-heal (for former consumables)
+      if (item.onPurchaseHeal) {
+        const heal = Math.round(Number(item.onPurchaseHeal));
+        if (heal > 0) {
+          playerHealth = Math.min(getPlayerMaxHealth(), playerHealth + heal);
+          updateHealth();
+          showHitPopup(true, `+${heal}`, true);
+        }
+      }
+
+      // Apply permanent stats for normal items (only once) and add to inventory unless told not to
+      if (!item.repeatable && !item.noInventory) {
+        playerItems.push(item);
+        item.applyEffect?.();
+        div.classList.add('purchased');
+        div.innerHTML = `
+          <strong style="color:${item.rarity.color}; font-size:28px;">${item.name}</strong>
+          <p>Purchased!</p>
+          <p style="font-size:20px; color:gold;">Cost: ${cost}💰</p>
+        `;
+      }
+
+      // Repeatables or no-inventory items: apply their effect (if any) but do NOT mark purchased
+      if (item.repeatable || item.noInventory) {
+        item.applyEffect?.(); // usually unused for healers
+        // nice little flash
+        div.style.transform = 'scale(1.08)';
+        setTimeout(() => (div.style.transform = ''), 120);
+      }
+
       updateGoldEverywhere();
     });
 

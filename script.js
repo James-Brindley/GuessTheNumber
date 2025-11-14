@@ -258,6 +258,8 @@ let meta = {
   totalTilesClicked: 0
 };
 
+loadMeta();
+
 // === ACHIEVEMENTS (progressive: Bronze, Silver, Gold, Platinum) ===
 const TIERS = [
   { name: 'Bronze',   color: '#cd7f32' },
@@ -675,8 +677,7 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
     playerCombo = 1.0;
 
     updateHealth();
-}
-
+  }
 }
 
 window.addEventListener('resize', () => {
@@ -925,8 +926,6 @@ function loadMeta() {
     meta = { ...meta, ...d };
   } catch(e) {}
 }
-
-loadMeta();
 
 function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSelector, speed = 250) {
   const el = document.getElementById(id);

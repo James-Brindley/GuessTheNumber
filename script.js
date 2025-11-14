@@ -160,6 +160,7 @@ function updateHealth() {
 function updateLevel() {
   updateGoldEverywhere();
   levelDisplay.textContent = `Level ${level}`;
+  if (level > meta.highestLevel) { meta.highestLevel = level; saveMeta(); }
 }
 
 const goldDisplay = document.createElement('div');
@@ -227,6 +228,8 @@ function applyBurnEffect() {
     const burn = Math.round(stats.burnDamage);
     enemyHealth = Math.max(0, enemyHealth - burn);
     totalDamageDealt += burn;
+    meta.totalDamageDealtAllRuns += burn;
+    saveMeta();
     showHitPopup(false, `-${burn}`, false);
 
     const enemyEl = document.querySelector('.enemy-container');
@@ -616,6 +619,8 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
 
     enemyHealth = Math.max(0, enemyHealth - totalDamage);
     totalDamageDealt += totalDamage;
+    meta.totalDamageDealtAllRuns += totalDamage;
+    saveMeta();
 
     // ✅ Heal if player has healing effects
     if (stats.healOnAttack > 0) {
@@ -645,6 +650,9 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
     totalDamage = Math.round(totalDamage);
     totalDamage -= Math.round(stats.damageReduction || 0);
     totalDamageTaken += totalDamage;
+    meta.totalDamageTakenAllRuns += totalDamage;
+    saveMeta();
+
     if (totalDamage < 0) totalDamage = 0;
 
     // ✅ Check ignore chance (MISS)
@@ -770,6 +778,9 @@ function buildGrid() {
           const gstats = getGoldStats();
           const gain = GOLD_PER_TILE + (gstats.extraGoldPerTile || 0);
           playerGold += gain;
+          meta.totalGoldEarned += gain;
+          saveMeta();
+
           updateGoldEverywhere();
           showHitPopup(true, `+${gain}🪙`, true);
           playerCombo = 1.0;
@@ -804,6 +815,8 @@ function buildGrid() {
         if (num >= min && num <= max) cell.classList.add('safe-range');
       });
     });
+
+  saveRun();
 }
 
 // === UTIL: map saved item ids back to data objects ===
@@ -977,18 +990,21 @@ function resolveDeaths() {
     playerHealth = 0;
     hero.playDeath();
     showEndScreen(false);
+    saveRun();
     return true;
   }
   if (playerHealth <= 0) {
     playerHealth = 0;
     hero.playDeath();
     showEndScreen(false);
+    saveRun();
     return true;
   }
   if (enemyHealth <= 0) {
     enemyHealth = 0;
     enemy.playDeath();
     showEndScreen(true);
+    saveRun();
     return true;
   }
   return false;
@@ -1178,8 +1194,77 @@ function buildShopUI(intoPopup) {
   });
 
   updateGoldEverywhere();
+  saveRun();
 }
 
+// === ACHIEVEMENTS MENU HANDLERS ===
+const achievementsBtn = document.getElementById('achievements-btn');
+const achievementsScreen = document.getElementById('achievements-screen');
+const achievementsBackBtn = document.getElementById('achievements-back-btn');
+const achievementsContent = document.getElementById('achievements-content');
+
+function getTier(progress, thresholds) {
+  let tierIdx = -1;
+  for (let i = 0; i < thresholds.length; i++) {
+    if (progress >= thresholds[i]) tierIdx = i;
+  }
+  return tierIdx; // -1 = none, 0..3 = Bronze..Platinum
+}
+
+function renderAchievements() {
+  achievementsContent.innerHTML = '';
+  ACHIEVEMENTS.forEach(a => {
+    const progress = a.getProgress();
+    const tierIdx = getTier(progress, a.thresholds);
+    const nextTarget = a.thresholds[Math.min(tierIdx + 1, a.thresholds.length - 1)];
+    const currentTarget = tierIdx >= 0 ? a.thresholds[tierIdx] : 0;
+    const maxTarget = a.thresholds[a.thresholds.length - 1];
+
+    // progress ratio to next tier (if already max, 100%)
+    const denom = (tierIdx < a.thresholds.length - 1) ? (nextTarget - currentTarget) : 1;
+    const numer = (tierIdx < a.thresholds.length - 1) ? (progress - currentTarget) : 1;
+    const pct = Math.max(0, Math.min(100, Math.floor((numer / denom) * 100)));
+
+    const tierName = tierIdx >= 0 ? TIERS[tierIdx].name : 'None';
+    const tierColor = tierIdx >= 0 ? TIERS[tierIdx].color : '#bbb';
+
+    const el = document.createElement('div');
+    el.className = 'achievement-card';
+    el.innerHTML = `
+      <h3>${a.title}</h3>
+      <div class="achievement-tier" style="color:${tierColor};">Tier: ${tierName}</div>
+      <div style="font-size:20px;opacity:0.9;">${a.desc}</div>
+      <div style="font-size:18px;margin-top:6px;">Progress: ${progress} / ${maxTarget}</div>
+      <div class="achievement-progress">
+        <div class="achievement-progress-fill" style="width:${pct}%;"></div>
+      </div>
+    `;
+    achievementsContent.appendChild(el);
+  });
+}
+
+achievementsBtn.addEventListener('click', () => {
+  mainMenu.classList.add("menu-fade-out");
+  achievementsScreen.style.display = "flex";
+  achievementsScreen.classList.add("menu-fade-in");
+  setTimeout(() => {
+    mainMenu.style.display = "none";
+    mainMenu.classList.remove("menu-fade-out");
+    achievementsScreen.classList.remove("menu-fade-in");
+  }, 400);
+  renderAchievements();
+});
+
+achievementsBackBtn.addEventListener('click', () => {
+  achievementsScreen.classList.add("menu-fade-out");
+  mainMenu.style.display = "flex";
+  mainMenu.classList.add("menu-fade-in");
+  setTimeout(() => {
+    achievementsScreen.style.display = "none";
+    achievementsScreen.classList.remove("menu-fade-out");
+    mainMenu.classList.remove("menu-fade-in");
+  }, 500);
+});
 
 function showEndScreen(playerWon) {
   if (gameOver) return;
@@ -1219,12 +1304,76 @@ function showEndScreen(playerWon) {
       nextLevel();
     });
   } else {
-    if (isBossLevel) {
-      const bossReward = 50;
-      playerGold += bossReward;
-      updateGoldEverywhere();
-    }
+  // ✅ Player won the level
+  if (isBossLevel) {
+    const bossReward = 50;
+    playerGold += bossReward;
+    updateGoldEverywhere();
+    meta.bossesDefeated++;
+    saveMeta();
+  }
 
+  // === RUN COMPLETE at Level 100 ===
+  const runCompleted = (level >= 100);
+
+  const popup = document.createElement('div');
+  popup.className = 'end-screen';
+
+  if (runCompleted) {
+    // Record victory
+    meta.wins++;
+    saveMeta();
+
+    // Final stats summary
+    const summaryHtml = `
+      ❤️ Max Health: ${getPlayerMaxHealth()}<br>
+      ⚔️ Attack Squares: ${playerAttackCount}<br>
+      💥 Total Damage Dealt: ${totalDamageDealt}<br>
+      💢 Total Damage Taken: ${totalDamageTaken}<br>
+      💚 Total Healing Done: ${totalHealingDone}<br>
+      🔁 Revives Used: ${revivesUsed}<br>
+      🧩 Items Collected: ${playerItems.length}<br>
+      🏆 Total Wins: ${meta.wins}
+    `;
+
+    popup.innerHTML = `
+      <div class="end-screen-content">
+        <h1>🏆 Run Complete!</h1>
+        <p>You reached <strong>Level 100</strong>. Amazing!</p>
+        <h2 style="margin-top:24px;">📊 Run Summary</h2>
+        <p>${summaryHtml}</p>
+
+        <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;">
+          <button id="continue-endless-btn">Continue (Endless)</button>
+          <button id="new-run-btn">New Run</button>
+          <button id="main-menu-btn">Main Menu</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    // Continue → endless (just keep leveling; no further run-complete popups)
+    popup.querySelector('#continue-endless-btn').addEventListener('click', () => {
+      popup.remove();
+      currentShopPopup = null;
+      level++;                 // push beyond 100
+      enemyAttackCount += 1;
+      if (level % 2 === 0) playerAttackCount += 1;
+      saveRun();
+      nextLevel();
+    });
+
+    // New Run
+    popup.querySelector('#new-run-btn').addEventListener('click', () => {
+      popup.remove();
+      currentShopPopup = null;
+      startNewRun();
+    });
+
+    // Main Menu (re-use common handler below attaches to id="main-menu-btn")
+  } else {
+    // === Normal inter-level shop as before
     popup.innerHTML = `
       <div class="end-screen-content">
         <h1>You Win!</h1>
@@ -1241,19 +1390,52 @@ function showEndScreen(playerWon) {
     `;
     document.body.appendChild(popup);
 
-    // Build the shop right into this popup
     buildShopUI(popup);
 
-    // Continue → advance level and start next
     popup.querySelector('#continue-btn').addEventListener('click', () => {
       popup.remove();
       currentShopPopup = null;
       level++;
       enemyAttackCount += 1;
       if (level % 2 === 0) playerAttackCount += 1;
+      saveRun();
       nextLevel();
     });
   }
+
+  // Main Menu (shared)
+  document.getElementById('main-menu-btn').addEventListener('click', () => {
+    const confirmPopup = document.createElement('div');
+    confirmPopup.className = 'end-screen';
+    confirmPopup.innerHTML = `
+      <div class="end-screen-content">
+        <h1>Return to Main Menu?</h1>
+        <p>Your current run will be lost.</p>
+        <div style="display:flex;gap:30px;justify-content:center;margin-top:20px;">
+          <button id="confirm-main-menu-yes">Yes</button>
+          <button id="confirm-main-menu-no" style="background:#E53935;">Cancel</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(confirmPopup);
+
+    document.getElementById('confirm-main-menu-yes').addEventListener('click', () => {
+      confirmPopup.remove();
+      popup.remove();
+      mainMenu.style.display = 'flex';
+      container.innerHTML = '';
+      resetGame();
+      // also clear run save so menu truly resets
+      localStorage.removeItem(SAVE_KEY_RUN);
+      saveRun(); // store clean state
+    });
+
+    document.getElementById('confirm-main-menu-no').addEventListener('click', () => {
+      confirmPopup.remove();
+    });
+  });
+}
+
 
   // Main Menu (shared)
   document.getElementById('main-menu-btn').addEventListener('click', () => {
@@ -1357,6 +1539,8 @@ function nextLevel() {
   const gstats = getGoldStats();
   if (gstats.passiveGoldPerRound > 0) {
     playerGold += gstats.passiveGoldPerRound;
+    meta.totalGoldEarned += gstats.passiveGoldPerRound;
+    saveMeta();
     updateGoldEverywhere();
   }
 
@@ -1430,27 +1614,23 @@ function nextLevel() {
 
 startButton.addEventListener("click", () => {
   const buttons = document.querySelector("#main-menu .menu-buttons");
-
-  // ✅ Instantly hide buttons for clean zoom animation
   buttons.style.opacity = "0";
   buttons.style.pointerEvents = "none";
-
-  // Add zoom-out animation
   mainMenu.classList.add("menu-zoom-out");
 
-  // Wait for animation to finish before starting the game
   setTimeout(() => {
     mainMenu.style.display = "none";
     mainMenu.classList.remove("menu-zoom-out");
-
-    // Reset button visibility when menu returns later
     buttons.style.opacity = "1";
     buttons.style.pointerEvents = "auto";
 
-    resetGame();
-    nextLevel();
-  }, 1200); // match CSS animation duration
+    // Try resume saved run; if none, start fresh
+    if (!loadRun()) {
+      startNewRun();
+    }
+  }, 1200);
 });
+
 
 function resetGame() {
   playerItems = [];
@@ -1477,6 +1657,15 @@ function resetGame() {
   playerCombo = 1.0;
   enemyCombo = 1.0;
 }
+
+function startNewRun() {
+  resetGame();
+  meta.runsStarted++;
+  saveMeta();
+  saveRun();      // clean slate saved
+  nextLevel();
+}
+
 
 // === INVENTORY PANEL HANDLING ===
 const inventoryButton = document.getElementById('inventory-button');

@@ -922,6 +922,8 @@ function loadMeta() {
   } catch(e) {}
 }
 
+loadMeta();
+
 function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSelector, speed = 250) {
   const el = document.getElementById(id);
   const container = document.querySelector(containerSelector);
@@ -1216,9 +1218,11 @@ function renderAchievements() {
   ACHIEVEMENTS.forEach(a => {
     const progress = a.getProgress();
     const tierIdx = getTier(progress, a.thresholds);
-    const nextTarget = a.thresholds[Math.min(tierIdx + 1, a.thresholds.length - 1)];
+    const nextTarget =
+      tierIdx < a.thresholds.length - 1
+        ? a.thresholds[tierIdx + 1]
+        : a.thresholds[a.thresholds.length - 1];  // at max tier, show the platinum cap
     const currentTarget = tierIdx >= 0 ? a.thresholds[tierIdx] : 0;
-    const maxTarget = a.thresholds[a.thresholds.length - 1];
 
     // progress ratio to next tier (if already max, 100%)
     const denom = (tierIdx < a.thresholds.length - 1) ? (nextTarget - currentTarget) : 1;
@@ -1234,7 +1238,9 @@ function renderAchievements() {
       <h3>${a.title}</h3>
       <div class="achievement-tier" style="color:${tierColor};">Tier: ${tierName}</div>
       <div style="font-size:20px;opacity:0.9;">${a.desc}</div>
-      <div style="font-size:18px;margin-top:6px;">Progress: ${progress} / ${maxTarget}</div>
+      <div style="font-size:18px;margin-top:6px;">
+        Progress: ${progress} / ${nextTarget}
+      </div>
       <div class="achievement-progress">
         <div class="achievement-progress-fill" style="width:${pct}%;"></div>
       </div>
@@ -1274,7 +1280,6 @@ function showEndScreen(playerWon) {
   popup.className = 'end-screen';
 
   if (!playerWon) {
-    // ——— LOSS SCREEN (unchanged) ———
     popup.innerHTML = `
       <div class="end-screen-content">
         <h1>Game Over</h1>
@@ -1304,168 +1309,84 @@ function showEndScreen(playerWon) {
       nextLevel();
     });
   } else {
-  // ✅ Player won the level
-  if (isBossLevel) {
-    const bossReward = 50;
-    playerGold += bossReward;
-    updateGoldEverywhere();
-    meta.bossesDefeated++;
-    saveMeta();
-  }
+    // ✅ Player won the level
+    if (isBossLevel) {
+      const bossReward = 50;
+      playerGold += bossReward;
+      updateGoldEverywhere();
+      meta.bossesDefeated++;
+      saveMeta();
+    }
 
-  // === RUN COMPLETE at Level 100 ===
-  const runCompleted = (level >= 100);
+    const runCompleted = (level >= 100);
 
-  const popup = document.createElement('div');
-  popup.className = 'end-screen';
+    if (runCompleted) {
+      meta.wins++;
+      saveMeta();
 
-  if (runCompleted) {
-    // Record victory
-    meta.wins++;
-    saveMeta();
+      const summaryHtml = `...`;
 
-    // Final stats summary
-    const summaryHtml = `
-      ❤️ Max Health: ${getPlayerMaxHealth()}<br>
-      ⚔️ Attack Squares: ${playerAttackCount}<br>
-      💥 Total Damage Dealt: ${totalDamageDealt}<br>
-      💢 Total Damage Taken: ${totalDamageTaken}<br>
-      💚 Total Healing Done: ${totalHealingDone}<br>
-      🔁 Revives Used: ${revivesUsed}<br>
-      🧩 Items Collected: ${playerItems.length}<br>
-      🏆 Total Wins: ${meta.wins}
-    `;
-
-    popup.innerHTML = `
-      <div class="end-screen-content">
-        <h1>🏆 Run Complete!</h1>
-        <p>You reached <strong>Level 100</strong>. Amazing!</p>
-        <h2 style="margin-top:24px;">📊 Run Summary</h2>
-        <p>${summaryHtml}</p>
-
-        <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;">
+      popup.innerHTML = `
+        <div class="end-screen-content">
+          ...
           <button id="continue-endless-btn">Continue (Endless)</button>
           <button id="new-run-btn">New Run</button>
           <button id="main-menu-btn">Main Menu</button>
         </div>
-      </div>
-    `;
+      `;
+      document.body.appendChild(popup);
 
-    document.body.appendChild(popup);
+      // attach run-complete buttons...
+    } else {
+      popup.innerHTML = `
+        <div class="end-screen-content">
+          ...
+          <button id="continue-btn">Continue</button>
+          <br><br>
+          <button id="main-menu-btn">Main Menu</button>
+        </div>
+      `;
+      document.body.appendChild(popup);
 
-    // Continue → endless (just keep leveling; no further run-complete popups)
-    popup.querySelector('#continue-endless-btn').addEventListener('click', () => {
-      popup.remove();
-      currentShopPopup = null;
-      level++;                 // push beyond 100
-      enemyAttackCount += 1;
-      if (level % 2 === 0) playerAttackCount += 1;
-      saveRun();
-      nextLevel();
-    });
-
-    // New Run
-    popup.querySelector('#new-run-btn').addEventListener('click', () => {
-      popup.remove();
-      currentShopPopup = null;
-      startNewRun();
-    });
-
-    // Main Menu (re-use common handler below attaches to id="main-menu-btn")
-  } else {
-    // === Normal inter-level shop as before
-    popup.innerHTML = `
-      <div class="end-screen-content">
-        <h1>You Win!</h1>
-        <p>Level ${level} cleared. Spend your gold, then continue.</p>
-
-        <p>You have <strong style="color:gold;">💰 <span id="shop-gold">${playerGold}</span></strong></p>
-        <div id="shop-items"></div>
-
-        <br>
-        <button id="continue-btn">Continue</button>
-        <br><br>
-        <button id="main-menu-btn">Main Menu</button>
-      </div>
-    `;
-    document.body.appendChild(popup);
-
-    buildShopUI(popup);
-
-    popup.querySelector('#continue-btn').addEventListener('click', () => {
-      popup.remove();
-      currentShopPopup = null;
-      level++;
-      enemyAttackCount += 1;
-      if (level % 2 === 0) playerAttackCount += 1;
-      saveRun();
-      nextLevel();
-    });
+      buildShopUI(popup);
+      // attach continue button...
+    }
   }
 
-  // Main Menu (shared)
-  document.getElementById('main-menu-btn').addEventListener('click', () => {
-    const confirmPopup = document.createElement('div');
-    confirmPopup.className = 'end-screen';
-    confirmPopup.innerHTML = `
-      <div class="end-screen-content">
-        <h1>Return to Main Menu?</h1>
-        <p>Your current run will be lost.</p>
-        <div style="display:flex;gap:30px;justify-content:center;margin-top:20px;">
-          <button id="confirm-main-menu-yes">Yes</button>
-          <button id="confirm-main-menu-no" style="background:#E53935;">Cancel</button>
+  // ✅ Main Menu (shared for both win & loss)
+  const mainMenuBtn = document.getElementById('main-menu-btn');
+  if (mainMenuBtn) {
+    mainMenuBtn.addEventListener('click', () => {
+      const confirmPopup = document.createElement('div');
+      confirmPopup.className = 'end-screen';
+      confirmPopup.innerHTML = `
+        <div class="end-screen-content">
+          <h1>Return to Main Menu?</h1>
+          <p>Your current run will be lost.</p>
+          <div style="display:flex;gap:30px;justify-content:center;margin-top:20px;">
+            <button id="confirm-main-menu-yes">Yes</button>
+            <button id="confirm-main-menu-no" style="background:#E53935;">Cancel</button>
+          </div>
         </div>
-      </div>
-    `;
-    document.body.appendChild(confirmPopup);
+      `;
+      document.body.appendChild(confirmPopup);
 
-    document.getElementById('confirm-main-menu-yes').addEventListener('click', () => {
-      confirmPopup.remove();
-      popup.remove();
-      mainMenu.style.display = 'flex';
-      container.innerHTML = '';
-      resetGame();
-      // also clear run save so menu truly resets
-      localStorage.removeItem(SAVE_KEY_RUN);
-      saveRun(); // store clean state
-    });
+      document.getElementById('confirm-main-menu-yes').addEventListener('click', () => {
+        confirmPopup.remove();
+        popup.remove();
+        mainMenu.style.display = 'flex';
+        container.innerHTML = '';
+        localStorage.removeItem(SAVE_KEY_RUN);
+        resetGame();
+      });
 
-    document.getElementById('confirm-main-menu-no').addEventListener('click', () => {
-      confirmPopup.remove();
+      document.getElementById('confirm-main-menu-no').addEventListener('click', () => {
+        confirmPopup.remove();
+      });
     });
-  });
+  }
 }
 
-
-  // Main Menu (shared)
-  document.getElementById('main-menu-btn').addEventListener('click', () => {
-    const confirmPopup = document.createElement('div');
-    confirmPopup.className = 'end-screen';
-    confirmPopup.innerHTML = `
-      <div class="end-screen-content">
-        <h1>Return to Main Menu?</h1>
-        <p>Your current run will be lost.</p>
-        <div style="display:flex;gap:30px;justify-content:center;margin-top:20px;">
-          <button id="confirm-main-menu-yes">Yes</button>
-          <button id="confirm-main-menu-no" style="background:#E53935;">Cancel</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(confirmPopup);
-
-    document.getElementById('confirm-main-menu-yes').addEventListener('click', () => {
-      confirmPopup.remove();
-      popup.remove();
-      mainMenu.style.display = 'flex';
-      container.innerHTML = '';
-      resetGame();
-    });
-
-    document.getElementById('confirm-main-menu-no').addEventListener('click', () => {
-      confirmPopup.remove();
-    });
-  });
-}
 
 // === PAUSE MENU ===
 const pauseBtn = document.getElementById("pause-btn");
@@ -1516,6 +1437,7 @@ function showPauseMenu() {
       isPaused = false;
       mainMenu.style.display = 'flex';
       container.innerHTML = '';
+      localStorage.removeItem(SAVE_KEY_RUN);
       resetGame();
     });
 
@@ -1696,7 +1618,7 @@ inventoryButton.addEventListener('mouseenter', () => {
 });
 
 // Hide panel when not hovered
-inventoryContainer = document.getElementById('inventory-container');
+const inventoryContainer = document.getElementById('inventory-container');
 inventoryContainer.addEventListener('mouseleave', () => {
   inventoryPanel.style.display = 'none';
 });

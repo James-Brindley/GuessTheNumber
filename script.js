@@ -1286,7 +1286,6 @@ function renderAchievements() {
         : a.thresholds[a.thresholds.length - 1];  // at max tier, show the platinum cap
     const currentTarget = tierIdx >= 0 ? a.thresholds[tierIdx] : 0;
 
-    // progress ratio to next tier (if already max, 100%)
     const denom = (tierIdx < a.thresholds.length - 1) ? (nextTarget - currentTarget) : 1;
     const numer = (tierIdx < a.thresholds.length - 1) ? (progress - currentTarget) : 1;
     const pct = Math.max(0, Math.min(100, Math.floor((numer / denom) * 100)));
@@ -1307,6 +1306,17 @@ function renderAchievements() {
         <div class="achievement-progress-fill" style="width:${pct}%;"></div>
       </div>
     `;
+
+    // ✅ Glow + border colour based on tier
+    if (tierIdx >= 0) {
+      el.style.borderColor = tierColor;
+      el.style.boxShadow = `0 0 18px 4px ${tierColor}55`;
+    } else {
+      // No tier yet – subtle neutral look
+      el.style.borderColor = '#ffffff';
+      el.style.boxShadow = '0 0 10px 2px rgba(255,255,255,0.2)';
+    }
+
     achievementsContent.appendChild(el);
   });
 }

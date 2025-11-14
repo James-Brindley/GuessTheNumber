@@ -500,9 +500,9 @@ body {
   transform: translateY(-5vh);
 }
 
-/* === BUTTON STYLES === */
 .menu-buttons button,
-#back-to-menu-btn {
+#back-to-menu-btn,
+#achievements-back-btn {
   font-size: 50px;
   padding: 20px 70px;
   background: #4CAF50;
@@ -515,10 +515,12 @@ body {
 }
 
 .menu-buttons button:hover,
-#back-to-menu-btn:hover {
+#back-to-menu-btn:hover,
+#achievements-back-btn:hover {
   background: #66bb6a;
   transform: scale(1.05);
 }
+
 
 /* === HOW TO PLAY MENU === */
 #how-to-play-screen .menu-title {
@@ -551,15 +553,16 @@ body {
   margin: 6px 0;
 }
 
-/* === BACK BUTTON (HOW TO PLAY) === */
-#back-to-menu-btn {
+#back-to-menu-btn,
+#achievements-back-btn {
   background: #2196F3;
   font-size: 45px;
   margin-top: 20px;
   padding: 15px 50px;
 }
 
-#back-to-menu-btn:hover {
+#back-to-menu-btn:hover,
+#achievements-back-btn:hover {
   background: #42a5f5;
 }
 

@@ -393,8 +393,8 @@ const allItems = [
     regenPerRound: 8, applyEffect() {} },
   { id: "glowingBrand", name: "Glowing Brand", description: "2 Burn Per Square", rarity: RARITY.RARE,
     burnDamage: 2, applyEffect() {} },
-  { id: "duelistGrip", name: "Duelist’s Grip", description: "Combo Gain +0.15", rarity: RARITY.RARE,
-    comboBoost: 0.15, applyEffect() {} },
+  { id: "duelistGrip", name: "Duelist’s Grip", description: "Combo Gain +0.2", rarity: RARITY.RARE,
+    comboBoost: 0.2, applyEffect() {} },
   { id: "steelBrooch", name: "Steel Brooch", description: "+25 Max HP", rarity: RARITY.RARE,
     bonusHP: 25, applyEffect() {} },
   { id: "silverPouch", name: "Silver Pouch", description: "+2 Gold Per Square", rarity: RARITY.RARE,
@@ -417,8 +417,8 @@ const allItems = [
     onPurchaseHeal: 25, repeatable: true, noInventory: true },
   { id: "scoutCharm", name: "Scout’s Charm", description: "+20 Max HP & Heal +5/round", rarity: RARITY.RARE,
     bonusHP: 20, regenPerRound: 5, applyEffect() {} },
-  { id: "strikeBelt", name: "Strike Belt", description: "Deal +6 Damage & +0.05 Combo", rarity: RARITY.RARE,
-    bonusDamage: 6, comboBoost: 0.05, applyEffect() {} },
+  { id: "strikeBelt", name: "Strike Belt", description: "Deal +6 Damage & +0.1 Combo", rarity: RARITY.RARE,
+    bonusDamage: 6, comboBoost: 0.1, applyEffect() {} },
 
   // =====================================================================
   // =============================== EPIC ================================
@@ -451,8 +451,8 @@ const allItems = [
     healOnAttack: 10, applyEffect() {} },
   { id: "seerStone", name: "Seer Stone", description: "2 Attack Numbers Between 8–12", rarity: RARITY.EPIC,
     range: [8, 12], safeNumbers: 2, applyEffect() {} },
-  { id: "stormBand", name: "Storm Band", description: "Combo Gain +0.25", rarity: RARITY.EPIC,
-    comboBoost: 0.25, applyEffect() {} },
+  { id: "stormBand", name: "Storm Band", description: "Combo Gain +0.3", rarity: RARITY.EPIC,
+    comboBoost: 0.3, applyEffect() {} },
   { id: "pyreHeart", name: "Pyre Heart", description: "3 Burn Per Square", rarity: RARITY.EPIC,
     burnDamage: 3, applyEffect() {} },
   { id: "kingsPurse", name: "King’s Purse", description: "+4 Gold Per Square", rarity: RARITY.EPIC,

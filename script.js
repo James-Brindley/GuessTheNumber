@@ -239,7 +239,75 @@ function applyBurnEffect() {
   return false;
 }
 
+// === LOCAL SAVE KEYS ===
+const SAVE_KEY_RUN  = 'gtd_run_v1';
+const SAVE_KEY_META = 'gtd_meta_v1';
 
+// === META (persists across runs) ===
+let meta = {
+  wins: 0,
+  runsStarted: 0,
+  bossesDefeated: 0,
+  highestLevel: 0,
+  totalGoldEarned: 0,
+  totalDamageDealtAllRuns: 0,
+  totalDamageTakenAllRuns: 0,
+  totalTilesClicked: 0
+};
+
+// === ACHIEVEMENTS (progressive: Bronze, Silver, Gold, Platinum) ===
+const TIERS = [
+  { name: 'Bronze',   color: '#cd7f32' },
+  { name: 'Silver',   color: '#c0c0c0' },
+  { name: 'Gold',     color: '#ffd700' },
+  { name: 'Platinum', color: '#e5e4e2' },
+];
+
+const ACHIEVEMENTS = [
+  {
+    id: 'boss_slayer',
+    title: 'Boss Slayer',
+    desc: 'Defeat bosses over all runs',
+    // boss every 10th level → thresholds tuned for long-term play
+    thresholds: [10, 25, 50, 100],
+    getProgress: () => meta.bossesDefeated
+  },
+  {
+    id: 'victor',
+    title: 'Victories',
+    desc: 'Complete a full run (reach Level 100)',
+    thresholds: [1, 3, 10, 25],
+    getProgress: () => meta.wins
+  },
+  {
+    id: 'gold_digger',
+    title: 'Gold Collector',
+    desc: 'Accumulate gold across all runs',
+    thresholds: [500, 2000, 10000, 50000],
+    getProgress: () => meta.totalGoldEarned
+  },
+  {
+    id: 'click_master',
+    title: 'Relentless Clicker',
+    desc: 'Click total tiles across all runs',
+    thresholds: [500, 2000, 8000, 25000],
+    getProgress: () => meta.totalTilesClicked
+  },
+  {
+    id: 'heavy_hitter',
+    title: 'Heavy Hitter',
+    desc: 'Deal total damage across all runs',
+    thresholds: [2000, 10000, 50000, 200000],
+    getProgress: () => meta.totalDamageDealtAllRuns
+  },
+  {
+    id: 'survivor',
+    title: 'Survivor',
+    desc: 'Total damage taken across all runs (you lived!)',
+    thresholds: [2000, 10000, 50000, 200000],
+    getProgress: () => meta.totalDamageTakenAllRuns
+  },
+];
 
 // === RARITY SYSTEM ===
 const RARITY = {
@@ -677,6 +745,10 @@ function buildGrid() {
 
       // click handler
       cell.addEventListener('click', () => {
+
+        meta.totalTilesClicked++;
+        saveMeta();
+
         if (cell.classList.contains('clicked') || gameOver || isPaused) return;
 
         cell.classList.add('clicked');
@@ -734,6 +806,108 @@ function buildGrid() {
     });
 }
 
+// === UTIL: map saved item ids back to data objects ===
+function itemsFromIds(ids) {
+  const byId = new Map(allItems.map(i => [i.id, i]));
+  return (ids || [])
+    .map(id => byId.get(id))
+    .filter(Boolean);
+}
+
+// === Recompute any derived counts from items (safe for load) ===
+function recomputeDerivedStats() {
+  // Attack squares derived from items you own that add attacks
+  const bonusAtt = playerItems.reduce((a, i) => a + (i.bonusAttackCount || 0), 0);
+  playerAttackCount = BASE_PLAYER_ATTACK_COUNT + bonusAtt;
+  // enemyAttackCount is scaled by gameplay, so keep as-is (loaded)
+  playerMaxHealth = getPlayerMaxHealth();
+  enemyMaxHealth = getEnemyMaxHealth() + enemyBonusHealth;
+}
+
+// === RUN SAVE ===
+function saveRun() {
+  const data = {
+    level,
+    gameOver,
+    isBossLevel,
+    enemyBonusHealth,
+    enemyBonusDamage,
+    playerHealth,
+    enemyHealth,
+    playerAttackCount,        // stored but recomputed on load too
+    enemyAttackCount,
+    playerGold,
+    playerItems: playerItems.map(i => i.id),
+    totalDamageDealt,
+    totalDamageTaken,
+    totalHealingDone,
+    revivesUsed,
+    playerCombo,
+    enemyCombo
+  };
+  try { localStorage.setItem(SAVE_KEY_RUN, JSON.stringify(data)); } catch(e) {}
+}
+
+// === RUN LOAD ===
+function loadRun() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY_RUN);
+    if (!raw) return false;
+    const d = JSON.parse(raw);
+
+    level = d.level ?? 1;
+    gameOver = !!d.gameOver;
+    isBossLevel = !!d.isBossLevel;
+    enemyBonusHealth = d.enemyBonusHealth || 0;
+    enemyBonusDamage = d.enemyBonusDamage || 0;
+    playerGold = d.playerGold || 0;
+    playerItems = itemsFromIds(d.playerItems);
+
+    // Use saved counts/health but recompute derived caps
+    playerAttackCount = d.playerAttackCount ?? BASE_PLAYER_ATTACK_COUNT;
+    enemyAttackCount  = d.enemyAttackCount  ?? BASE_ENEMY_ATTACK_COUNT;
+
+    recomputeDerivedStats();
+
+    playerHealth = Math.min(d.playerHealth ?? playerMaxHealth, playerMaxHealth);
+    enemyMaxHealth = getEnemyMaxHealth() + enemyBonusHealth;
+    enemyHealth = Math.min(d.enemyHealth ?? enemyMaxHealth, enemyMaxHealth);
+
+    totalDamageDealt = d.totalDamageDealt || 0;
+    totalDamageTaken = d.totalDamageTaken || 0;
+    totalHealingDone = d.totalHealingDone || 0;
+    revivesUsed = d.revivesUsed || 0;
+
+    playerCombo = d.playerCombo ?? 1.0;
+    enemyCombo  = d.enemyCombo  ?? 1.0;
+
+    // Refresh UI
+    updateGoldEverywhere();
+    updateHealth();
+    updateLevel();
+    hero.playIdle();
+    enemy.playIdle();
+    buildGrid();
+
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+// === META SAVE/LOAD ===
+function saveMeta() {
+  try { localStorage.setItem(SAVE_KEY_META, JSON.stringify(meta)); } catch(e) {}
+}
+
+function loadMeta() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY_META);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    meta = { ...meta, ...d };
+  } catch(e) {}
+}
 
 function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSelector, speed = 250) {
   const el = document.getElementById(id);

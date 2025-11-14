@@ -649,13 +649,11 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
     let totalDamage = baseEnemyDamage * enemyCombo;
     totalDamage = Math.round(totalDamage);
     totalDamage -= Math.round(stats.damageReduction || 0);
-    totalDamageTaken += totalDamage;
-    meta.totalDamageTakenAllRuns += totalDamage;
-    saveMeta();
 
+    // Clamp before anything else
     if (totalDamage < 0) totalDamage = 0;
 
-    // ✅ Check ignore chance (MISS)
+    // ✅ Check ignore chance (MISS) before applying damage
     if (Math.random() < (stats.ignoreDamageChance || 0)) {
       showHitPopup(true, "MISS");
       enemyCombo = 1.0;
@@ -663,7 +661,12 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
       return;
     }
 
+    // Apply damage & track stats
     playerHealth = Math.max(0, playerHealth - totalDamage);
+    totalDamageTaken += totalDamage;
+    meta.totalDamageTakenAllRuns += totalDamage;
+    saveMeta();
+
     showHitPopup(true, `-${totalDamage}`);
 
     if (enemyCombo > 1.0) showComboPopup(false);
@@ -672,7 +675,8 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
     playerCombo = 1.0;
 
     updateHealth();
-  }
+}
+
 }
 
 window.addEventListener('resize', () => {
@@ -1280,6 +1284,7 @@ function showEndScreen(playerWon) {
   popup.className = 'end-screen';
 
   if (!playerWon) {
+    // === LOSS SCREEN ===
     popup.innerHTML = `
       <div class="end-screen-content">
         <h1>Game Over</h1>
@@ -1308,8 +1313,11 @@ function showEndScreen(playerWon) {
       resetGame();
       nextLevel();
     });
+
   } else {
-    // ✅ Player won the level
+    // === WIN SCREEN ===
+
+    // Boss reward
     if (isBossLevel) {
       const bossReward = 50;
       playerGold += bossReward;
@@ -1321,26 +1329,66 @@ function showEndScreen(playerWon) {
     const runCompleted = (level >= 100);
 
     if (runCompleted) {
+      // === FULL RUN COMPLETE (LEVEL 100) ===
       meta.wins++;
       saveMeta();
 
-      const summaryHtml = `...`;
+      const summaryHtml = `
+        ❤️ Max Health: ${getPlayerMaxHealth()}<br>
+        ⚔️ Attack Squares: ${playerAttackCount}<br>
+        💥 Total Damage Dealt: ${totalDamageDealt}<br>
+        💢 Total Damage Taken: ${totalDamageTaken}<br>
+        💚 Total Healing Done: ${totalHealingDone}<br>
+        🔁 Revives Used: ${revivesUsed}<br>
+        🧩 Items Collected: ${playerItems.length}<br>
+        🏆 Total Wins: ${meta.wins}
+      `;
 
       popup.innerHTML = `
         <div class="end-screen-content">
-          ...
-          <button id="continue-endless-btn">Continue (Endless)</button>
-          <button id="new-run-btn">New Run</button>
-          <button id="main-menu-btn">Main Menu</button>
+          <h1>🏆 Run Complete!</h1>
+          <p>You reached <strong>Level 100</strong>. Amazing!</p>
+          <h2 style="margin-top:24px;">📊 Run Summary</h2>
+          <p>${summaryHtml}</p>
+
+          <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;">
+            <button id="continue-endless-btn">Continue (Endless)</button>
+            <button id="new-run-btn">New Run</button>
+            <button id="main-menu-btn">Main Menu</button>
+          </div>
         </div>
       `;
       document.body.appendChild(popup);
 
-      // attach run-complete buttons...
+      // Continue into endless mode
+      popup.querySelector('#continue-endless-btn').addEventListener('click', () => {
+        popup.remove();
+        currentShopPopup = null;
+        level++;                 // go beyond 100
+        enemyAttackCount += 1;
+        if (level % 2 === 0) playerAttackCount += 1;
+        saveRun();
+        nextLevel();
+      });
+
+      // Start a brand new run
+      popup.querySelector('#new-run-btn').addEventListener('click', () => {
+        popup.remove();
+        currentShopPopup = null;
+        startNewRun();
+      });
+
     } else {
+      // === NORMAL LEVEL CLEAR (INTER-LEVEL SHOP) ===
       popup.innerHTML = `
         <div class="end-screen-content">
-          ...
+          <h1>You Win!</h1>
+          <p>Level ${level} cleared. Spend your gold, then continue.</p>
+
+          <p>You have <strong style="color:gold;">💰 <span id="shop-gold">${playerGold}</span></strong></p>
+          <div id="shop-items"></div>
+
+          <br>
           <button id="continue-btn">Continue</button>
           <br><br>
           <button id="main-menu-btn">Main Menu</button>
@@ -1349,11 +1397,20 @@ function showEndScreen(playerWon) {
       document.body.appendChild(popup);
 
       buildShopUI(popup);
-      // attach continue button...
+
+      popup.querySelector('#continue-btn').addEventListener('click', () => {
+        popup.remove();
+        currentShopPopup = null;
+        level++;
+        enemyAttackCount += 1;
+        if (level % 2 === 0) playerAttackCount += 1;
+        saveRun();
+        nextLevel();
+      });
     }
   }
 
-  // ✅ Main Menu (shared for both win & loss)
+  // === Main Menu (shared for both win & loss) ===
   const mainMenuBtn = document.getElementById('main-menu-btn');
   if (mainMenuBtn) {
     mainMenuBtn.addEventListener('click', () => {
@@ -1386,7 +1443,6 @@ function showEndScreen(playerWon) {
     });
   }
 }
-
 
 // === PAUSE MENU ===
 const pauseBtn = document.getElementById("pause-btn");

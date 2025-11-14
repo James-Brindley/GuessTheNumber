@@ -160,7 +160,7 @@ function updateHealth() {
 function updateLevel() {
   updateGoldEverywhere();
   levelDisplay.textContent = `Level ${level}`;
-  if (level > meta.highestLevel) { meta.highestLevel = level; saveMeta(); }
+  if (level > meta.highestLevel) { meta.highestLevel = level; metaUpdated(); }
 }
 
 const goldDisplay = document.createElement('div');
@@ -229,7 +229,7 @@ function applyBurnEffect() {
     enemyHealth = Math.max(0, enemyHealth - burn);
     totalDamageDealt += burn;
     meta.totalDamageDealtAllRuns += burn;
-    saveMeta();
+    metaUpdated();
     showHitPopup(false, `-${burn}`, false);
 
     const enemyEl = document.querySelector('.enemy-container');
@@ -255,10 +255,12 @@ let meta = {
   totalGoldEarned: 0,
   totalDamageDealtAllRuns: 0,
   totalDamageTakenAllRuns: 0,
-  totalTilesClicked: 0
+  totalTilesClicked: 0,
+  achievementTiers: {}
 };
 
 loadMeta();
+
 
 // === ACHIEVEMENTS (progressive: Bronze, Silver, Gold, Platinum) ===
 const TIERS = [
@@ -622,7 +624,7 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
     enemyHealth = Math.max(0, enemyHealth - totalDamage);
     totalDamageDealt += totalDamage;
     meta.totalDamageDealtAllRuns += totalDamage;
-    saveMeta();
+    metaUpdated();
 
     // ✅ Heal if player has healing effects
     if (stats.healOnAttack > 0) {
@@ -667,7 +669,7 @@ function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
     playerHealth = Math.max(0, playerHealth - totalDamage);
     totalDamageTaken += totalDamage;
     meta.totalDamageTakenAllRuns += totalDamage;
-    saveMeta();
+    metaUpdated();
 
     showHitPopup(true, `-${totalDamage}`);
 
@@ -760,7 +762,7 @@ function buildGrid() {
       cell.addEventListener('click', () => {
 
         meta.totalTilesClicked++;
-        saveMeta();
+        metaUpdated();
 
         if (cell.classList.contains('clicked') || gameOver || isPaused) return;
 
@@ -784,7 +786,7 @@ function buildGrid() {
           const gain = GOLD_PER_TILE + (gstats.extraGoldPerTile || 0);
           playerGold += gain;
           meta.totalGoldEarned += gain;
-          saveMeta();
+          metaUpdated();
 
           updateGoldEverywhere();
           showHitPopup(true, `+${gain}🪙`, true);
@@ -918,14 +920,21 @@ function saveMeta() {
   try { localStorage.setItem(SAVE_KEY_META, JSON.stringify(meta)); } catch(e) {}
 }
 
+function metaUpdated() {
+  checkAchievementUnlocks();
+  saveMeta();
+}
+
 function loadMeta() {
   try {
     const raw = localStorage.getItem(SAVE_KEY_META);
     if (!raw) return;
     const d = JSON.parse(raw);
     meta = { ...meta, ...d };
+    if (!meta.achievementTiers) meta.achievementTiers = {}; // ✅ ensure exists
   } catch(e) {}
 }
+
 
 function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSelector, speed = 250) {
   const el = document.getElementById(id);
@@ -1216,6 +1225,56 @@ function getTier(progress, thresholds) {
   return tierIdx; // -1 = none, 0..3 = Bronze..Platinum
 }
 
+function showAchievementPopup(achievement, tierIdx) {
+  const tier = TIERS[tierIdx];
+
+  // Ensure container exists
+  let container = document.getElementById('achievement-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'achievement-toast-container';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = 'achievement-toast';
+
+  toast.style.borderColor = tier.color;
+
+  toast.innerHTML = `
+    <div class="achievement-toast-title">🏆 Achievement Unlocked!</div>
+    <div class="achievement-toast-name">${achievement.title}</div>
+    <div class="achievement-toast-tier" style="color:${tier.color};">
+      ${tier.name} Tier
+    </div>
+  `;
+
+  container.appendChild(toast);
+
+  // Stay for ~2.6s, then animate out and remove
+  setTimeout(() => {
+    toast.classList.add('hide');
+    setTimeout(() => toast.remove(), 400);
+  }, 2600);
+}
+
+function checkAchievementUnlocks() {
+  ACHIEVEMENTS.forEach(a => {
+    const progress = a.getProgress();
+    const tierIdx = getTier(progress, a.thresholds); // -1..3
+    if (tierIdx < 0) return;
+
+    const prevTier = meta.achievementTiers[a.id] ?? -1;
+
+    // New tier reached
+    if (tierIdx > prevTier) {
+      if (!meta.achievementTiers) meta.achievementTiers = {};
+      meta.achievementTiers[a.id] = tierIdx;
+      showAchievementPopup(a, tierIdx);
+    }
+  });
+}
+
 function renderAchievements() {
   achievementsContent.innerHTML = '';
   ACHIEVEMENTS.forEach(a => {
@@ -1322,7 +1381,7 @@ function showEndScreen(playerWon) {
       playerGold += bossReward;
       updateGoldEverywhere();
       meta.bossesDefeated++;
-      saveMeta();
+      metaUpdated();
     }
 
     const runCompleted = (level >= 100);
@@ -1330,7 +1389,7 @@ function showEndScreen(playerWon) {
     if (runCompleted) {
       // === FULL RUN COMPLETE (LEVEL 100) ===
       meta.wins++;
-      saveMeta();
+      metaUpdated();
 
       const summaryHtml = `
         ❤️ Max Health: ${getPlayerMaxHealth()}<br>
@@ -1517,7 +1576,7 @@ function nextLevel() {
   if (gstats.passiveGoldPerRound > 0) {
     playerGold += gstats.passiveGoldPerRound;
     meta.totalGoldEarned += gstats.passiveGoldPerRound;
-    saveMeta();
+    metaUpdated();
     updateGoldEverywhere();
   }
 
@@ -1638,7 +1697,7 @@ function resetGame() {
 function startNewRun() {
   resetGame();
   meta.runsStarted++;
-  saveMeta();
+  metaUpdated();
   saveRun();      // clean slate saved
   nextLevel();
 }

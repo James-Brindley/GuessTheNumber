@@ -852,3 +852,71 @@ body {
   background: linear-gradient(90deg, #4CAF50, #2196F3);
   transition: width 0.3s ease-out;
 }
+
+#achievement-toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1200;
+  pointer-events: none; /* click-through if it overlaps things */
+}
+
+.achievement-toast {
+  min-width: 260px;
+  max-width: 340px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 3px solid #ffffff;
+  border-radius: 14px;
+  padding: 10px 16px;
+  font-family: pixelText;
+  color: #fff;
+  text-align: left;
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.8);
+  animation: toastIn 0.35s ease-out forwards;
+  pointer-events: auto;
+}
+
+.achievement-toast-title {
+  font-size: 26px;
+  margin-bottom: 4px;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.achievement-toast-name {
+  font-size: 22px;
+  margin-bottom: 2px;
+}
+
+.achievement-toast-tier {
+  font-size: 20px;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.achievement-toast.hide {
+  animation: toastOut 0.35s ease-in forwards;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+  }
+}
+
+@keyframes toastOut {
+  from {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(40px) translateY(10px);
+  }
+}

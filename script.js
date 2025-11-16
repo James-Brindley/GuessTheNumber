@@ -46,6 +46,8 @@ const MIN_CELL_PX  = 28;   // floor for readability
 let gridBoxW = 0; // pixels
 let gridBoxH = 0; // pixels
 
+let endlessMode = false;
+
 function initGridBox(baseCols = cols, baseRows = rows) {
   // What box size would we need to show baseCols x baseRows at BASE_CELL_PX?
   let wantedW = baseCols * BASE_CELL_PX + (baseCols - 1) * GAP_PX;
@@ -844,7 +846,6 @@ function recomputeDerivedStats() {
   enemyMaxHealth = getEnemyMaxHealth() + enemyBonusHealth;
 }
 
-// === RUN SAVE ===
 function saveRun() {
   const data = {
     level,
@@ -854,7 +855,7 @@ function saveRun() {
     enemyBonusDamage,
     playerHealth,
     enemyHealth,
-    playerAttackCount,        // stored but recomputed on load too
+    playerAttackCount,
     enemyAttackCount,
     playerGold,
     playerItems: playerItems.map(i => i.id),
@@ -863,12 +864,12 @@ function saveRun() {
     totalHealingDone,
     revivesUsed,
     playerCombo,
-    enemyCombo
+    enemyCombo,
+    endlessMode,          // ✅ add this
   };
   try { localStorage.setItem(SAVE_KEY_RUN, JSON.stringify(data)); } catch(e) {}
 }
 
-// === RUN LOAD ===
 function loadRun() {
   try {
     const raw = localStorage.getItem(SAVE_KEY_RUN);
@@ -882,6 +883,7 @@ function loadRun() {
     enemyBonusDamage = d.enemyBonusDamage || 0;
     playerGold = d.playerGold || 0;
     playerItems = itemsFromIds(d.playerItems);
+    endlessMode = !!d.endlessMode;
 
     // Use saved counts/health but recompute derived caps
     playerAttackCount = d.playerAttackCount ?? BASE_PLAYER_ATTACK_COUNT;
@@ -1394,7 +1396,7 @@ function showEndScreen(playerWon) {
       metaUpdated();
     }
 
-    const runCompleted = (level >= 100);
+const runCompleted = (!endlessMode && level >= 100);
 
     if (runCompleted) {
       // === FULL RUN COMPLETE (LEVEL 100) ===
@@ -1428,16 +1430,17 @@ function showEndScreen(playerWon) {
       `;
       document.body.appendChild(popup);
 
-      // Continue into endless mode
       popup.querySelector('#continue-endless-btn').addEventListener('click', () => {
         popup.remove();
         currentShopPopup = null;
-        level++;                 // go beyond 100
+        endlessMode = true;          // ✅ flip into endless mode
+        level++;                     // go beyond 100
         enemyAttackCount += 1;
         if (level % 2 === 0) playerAttackCount += 1;
         saveRun();
         nextLevel();
       });
+
 
       // Start a brand new run
       popup.querySelector('#new-run-btn').addEventListener('click', () => {
@@ -1677,12 +1680,10 @@ startButton.addEventListener("click", () => {
   }, 1200);
 });
 
-
 function resetGame() {
   playerItems = [];
   playerGold = 0;
   updateGoldEverywhere();
-
 
   level = 1;
   totalDamageDealt = 0;
@@ -1695,6 +1696,8 @@ function resetGame() {
   enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
   playerHealth = getPlayerMaxHealth();
   enemyHealth = getEnemyMaxHealth();
+
+  endlessMode = false;  // ✅ reset endless flag
 
   updateHealth();
   updateLevel();

@@ -1,7 +1,3 @@
-// Grid Tile Defense - A tile-based RPG combat game
-// Click tiles to attack enemies, collect gold, and buy items to get stronger
-// Boss battles every 10 levels, endless mode after level 100
-
 // Grid dimensions - 15 columns by 4 rows gives us 60 tiles to work with
 const cols = 15;
 const rows = 4;

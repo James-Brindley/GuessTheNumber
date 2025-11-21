@@ -13,76 +13,73 @@
 </head>
 <body>
 
-  <!-- ================================================================= -->
-  <!-- HEALTH BAR DISPLAY -->
-  <!-- Container for the player and enemy health bars, fixed at the top -->
-  <!-- ================================================================= -->
-  <div class="health-bar-container">
-    <!-- Player Health Bar -->
-    <div class="health-wrapper player">
-      <div class="health-bar-bg">
-        <div class="health-bar-fill player-health-fill"></div>
-        <!-- Tooltip to show exact HP values -->
-        <div class="health-tooltip player-tooltip">100 / 100</div>
-      </div>
-    </div>
-
-    <!-- Enemy Health Bar -->
-    <div class="health-wrapper enemy">
-      <div class="health-bar-bg">
-        <div class="health-bar-fill enemy-health-fill"></div>
-        <!-- Tooltip to show exact HP values -->
-        <div class="health-tooltip enemy-tooltip">100 / 100</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================================================================= -->
-  <!-- CHARACTER SPRITES -->
-  <!-- Containers for the Hero and Enemy sprites -->
-  <!-- ================================================================= -->
-  <div class="hero-container">
-      <img id="hero" src="assets/ready_1.png" alt="Hero">
-  </div>
-
-  <div class="enemy-container">
-    <img id="enemy" src="assets/eReady_1.png" alt="Enemy">
-  </div>
-
-  <!-- ================================================================= -->
-  <!-- GAME UI ELEMENTS -->
-  <!-- ================================================================= -->
-  
-  <!-- Tooltips to display detailed character stats on hover -->
-  <div id="player-stats-tooltip" class="stats-tooltip"></div>
-  <div id="enemy-stats-tooltip" class="stats-tooltip"></div>
-
-  <!-- The main container for the interactive game grid -->
+  <!-- The main container for the interactive game grid (This element scales separately) -->
   <div id="grid-container"></div>
 
-  <!-- Container for the current level number -->
-  <div id="level-display">Level 1</div>
-
-  <!-- Container for the player's current gold amount -->
-  <div id="gold-display">💰 0</div>
-
-  <!-- Button to pause the game -->
-  <button id="pause-btn">⏸️</button>
-
-  <!-- Inventory Button and Panel -->
-  <div id="inventory-container">
-    <button id="inventory-button">🎒</button>
-    <!-- Panel that displays collected items -->
-    <div id="inventory-panel"></div>
-  </div>
-
-  <!-- Container for achievement toast notifications (bottom right) -->
-  <div id="achievement-toast-container"></div>
-
   <!-- ================================================================= -->
-  <!-- FULLSCREEN GAME SCREENS -->
-  <!-- These screens are hidden/shown by JavaScript -->
+  <!-- GAME WRAPPER: All other UI elements are wrapped here to be scaled -->
   <!-- ================================================================= -->
+  <div id="game-wrapper">
+
+    <!-- HEALTH BAR DISPLAY -->
+    <div class="health-bar-container">
+      <!-- Player Health Bar -->
+      <div class="health-wrapper player">
+        <div class="health-bar-bg">
+          <div class="health-bar-fill player-health-fill"></div>
+          <!-- Tooltip to show exact HP values -->
+          <div class="health-tooltip player-tooltip">100 / 100</div>
+        </div>
+      </div>
+
+      <!-- Enemy Health Bar -->
+      <div class="health-wrapper enemy">
+        <div class="health-bar-bg">
+          <div class="health-bar-fill enemy-health-fill"></div>
+          <!-- Tooltip to show exact HP values -->
+          <div class="health-tooltip enemy-tooltip">100 / 100</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARACTER SPRITES -->
+    <div class="hero-container">
+        <img id="hero" src="assets/ready_1.png" alt="Hero">
+    </div>
+
+    <div class="enemy-container">
+      <img id="enemy" src="assets/eReady_1.png" alt="Enemy">
+    </div>
+
+    <!-- GAME UI ELEMENTS -->
+    
+    <!-- Tooltips to display detailed character stats on hover -->
+    <div id="player-stats-tooltip" class="stats-tooltip"></div>
+    <div id="enemy-stats-tooltip" class="stats-tooltip"></div>
+
+    <!-- Container for the current level number -->
+    <div id="level-display">Level 1</div>
+
+    <!-- Container for the player's current gold amount -->
+    <div id="gold-display">💰 0</div>
+
+    <!-- Button to pause the game -->
+    <button id="pause-btn">⏸️</button>
+
+    <!-- Inventory Button and Panel -->
+    <div id="inventory-container">
+      <button id="inventory-button">🎒</button>
+      <!-- Panel that displays collected items -->
+      <div id="inventory-panel"></div>
+    </div>
+
+    <!-- Container for achievement toast notifications (bottom right) -->
+    <div id="achievement-toast-container"></div>
+
+    <!-- FULLSCREEN GAME SCREENS (These are full-viewport overlays and should not be scaled by #game-wrapper) -->
+    <!-- The scaling for their inner content will be handled separately in CSS -->
+    
+  </div> <!-- End of #game-wrapper -->
 
   <!-- Main Menu Screen -->
   <div id="main-menu" class="menu-screen fullscreen">

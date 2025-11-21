@@ -1,29 +1,3 @@
-#game-wrapper {
-  /* Set a base size for the game content */
-  width: 1280px;
-  height: 720px;
-  
-  /* Center the game content on the screen */
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  
-  /* Apply the calculated scale factor from JavaScript */
-  transform: translate(-50%, -50%) scale(var(--global-scale, 1));
-  
-  /* Ensure all content is visible within the scaled area */
-  transform-origin: center center;
-  
-  /* Hide overflow that might occur from scaled elements */
-  overflow: hidden;
-  
-  /* Set the background to transparent so the body background shows through */
-  background: transparent;
-  
-  /* All fixed/absolute positions inside this wrapper will be relative to its scaled size */
-}
-
 body {
   /* Remove default browser margins and padding */
   margin: 0;
@@ -41,9 +15,6 @@ body {
   image-rendering: pixelated;
   /* Apply the custom pixel font */
   font-family: pixelText;
-  
-  /* --- NEW: Add a transition for smooth scaling --- */
-  transition: background-size 0.3s ease;
 }
 
 /* Custom font definition for the pixel art style */
@@ -60,8 +31,7 @@ body {
 
 /* Container for the player and enemy health displays, fixed at the top */
 .health-bar-container {
-  /* Change from fixed to absolute, relative to the #game-wrapper */
-  position: absolute;
+  position: fixed;
   top: 20px;
   left: 0;
   right: 0;
@@ -71,9 +41,6 @@ body {
   font-size: 50px;
   font-weight: bold;
   z-index: 50; /* Ensure health bars are above most elements */
-  
-  /* --- NEW: Scale down font size for better fit on smaller screens --- */
-  font-size: 36px;
 }
 
 /* Text color for the player's health display */
@@ -176,8 +143,7 @@ body {
 
 /* Main container for the game grid, fixed at the bottom center */
 #grid-container {
-  /* Change from fixed to absolute, relative to the #game-wrapper */
-  position: absolute;
+  position: fixed;
   bottom: 5%;
   left: 50%;
   transform: translateX(-50%);
@@ -294,8 +260,7 @@ body {
 
 /* Common container for both hero and enemy sprites */
 .hero-container, .enemy-container {
-  /* Change from fixed to absolute, relative to the #game-wrapper */
-  position: absolute;
+  position: fixed;
   bottom: 50%;
   width: 100px;
   height: 100px;
@@ -338,16 +303,14 @@ body {
 /* Keyframes for the hero's attack movement (moves right) */
 @keyframes heroAttackMove {
   0% { transform: translateX(0%) translateY(0); }
-  /* Use a percentage of the container width for scaling */
-  50% { transform: translateX(300%) translateY(0); } 
+  50% { transform: translateX(calc(300px)) translateY(0); }
   100% { transform: translateX(0%) translateY(0); }
 }
 
 /* Keyframes for the enemy's attack movement (moves left) */
 @keyframes enemyAttackMove {
   0% { transform: translateX(0%) translateY(0); }
-  /* Use a percentage of the container width for scaling */
-  50% { transform: translateX(-300%) translateY(0); }
+  50% { transform: translateX(calc(-300px)) translateY(0); }
   100% { transform: translateX(0%) translateY(0); }
 }
 
@@ -381,8 +344,7 @@ body {
 
 /* Full-screen overlay for the game over or victory screen */
 .end-screen {
-  /* Change from fixed to absolute, relative to the #game-wrapper */
-  position: absolute;
+  position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.85);
   color: white;
@@ -402,531 +364,645 @@ body {
   border-radius: 20px;
   padding: 80px 120px;
   box-shadow: 0 0 30px #ffffff55;
-  
-  /* --- NEW: Use relative units for padding/font-size to scale better --- */
-  padding: 5% 8%;
 }
 
 /* Main title/result text on the end screen */
 .end-screen h1 {
-  font-size: 72px;
-  margin-bottom: 20px;
-  text-shadow: 4px 4px 0 black;
+  font-size: 120px;
+  margin-bottom: 10px;
+  text-shadow: 4px 4px 0px #000000aa;
 }
 
-/* Message text on the end screen */
+/* Sub-text/message on the end screen */
 .end-screen p {
   font-size: 30px;
-  margin-bottom: 40px;
-  line-height: 1.4;
+  margin-bottom: 30px;
+  text-shadow: 4px 4px 0px #000000aa;
+}
+
+/* Button styling on the end screen */
+.end-screen button {
+  font-size: 50px;
+  padding: 20px 60px;
+  background: #4CAF50;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-family: pixelText;
+}
+
+/* Hover effect for the end screen button */
+.end-screen button:hover {
+  background: #66bb6a;
+  transform: scale(1.05);
+  transition: 0.2s;
+}
+
+/* Gold display text within the end screen content */
+.end-screen-content #shop-gold {
+  color: gold;
+  text-shadow: 0 0 8px #000;
 }
 
 /*
  * =================================================================
- * MAIN MENU & OTHER SCREENS
+ * FULLSCREEN MENUS (MAIN MENU, HOW TO PLAY, ETC.)
  * =================================================================
  */
 
-/* Common style for all full-screen menu overlays */
-.menu-screen {
-  /* Change from fixed to absolute, relative to the #game-wrapper */
-  position: absolute;
+/* Generic full-screen overlay for all menus */
+.fullscreen {
+  position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.95);
   color: white;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 100;
+  z-index: 1000;
   font-family: pixelText;
   text-align: center;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-/* Inner content box for menus */
+/* Specific styling for the main menu screen */
+#main-menu {
+  background-image: url('assets/mainMenuBackground.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Specific styling for the 'How To Play' screen */
+#how-to-play-screen {
+  background-image: url('assets/blank.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Common inner container for menu content */
 .menu-inner {
-  background: rgba(0, 0, 0, 0.7);
+  width: 90%;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+}
+
+/* Generic menu content box (used by older menu structure) */
+.menu-content {
+  background: rgba(0, 0, 0, 0.6);
   border: 4px solid white;
   border-radius: 20px;
-  padding: 50px 80px;
-  box-shadow: 0 0 20px #ffffff44;
-  max-width: 90%;
-  max-height: 90%;
-  overflow-y: auto;
+  padding: 100px 150px;
+  box-shadow: 0 0 30px #ffffff55;
 }
 
-/* Title text on menus */
+/* Generic title styling for all menus */
 .menu-title {
-  font-size: 64px;
-  margin-bottom: 30px;
-  text-shadow: 4px 4px 0 black;
+  font-size: 120px;
+  margin: 0;
+  text-shadow: 5px 5px 0px #000000aa;
+}
+
+/* Overridden title styling for the main menu (larger and higher) */
+#main-menu .menu-title {
+  transform: translateY(-15vh);
+  font-size: 160px;
+  margin-bottom: 80px;
+}
+
+/* Title styling for the 'How To Play' menu */
+#how-to-play-screen .menu-title {
+  font-size: 100px;
+  margin-bottom: 20px;
 }
 
 /* Container for menu buttons */
 .menu-buttons {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  align-items: center;
+  gap: 30px;
+  transform: translateY(-5vh);
 }
 
-/* Style for all buttons */
-button {
-  background-color: #4CAF50;
-  color: white;
+/* Button styling for main menu buttons */
+.menu-buttons button,
+#back-to-menu-btn,
+#achievements-back-btn {
+  font-size: 50px;
+  padding: 20px 70px;
+  background: #4CAF50; /* Green */
   border: none;
-  padding: 15px 30px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 28px;
+  border-radius: 15px;
   cursor: pointer;
-  border-radius: 10px;
-  transition: background-color 0.3s, transform 0.1s;
   font-family: pixelText;
-  border: 3px solid #fff;
-  box-shadow: 0 5px 0 #2e7d32;
-}
-
-button:hover {
-  background-color: #45a049;
-}
-
-button:active {
-  transform: translateY(3px);
-  box-shadow: 0 2px 0 #2e7d32;
-}
-
-button:disabled {
-  background-color: #555;
-  cursor: not-allowed;
-  box-shadow: 0 5px 0 #333;
-}
-
-/* How To Play Screen specific styles */
-.how-to-text {
-  text-align: left;
-  font-size: 20px;
-  max-width: 800px;
-  margin: 0 auto 30px;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-}
-
-.how-to-text h2 {
-  font-size: 32px;
-  color: #ffd700;
-  margin-top: 20px;
-  margin-bottom: 10px;
-  text-shadow: 2px 2px 0 black;
-}
-
-.how-to-text p, .how-to-text ul {
-  margin-bottom: 15px;
-}
-
-.how-to-text ul {
-  list-style-type: none;
-  padding-left: 0;
-}
-
-.how-to-text ul li {
-  margin-bottom: 5px;
-}
-
-/*
- * =================================================================
- * HUD ELEMENTS (Level, Gold, Pause, Inventory)
- * =================================================================
- */
-
-#level-display {
-  /* Change from body-appended to absolute, relative to the #game-wrapper */
-  position: absolute;
-  top: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 40px;
   color: white;
-  text-shadow: 3px 3px 0 black;
-  z-index: 50;
+  transition: 0.2s;
 }
 
-#gold-display {
-  /* Change from body-appended to absolute, relative to the #game-wrapper */
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 36px;
-  color: #ffd700;
-  text-shadow: 3px 3px 0 black;
-  z-index: 50;
+/* Hover effect for main menu buttons */
+.menu-buttons button:hover,
+#back-to-menu-btn:hover,
+#achievements-back-btn:hover {
+  background: #66bb6a;
+  transform: scale(1.05);
 }
 
-#pause-btn {
-  /* Change from body-appended to absolute, relative to the #game-wrapper */
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 60px;
-  height: 60px;
-  padding: 0;
-  font-size: 30px;
-  line-height: 60px;
-  text-align: center;
-  border-radius: 50%;
-  z-index: 50;
-  box-shadow: 0 4px 0 #2e7d32;
+/* Specific styling for the back buttons (blue color) */
+#back-to-menu-btn,
+#achievements-back-btn {
+  background: #2196F3; /* Blue */
+  font-size: 45px;
+  margin-top: 20px;
+  padding: 15px 50px;
 }
 
-#pause-btn:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 #2e7d32;
+/* Hover effect for the blue back buttons */
+#back-to-menu-btn:hover,
+#achievements-back-btn:hover {
+  background: #42a5f5;
 }
 
-#inventory-container {
-  /* Change from body-appended to absolute, relative to the #game-wrapper */
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  z-index: 50;
-}
-
-#inventory-button {
-  width: 60px;
-  height: 60px;
-  padding: 0;
-  font-size: 30px;
-  line-height: 60px;
-  text-align: center;
-  border-radius: 50%;
-  box-shadow: 0 4px 0 #2e7d32;
-}
-
-#inventory-button:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 #2e7d32;
-}
-
-#inventory-container:hover #inventory-panel {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-#inventory-panel {
-  position: absolute;
-  top: 70px;
-  left: 0;
-  background: rgba(0, 0, 0, 0.85);
-  border: 3px solid white;
-  border-radius: 10px;
-  padding: 15px;
-  width: 300px;
+/* Text area for 'How To Play' instructions */
+.how-to-text {
+  font-size: 26px;
   text-align: left;
-  opacity: 0;
-  transform: translateX(-20px);
-  transition: opacity 0.3s, transform 0.3s;
-  pointer-events: none;
+  color: #fff;
+  text-shadow: 2px 2px 0 black;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 15px;
+  padding: 30px 50px;
+  line-height: 1.5;
+  width: 80%;
+  max-width: 800px;
+  overflow-y: auto;
+  max-height: 55vh;
 }
 
-#inventory-panel p {
-  font-size: 18px;
-  margin: 0;
-}
-
-#inventory-panel ul {
+/* List styling within the 'How To Play' text */
+.how-to-text ul {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 10px 0;
 }
 
-#inventory-panel li {
-  font-size: 18px;
-  margin-bottom: 5px;
-  padding-left: 10px;
-  border-left: 3px solid;
+.how-to-text li {
+  margin: 6px 0;
 }
-
-/* Rarity colors for inventory items */
-.rarity-common { border-left-color: #4CAF50 !important; }
-.rarity-rare { border-left-color: #2196F3 !important; }
-.rarity-epic { border-left-color: #9C27B0 !important; }
-.rarity-legendary { border-left-color: #FFD700 !important; }
 
 /*
  * =================================================================
- * SHOP SCREEN
+ * SHOP LAYOUT
  * =================================================================
  */
 
-#shop-screen .menu-inner {
-  max-width: 1000px;
-}
-
+/* Container for all shop items, using flexbox for horizontal layout */
 #shop-items {
-  display: flex;
-  gap: 30px;
+  display: flex !important;
+  flex-wrap: nowrap;
   justify-content: center;
-  margin-bottom: 40px;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 25px;
+  flex-direction: row !important;
+  margin-top: 40px;
 }
 
+/* Individual item card in the shop */
 .shop-item {
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid white;
-  border-radius: 15px;
-  padding: 20px;
-  width: 250px;
+  width: 220px;
+  height: 220px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 5px solid white;
+  border-radius: 20px;
+  color: white;
+  font-family: pixelText;
   text-align: center;
-  transition: transform 0.2s;
+  padding: 15px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
+/* Hover effect for shop items */
 .shop-item:hover {
-  transform: translateY(-5px);
+  transform: scale(1.1);
+  box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.5);
 }
 
-.shop-item h3 {
-  font-size: 32px;
-  margin-top: 0;
-  margin-bottom: 10px;
+/* Style for items that have already been purchased */
+.shop-item.purchased {
+  opacity: 0.5;
+  transform: scale(0.95);
+  cursor: not-allowed;
 }
-
-.shop-item p {
-  font-size: 18px;
-  margin-bottom: 20px;
-  min-height: 54px; /* Ensure consistent height */
-}
-
-.shop-item button {
-  font-size: 22px;
-  padding: 10px 20px;
-  box-shadow: 0 3px 0 #2e7d32;
-}
-
-.shop-item button:active {
-  transform: translateY(1px);
-  box-shadow: 0 2px 0 #2e7d32;
-}
-
-/* Rarity colors for shop items */
-.shop-item.rarity-common { border-color: #4CAF50; }
-.shop-item.rarity-rare { border-color: #2196F3; }
-.shop-item.rarity-epic { border-color: #9C27B0; }
-.shop-item.rarity-legendary { border-color: #FFD700; }
 
 /*
  * =================================================================
- * ACHIEVEMENTS SCREEN
+ * INVENTORY PANEL
  * =================================================================
  */
 
-#achievements-content {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-  margin-bottom: 40px;
-  max-width: 1000px;
+/* Container for the inventory button */
+#inventory-container {
+  position: fixed;
+  top: 250px;
+  left: 20px;
+  z-index: 20;
 }
 
-.achievement-card {
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid white;
+/* The button to open the inventory */
+#inventory-button {
+  font-size: 40px;
+  background: rgba(0, 0, 0, 0.15);
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 10px 15px;
+  font-family: pixelText;
+  transition: 0.3s;
+}
+
+/* Hover effect for the inventory button */
+#inventory-button:hover {
+  background: rgba(255, 255, 255, 0.336);
+}
+
+/* The inventory panel itself */
+#inventory-panel {
+  display: none; /* Hidden by default, shown via JS */
+  position: absolute;
+  top: 80px;
+  left: 0;
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 15px;
   padding: 20px;
+  color: white;
+  font-family: pixelText;
+  font-size: 22px;
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
   text-align: left;
 }
 
-.achievement-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+/* Styling for each row/item in the inventory list */
+.inventory-item {
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  border-left: 5px solid;
 }
 
-.achievement-card h2 {
-  font-size: 28px;
-  margin: 0;
+/*
+ * =================================================================
+ * ACHIEVEMENTS
+ * =================================================================
+ */
+
+/* Grid layout for displaying achievement cards */
+.achievements-grid {
+  width: 90%;
+  max-width: 1000px;
+  display: grid;
+  /* Responsive grid: auto-fit columns with a minimum width of 260px */
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
 }
 
-.achievement-desc {
-  font-size: 18px;
-  margin-bottom: 15px;
-  min-height: 40px;
+/* Individual achievement card styling */
+.achievement-card {
+  background: rgba(0,0,0,0.55);
+  border: 4px solid white;
+  border-radius: 16px;
+  padding: 18px;
+  text-align: left;
+  color: white;
+  font-family: pixelText;
 }
 
-.tier-label {
-  font-size: 20px;
-  font-weight: bold;
-  padding: 5px 10px;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid;
+/* Achievement card title */
+.achievement-card h3 {
+  margin: 0 0 6px 0;
+  font-size: 30px;
 }
 
-.progress-bar-container {
+/* Achievement tier text (e.g., Bronze, Silver, Gold) */
+.achievement-tier {
+  font-size: 22px;
+  margin-bottom: 8px;
+  color: #FFD700; /* Gold color */
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* Background container for the progress bar */
+.achievement-progress {
   width: 100%;
-  height: 15px;
-  background: #333;
-  border-radius: 8px;
+  height: 16px;
+  background: rgba(255,255,255,0.2);
+  border: 2px solid #fff;
+  border-radius: 10px;
   overflow: hidden;
-  margin-bottom: 5px;
+  margin-top: 6px;
 }
 
-.progress-bar {
+/* The inner fill of the progress bar */
+.achievement-progress-fill {
   height: 100%;
-  transition: width 0.5s ease-out;
+  width: 0%; /* Width is controlled by JS based on progress */
+  background: linear-gradient(90deg, #4CAF50, #2196F3);
+  transition: width 0.3s ease-out;
 }
 
-.progress-text {
-  font-size: 16px;
-  margin: 0;
-}
-
-/*
- * =================================================================
- * HIT POPUP (Damage/Heal/Gold floating text)
- * =================================================================
- */
-
-.hit-popup {
-  position: absolute;
-  font-size: 40px;
-  font-weight: bold;
-  text-shadow: 2px 2px 0 black;
-  animation: floatUp 1.5s ease-out forwards;
-  pointer-events: none;
-  z-index: 1000;
-}
-
-.hit-popup.positive {
-  color: #4CAF50; /* Green for positive effects (heal, gold) */
-}
-
-.hit-popup.negative {
-  color: #E53935; /* Red for negative effects (damage) */
-}
-
-@keyframes floatUp {
-  0% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-100px);
-  }
-}
-
-/*
- * =================================================================
- * ACHIEVEMENT TOAST
- * =================================================================
- */
-
+/* Container for achievement toast notifications (bottom right) */
 #achievement-toast-container {
-  /* Change from fixed to absolute, relative to the #game-wrapper */
-  position: absolute;
+  position: fixed;
   bottom: 20px;
   right: 20px;
-  z-index: 100;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  z-index: 1200;
+  pointer-events: none; /* Allows clicks to pass through to elements underneath */
 }
 
+/* Individual achievement toast notification */
 .achievement-toast {
+  min-width: 260px;
+  max-width: 340px;
   background: rgba(0, 0, 0, 0.85);
+  border: 3px solid #ffffff;
+  border-radius: 14px;
+  padding: 10px 16px;
+  font-family: pixelText;
+  color: #fff;
+  text-align: left;
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.8);
+  animation: toastIn 0.35s ease-out forwards;
+  pointer-events: auto;
+}
+
+/* Title for the toast (e.g., "Achievement Unlocked!") */
+.achievement-toast-title {
+  font-size: 26px;
+  margin-bottom: 4px;
+  text-shadow: 2px 2px 0 #000;
+}
+
+/* Name of the unlocked achievement */
+.achievement-toast-name {
+  font-size: 22px;
+  margin-bottom: 2px;
+}
+
+/* Tier of the unlocked achievement */
+.achievement-toast-tier {
+  font-size: 20px;
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* Class to hide the toast notification */
+.achievement-toast.hide {
+  animation: toastOut 0.35s ease-in forwards;
+}
+
+/*
+ * =================================================================
+ * MISCELLANEOUS UI & ANIMATIONS
+ * =================================================================
+ */
+
+/* Display for the current level, fixed at the top center */
+#level-display {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 40px;
+  color: white;
+  text-shadow: 3px 3px 0px black;
+  z-index: 100;
+}
+
+/* Display for the player's gold/currency, fixed above the grid */
+#gold-display {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 36px;
+  color: gold;
+  text-shadow: 2px 2px 0px #000;
+  font-family: pixelText;
+  z-index: 100;
+}
+
+/* Button to pause the game */
+#pause-btn {
+  position: fixed;
+  top: 150px;
+  left: 20px;
+  font-size: 40px;
+  background: rgba(0, 0, 0, 0.15);
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 10px 15px;
+  font-family: pixelText;
+  transition: 0.3s;
+  z-index: 20;
+}
+
+/* Hover effect for the pause button */
+#pause-btn:hover {
+  background: rgba(255, 255, 255, 0.336);
+  transform: scale(1.05);
+}
+
+/* Popup for when a character is revived */
+.revive-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 215, 0, 0.9); /* Gold/Yellow background */
+  color: black;
+  font-family: pixelText;
+  font-size: 50px;
+  padding: 20px 50px;
+  border: 4px solid white;
+  border-radius: 20px;
+  text-shadow: 2px 2px 0 #000;
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.7);
+  animation: revivePop 1.5s ease-out forwards;
+  z-index: 1000;
+}
+
+/* Popup for damage numbers/hit indicators */
+.hit-popup {
+  position: fixed;
+  font-family: pixelText;
+  font-size: 50px;
+  text-shadow: 3px 3px 0 #000;
+  pointer-events: none;
+  z-index: 60;
+  transform: translate(-50%, 0) scale(1);
+  opacity: 0;
+  animation: hitPop 1s ease-out forwards;
+}
+
+/* Popup for combo messages */
+.combo-popup {
+  position: fixed;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: pixelText;
+  font-size: 80px;
+  color: #FFD700; /* Gold color */
+  text-shadow: 3px 3px 0px #000;
+  opacity: 0;
+  animation: comboPop 0.8s ease-out forwards;
+  pointer-events: none;
+  z-index: 70;
+}
+
+/* Tooltip for displaying character stats */
+.stats-tooltip {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  font-family: pixelText;
+  font-size: 24px;
   border: 2px solid white;
   border-radius: 10px;
-  padding: 15px 20px;
-  color: white;
-  font-size: 20px;
-  text-align: right;
-  opacity: 1;
-  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-  transform: translateX(0);
-}
-
-.achievement-toast.fade-out {
+  padding: 15px 25px;
+  line-height: 1.4;
+  text-align: left;
+  pointer-events: none;
+  z-index: 75;
   opacity: 0;
-  transform: translateX(50px);
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
 }
 
-.achievement-tier {
-  display: block;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.achievement-title {
-  display: block;
-  font-size: 24px;
-  font-weight: bold;
+/* Class to make the stats tooltip visible */
+.stats-tooltip.show {
+  opacity: 1;
 }
 
 /*
  * =================================================================
- * PAUSE SCREEN
+ * ANIMATION KEYFRAMES
  * =================================================================
  */
 
-#pause-screen {
-  /* Change from fixed to absolute, relative to the #game-wrapper */
-  position: absolute;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  display: none; /* Hidden by default */
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
-  font-family: pixelText;
-  text-align: center;
+/* Fade-in animation (used for end screen) */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-#pause-screen h1 {
-  font-size: 72px;
-  margin-bottom: 40px;
-  text-shadow: 4px 4px 0 black;
+/* Menu fade-out animation */
+@keyframes crossFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
-#pause-screen .menu-buttons {
-  gap: 15px;
+/* Menu fade-in animation */
+@keyframes crossFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-/*
- * =================================================================
- * MEDIA QUERIES (Optional, for fine-tuning)
- * =================================================================
- */
+/* Class to apply the menu fade-out animation */
+.menu-fade-out {
+  animation: crossFadeOut 0.3s ease forwards;
+}
 
-/* Example: Adjusting for very small screens if needed, though global scale should handle most */
-@media (max-width: 600px) {
-  .health-bar-container {
-    padding: 0 10px;
-    font-size: 24px;
+/* Class to apply the menu fade-in animation */
+.menu-fade-in {
+  animation: crossFadeIn 0.3s ease forwards;
+}
+
+/* Menu zoom-out animation (used for game start transition) */
+@keyframes zoomFadeOut {
+  0% {
+    transform: scale(1);
+    opacity: 1;
   }
-  
-  .health-bar-bg {
-    height: 30px;
+  80% {
+    transform: scale(5);
+    opacity: 1;
   }
-  
-  .health-label {
-    font-size: 20px;
+  100% {
+    transform: scale(7);
+    opacity: 0;
   }
-  
-  .health-tooltip {
-    font-size: 18px;
-    padding: 5px 10px;
-    top: 45px;
+}
+
+/* Class to apply the menu zoom-out animation */
+.menu-zoom-out {
+  animation: zoomFadeOut 1s ease forwards;
+}
+
+/* Animation for the revive popup (pop-in and fade-out) */
+@keyframes revivePop {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+  20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
+/* Animation for the hit popup (moves up and fades out) */
+@keyframes hitPop {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
   }
-  
-  .menu-title {
-    font-size: 48px;
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50px) scale(1.2);
   }
-  
-  button {
-    font-size: 20px;
-    padding: 10px 20px;
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -80px) scale(1);
+  }
+}
+
+/* Animation for the combo popup (pop-in and moves up/fades out) */
+@keyframes comboPop {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+  20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -80%) scale(1); opacity: 0; }
+}
+
+/* Animation for the achievement toast sliding in */
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+  }
+}
+
+/* Animation for the achievement toast sliding out */
+@keyframes toastOut {
+  from {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(40px) translateY(10px);
   }
 }

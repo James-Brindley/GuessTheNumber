@@ -1,220 +1,35 @@
-/* --- Global Styles & Reset --- */
-/* The main page body - sets the background, font, and ensures it fills the screen. */
 body {
+  /* Remove default browser margins and padding */
   margin: 0;
   padding: 0;
+  /* Set the background image for the game world */
   background-image: url('assets/background.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  /* Ensure the body takes up the full viewport height */
   height: 100vh;
+  /* Prevent scrolling */
   overflow: hidden;
+  /* Preserve the pixelated look for images */
   image-rendering: pixelated;
+  /* Apply the custom pixel font */
   font-family: pixelText;
 }
-/* --- Font Definitions --- */
-/* Custom pixel font for the game's aesthetic. */
+
+/* Custom font definition for the pixel art style */
 @font-face {
   font-family: pixelText;
   src: url(fonts/RetroByte.ttf);
 }
-/* --- Main Layout Elements --- */
-/* Simple margin for the controls element. */
-.controls {
-  margin-bottom: 20px;
-}
-/* --- Grid Container and Base Tile Styles --- */
-/* The main grid container - positioned at the bottom center of the screen. */
-#grid-container {
-  position: fixed;
-  bottom: 5%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: var(--grid-box-w, 1000px);
-  height: var(--grid-box-h, 520px);
-  display: grid;
-  place-content: center;
-  gap: 5px;
-  grid-template-columns: repeat(var(--grid-cols, 15), var(--cell-size, 80px));
-  grid-auto-rows: var(--cell-size, 80px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-/* Individual grid tiles - sets the base size, font, and transition effects. */
-.grid-item {
-  width: var(--cell-size, 80px);
-  height: var(--cell-size, 80px);
-  display: grid;
-  place-items: center;
-  font-size: calc(var(--cell-size) * 0.42);
-  color: white;
-  cursor: pointer;
-  user-select: none;
-  border-radius: 15px;
-  transform: scale(0.8);
-  opacity: 0;
-  transition: transform 0.4s ease, opacity 0.4s ease, background 0.2s;
-}
-/* --- Grid Tile States (Hover, Clicked, Attack, Gold) --- */
-/* Animation to make the grid tiles pop in when the level loads. */
-.grid-grow .grid-item {
-  transform: scale(1);
-  opacity: 1;
-}
-/* Visual feedback when hovering over a tile. */
-.grid-item:hover {
-  background-color: #0000001b;
-  color: white;
-}
-/* Style for a tile that has been clicked but was neutral (not attack or gold). */
-.grid-item.active {
-  background-color: #0000006c;
-  color: white;
-}
-/* Style for a player attack tile after it's clicked (green). */
-.grid-item.attack {
-  background-color: #379125b0;
-  color: white;
-}
-/* Style for an enemy attack tile after it's clicked (red). */
-.grid-item.eAttack {
-  background-color: #e44444b5;
-  color: white;
-}
-/* Small delay to create a subtle wave-in animation when the grid appears. */
-.grid-item:nth-child(odd) {
-  transition-delay: 0.05s;
-}
-/* Small delay to create a subtle wave-in animation when the grid appears. */
-.grid-item:nth-child(even) {
-  transition-delay: 0.1s;
-}
-/* Style for a gold tile after it's clicked (yellow). */
-.grid-item.gold {
-  background: radial-gradient(circle at 30% 30%, #ffd54f, #ffb300);
-  box-shadow: 0 0 18px 4px rgba(255, 200, 0, 0.6);
-  position: relative;
-}
-/* Style for a player attack tile after it's clicked (green). */
-.grid-item.attack {
-  background: radial-gradient(circle at 30% 30%, #4CAF50, #2e7d32);
-  box-shadow: 0 0 18px 4px rgba(76, 175, 80, 0.6);
-  color: white;
-  position: relative;
-}
-/* Style for an enemy attack tile after it's clicked (red). */
-.grid-item.eAttack {
-  background: radial-gradient(circle at 30% 30%, #e53935, #b71c1c);
-  box-shadow: 0 0 18px 4px rgba(229, 57, 53, 0.6);
-  color: white;
-  position: relative;
-}
-/* --- Character Sprites (Player and Enemy) --- */
-/* Base positioning and size for both the player and enemy character containers. */
-.hero-container, .enemy-container {
-  position: fixed;
-  bottom: 50%;
-  width: 100px;
-  height: 100px;
-  z-index: 10;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-/* Specific positioning for the player character. */
-.hero-container {
-  left: 40%;
-  transform: translateX(-50%);
-}
-/* Specific positioning for the enemy character. */
-.enemy-container {
-  right: 40%;
-  transform: translateX(50%);
-}
-/* Styling for the character sprites - scaling them up for the pixel art look. */
-.hero-container img, .enemy-container img {
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-  transform: scale(8);
-  transform-origin: bottom center;
-  image-rendering: pixelated;
-}
-/* Applies the attack animation to the enemy. */
-.enemy-container.attacking {
-  animation: enemyAttackMove 0.6s ease-out;
-}
-/* --- Keyframe Animations (Attack, Death, Popups) --- */
-/* Keyframe definitions for various animations. */
-@keyframes heroAttackMove {
-  0% { transform: translateX(0%) translateY(0);
-  }
-}
-/* Keyframe definitions for various animations. */
-@keyframes deathFade {
-  0% { opacity: 1;
-  transform: scale(8) rotate(0deg);
-  }
-}
-/* Keyframe definitions for various animations. */
-@keyframes fadeIn {
-  from { opacity: 0;
-  }
-}
-/* Keyframe definitions for various animations. */
-@keyframes revivePop {
-  0% { transform: translate(-50%, -50%) scale(0.8);
-  opacity: 0;
-  }
-}
-/* Keyframe definitions for various animations. */
-@keyframes zoomFadeOut {
-  0% {
-    transform: scale(1);
-  opacity: 1;
-  }
-}
-/* Keyframe definitions for various animations. */
-@keyframes comboPop {
-  0% { transform: translate(-50%, -50%) scale(0.8);
-  opacity: 0;
-  }
-}
-/* Keyframe definitions for various animations. */
-@keyframes hitPop {
-  0% {
-    opacity: 1;
-  transform: translate(-50%, 0) scale(1);
-  }
-}
-/* Keyframe definitions for various animations. */
-@keyframes pulse-blue {
-  0%, 100% {
-    box-shadow: 0 0 10px 3px rgb(61, 203, 66, 0.4);
-  }
-}
-/* Keyframe definitions for various animations. */
-@keyframes toastIn {
-  from {
-    opacity: 0;
-  transform: translateX(40px) translateY(10px);
-  }
-}
-/* --- General HUD Elements (Level, Gold) --- */
-/* Displays the player's current gold amount. */
-#gold-display {
-  position: fixed;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 36px;
-  color: gold;
-  text-shadow: 2px 2px 0px #000;
-  font-family: pixelText;
-  z-index: 100;
-}
-/* --- Health Bar and Tooltip Styles --- */
-/* Container for the top-level health bars (player and enemy). */
+
+/*
+ * =================================================================
+ * UI ELEMENTS: HEALTH BARS & CONTROLS
+ * =================================================================
+ */
+
+/* Container for the player and enemy health displays, fixed at the top */
 .health-bar-container {
   position: fixed;
   top: 20px;
@@ -225,16 +40,25 @@ body {
   padding: 0 40px;
   font-size: 50px;
   font-weight: bold;
+  z-index: 50; /* Ensure health bars are above most elements */
 }
-/* Text color for player health numbers. */
+
+/* Text color for the player's health display */
 .player-health {
-  color: #4CAF50;
+  color: #4CAF50; /* Green */
 }
-/* Text color for enemy health numbers. */
+
+/* Text color for the enemy's health display */
 .enemy-health {
-  color: #E53935;
+  color: #E53935; /* Red */
 }
-/* Wrapper for each individual health bar (label + bar). */
+
+/* General styling for control elements (currently only margin) */
+.controls {
+  margin-bottom: 20px;
+}
+
+/* Health bar wrapper for individual player/enemy bars */
 .health-wrapper {
   width: 40%;
   display: flex;
@@ -242,13 +66,15 @@ body {
   align-items: center;
   position: relative;
 }
-/* Label above the health bar. */
+
+/* Label above the health bar (e.g., "Player", "Enemy") */
 .health-label {
   font-size: 28px;
   margin-bottom: 5px;
   text-shadow: 2px 2px 0 black;
 }
-/* The background of the health bar (the empty part). */
+
+/* Background container for the health bar */
 .health-bar-bg {
   width: 100%;
   height: 40px;
@@ -256,25 +82,35 @@ body {
   border: 3px solid #fff;
   border-radius: 10px;
   position: relative;
-  overflow: visible;
+  overflow: visible; /* Allows the tooltip to render outside the bar */
   cursor: default;
 }
-/* The filling part of the health bar - animates when health changes. */
+
+/* The inner fill that shows the current health level */
 .health-bar-fill {
   height: 100%;
   width: 100%;
-  transition: width 0.3s ease-out;
+  transition: width 0.3s ease-out; /* Smooth transition for health changes */
   border-radius: 7px;
 }
-/* Green gradient for the player's health bar. */
+
+/* Gradient for the player's health bar fill (Green) */
 .player-health-fill {
   background: linear-gradient(90deg, #2ecc71, #27ae60);
 }
-/* Red gradient for the enemy's health bar. */
+
+/* Gradient for the enemy's health bar fill (Red) */
 .enemy-health-fill {
   background: linear-gradient(90deg, #e74c3c, #c0392b);
 }
-/* The tooltip that shows exact health numbers on hover. */
+
+/* Special styling for boss health text */
+.boss-health {
+  color: #ff3838 !important;
+  text-shadow: 0 0 15px #ff0000;
+}
+
+/* Tooltip that appears on hover over the health bar */
 .health-tooltip {
   position: absolute;
   top: 60px;
@@ -290,43 +126,291 @@ body {
   text-shadow: 1px 1px 2px #000;
   z-index: 50;
   pointer-events: none;
-  opacity: 0;
+  opacity: 0; /* Hidden by default */
   transition: opacity 0.15s ease-in-out;
 }
-/* Container for the top-level health bars (player and enemy). */
-.health-bar-container {
-  z-index: 50;
+
+/* Show the tooltip when hovering over the health bar background */
+.health-bar-bg:hover .health-tooltip {
+  opacity: 1;
 }
-/* --- Fullscreen Menu Styles (Main Menu, Pause, Achievements) --- */
-/* Specific background image for the main menu. */
-#main-menu {
-  background-image: url('assets/mainMenuBackground.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+
+/*
+ * =================================================================
+ * GAME GRID AND TILES
+ * =================================================================
+ */
+
+/* Main container for the game grid, fixed at the bottom center */
+#grid-container {
+  position: fixed;
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  /* CSS variables for dynamic sizing controlled by JavaScript */
+  width: var(--grid-box-w, 1000px);
+  height: var(--grid-box-h, 520px);
+  display: grid;
+  place-content: center;
+  gap: 5px;
+  /* Grid layout defined by JS variables for columns and cell size */
+  grid-template-columns: repeat(var(--grid-cols, 15), var(--cell-size, 80px));
+  grid-auto-rows: var(--cell-size, 80px);
+  /* Transition for visual effects (e.g., when the grid appears) */
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
-/* Specific background image for the how-to-play screen. */
-#how-to-play-screen {
-  background-image: url('assets/blank.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+
+/* Individual tile/cell within the game grid */
+.grid-item {
+  width: var(--cell-size, 80px);
+  height: var(--cell-size, 80px);
+  display: grid;
+  place-items: center;
+  /* Font size scales with cell size for legibility */
+  font-size: calc(var(--cell-size) * 0.42);
+  color: white;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 15px;
+  /* Initial state for the grow-in animation */
+  transform: scale(0.8);
+  opacity: 0;
+  /* Transitions for hover, scale, and opacity effects */
+  transition: transform 0.4s ease, opacity 0.4s ease, background 0.2s;
 }
-/* Styling for the main content box within menus. */
-.menu-content {
+
+/* Class to trigger the grow-in animation for all grid items */
+.grid-grow .grid-item {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Subtle background change on hover */
+.grid-item:hover {
+  background-color: #0000001b;
+}
+
+/* Style for the currently selected or active grid item */
+.grid-item.active {
+  background-color: #0000006c;
+}
+
+/* Style for tiles that are in the player's attack range */
+.grid-item.attack {
+  /* Green glowing effect */
+  background: radial-gradient(circle at 30% 30%, #4CAF50, #2e7d32);
+  box-shadow: 0 0 18px 4px rgba(76, 175, 80, 0.6);
+  position: relative;
+}
+
+/* Style for tiles that are in the enemy's attack range */
+.grid-item.eAttack {
+  /* Red glowing effect */
+  background: radial-gradient(circle at 30% 30%, #e53935, #b71c1c);
+  box-shadow: 0 0 18px 4px rgba(229, 57, 53, 0.6);
+  position: relative;
+}
+
+/* Style for tiles containing gold/currency */
+.grid-item.gold {
+  background: radial-gradient(circle at 30% 30%, #ffd54f, #ffb300);
+  box-shadow: 0 0 18px 4px rgba(255, 200, 0, 0.6);
+  position: relative;
+}
+
+/* Coin emoji overlay for gold tiles */
+.grid-item.gold::after {
+  content: '🪙';
+  position: absolute;
+  right: calc(var(--cell-size) * 0.1);
+  top: calc(var(--cell-size) * 0.08);
+  font-size: calc(var(--cell-size) * 0.35);
+  filter: drop-shadow(0 2px 0 black);
+}
+
+/* Small stagger for a subtle wave effect when tiles appear */
+.grid-item:nth-child(odd) {
+  transition-delay: 0.05s;
+}
+.grid-item:nth-child(even) {
+  transition-delay: 0.1s;
+}
+
+/* Pulse animation for safe-range tiles */
+.safe-range {
+  animation: pulse-blue 1.2s infinite;
+  box-shadow: 0 0 12px 3px rgba(61, 204, 66, 0.8);
+  border-radius: 15px;
+}
+
+@keyframes pulse-blue {
+  0%, 100% {
+    box-shadow: 0 0 10px 3px rgb(61, 203, 66, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px 5px rgb(61, 203, 66, 0.4);
+  }
+}
+
+/*
+ * =================================================================
+ * CHARACTER SPRITES AND ANIMATIONS
+ * =================================================================
+ */
+
+/* Common container for both hero and enemy sprites */
+.hero-container, .enemy-container {
+  position: fixed;
+  bottom: 50%;
+  width: 100px;
+  height: 100px;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Positioning for the player/hero sprite container */
+.hero-container {
+  left: 40%;
+  transform: translateX(-50%);
+}
+
+/* Positioning for the enemy sprite container */
+.enemy-container {
+  right: 40%;
+  transform: translateX(50%);
+}
+
+/* Styling for the actual image element inside the containers */
+.hero-container img, .enemy-container img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  /* Scale up the pixel art image for visibility */
+  transform: scale(8);
+  transform-origin: bottom center;
+  image-rendering: pixelated;
+}
+
+/* Filter effect for a 'burn' or 'flash' state on the image */
+.burn-flash img {
+  filter: sepia(1) saturate(4) hue-rotate(-10deg) brightness(1.3) drop-shadow(0 0 15px red);
+  transition: filter 0.3s ease-out;
+}
+
+/* Keyframes for the hero's attack movement (moves right) */
+@keyframes heroAttackMove {
+  0% { transform: translateX(0%) translateY(0); }
+  50% { transform: translateX(calc(300px)) translateY(0); }
+  100% { transform: translateX(0%) translateY(0); }
+}
+
+/* Keyframes for the enemy's attack movement (moves left) */
+@keyframes enemyAttackMove {
+  0% { transform: translateX(0%) translateY(0); }
+  50% { transform: translateX(calc(-300px)) translateY(0); }
+  100% { transform: translateX(0%) translateY(0); }
+}
+
+/* Apply the attack animation to the hero container */
+.hero-container.attacking {
+  animation: heroAttackMove 0.6s ease-out;
+}
+
+/* Apply the attack animation to the enemy container */
+.enemy-container.attacking {
+  animation: enemyAttackMove 0.6s ease-out;
+}
+
+/* Keyframes for the death animation (fade, scale, and rotate) */
+@keyframes deathFade {
+  0% { opacity: 1; transform: scale(8) rotate(0deg); }
+  50% { opacity: 0.6; transform: scale(7.5) rotate(10deg); }
+  100% { opacity: 0; transform: scale(6.5) rotate(-45deg); }
+}
+
+/* Apply the death animation to a character */
+.dead {
+  animation: deathFade 1s ease-out forwards;
+}
+
+/*
+ * =================================================================
+ * GAME OVER / END SCREEN
+ * =================================================================
+ */
+
+/* Full-screen overlay for the game over or victory screen */
+.end-screen {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  font-family: pixelText;
+  text-align: center;
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Inner content box for the end screen */
+.end-screen-content {
   background: rgba(0, 0, 0, 0.6);
   border: 4px solid white;
   border-radius: 20px;
-  padding: 100px 150px;
+  padding: 80px 120px;
   box-shadow: 0 0 30px #ffffff55;
 }
-/* Title style inside the menu content box. */
-.menu-content h1 {
+
+/* Main title/result text on the end screen */
+.end-screen h1 {
   font-size: 120px;
-  margin-bottom: 40px;
+  margin-bottom: 10px;
   text-shadow: 4px 4px 0px #000000aa;
 }
-/* Base style for all fullscreen menus (main menu, achievements, shop). */
+
+/* Sub-text/message on the end screen */
+.end-screen p {
+  font-size: 30px;
+  margin-bottom: 30px;
+  text-shadow: 4px 4px 0px #000000aa;
+}
+
+/* Button styling on the end screen */
+.end-screen button {
+  font-size: 50px;
+  padding: 20px 60px;
+  background: #4CAF50;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-family: pixelText;
+}
+
+/* Hover effect for the end screen button */
+.end-screen button:hover {
+  background: #66bb6a;
+  transform: scale(1.05);
+  transition: 0.2s;
+}
+
+/* Gold display text within the end screen content */
+.end-screen-content #shop-gold {
+  color: gold;
+  text-shadow: 0 0 8px #000;
+}
+
+/*
+ * =================================================================
+ * FULLSCREEN MENUS (MAIN MENU, HOW TO PLAY, ETC.)
+ * =================================================================
+ */
+
+/* Generic full-screen overlay for all menus */
 .fullscreen {
   position: fixed;
   inset: 0;
@@ -341,7 +425,24 @@ body {
   flex-direction: column;
   overflow: hidden;
 }
-/* Inner container for menu content. */
+
+/* Specific styling for the main menu screen */
+#main-menu {
+  background-image: url('assets/mainMenuBackground.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Specific styling for the 'How To Play' screen */
+#how-to-play-screen {
+  background-image: url('assets/blank.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Common inner container for menu content */
 .menu-inner {
   width: 90%;
   max-width: 1000px;
@@ -351,134 +452,174 @@ body {
   justify-content: center;
   gap: 30px;
 }
-/* Base style for menu titles. */
+
+/* Generic menu content box (used by older menu structure) */
+.menu-content {
+  background: rgba(0, 0, 0, 0.6);
+  border: 4px solid white;
+  border-radius: 20px;
+  padding: 100px 150px;
+  box-shadow: 0 0 30px #ffffff55;
+}
+
+/* Generic title styling for all menus */
 .menu-title {
   font-size: 120px;
   margin: 0;
   text-shadow: 5px 5px 0px #000000aa;
 }
-/* Special positioning for the main menu title. */
+
+/* Overridden title styling for the main menu (larger and higher) */
 #main-menu .menu-title {
   transform: translateY(-15vh);
   font-size: 160px;
   margin-bottom: 80px;
 }
-/* Layout for the main menu buttons. */
-#main-menu .menu-buttons {
+
+/* Title styling for the 'How To Play' menu */
+#how-to-play-screen .menu-title {
+  font-size: 100px;
+  margin-bottom: 20px;
+}
+
+/* Container for menu buttons */
+.menu-buttons {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 30px;
   transform: translateY(-5vh);
 }
-/* Fade in animation when switching menus. */
-.menu-fade-in {
-  animation: crossFadeIn 0.3s ease forwards;
-}
-/* --- Game Popups (Hit Numbers, Revive, Achievements) --- */
-/* Paragraph text style for the end screen summary. */
-.end-screen p {
-  font-size: 30px;
-  margin-bottom: 30px;
-  text-shadow: 4px 4px 0px #000000aa;
-}
-/* Popup shown when a revive item is used. */
-.revive-popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(255, 215, 0, 0.9);
-  color: black;
-  font-family: pixelText;
+
+/* Button styling for main menu buttons */
+.menu-buttons button,
+#back-to-menu-btn,
+#achievements-back-btn {
   font-size: 50px;
-  padding: 20px 50px;
-  border: 4px solid white;
-  border-radius: 20px;
-  text-shadow: 2px 2px 0 #000;
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.7);
-  animation: revivePop 1.5s ease-out forwards;
-  z-index: 1000;
-}
-/* Base style for floating damage/healing numbers. */
-.hit-popup {
-  position: fixed;
+  padding: 20px 70px;
+  background: #4CAF50; /* Green */
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
   font-family: pixelText;
-  font-size: 50px;
-  text-shadow: 3px 3px 0 #000;
-  pointer-events: none;
-  z-index: 60;
-  transform: translate(-50%, 0) scale(1);
-  opacity: 0;
-  animation: hitPop 1s ease-out forwards;
+  color: white;
+  transition: 0.2s;
 }
-/* Card style for achievements on the achievement screen. */
-.achievement-card {
-  background: rgba(0,0,0,0.55);
-  border: 4px solid white;
-  border-radius: 16px;
-  padding: 18px;
+
+/* Hover effect for main menu buttons */
+.menu-buttons button:hover,
+#back-to-menu-btn:hover,
+#achievements-back-btn:hover {
+  background: #66bb6a;
+  transform: scale(1.05);
+}
+
+/* Specific styling for the back buttons (blue color) */
+#back-to-menu-btn,
+#achievements-back-btn {
+  background: #2196F3; /* Blue */
+  font-size: 45px;
+  margin-top: 20px;
+  padding: 15px 50px;
+}
+
+/* Hover effect for the blue back buttons */
+#back-to-menu-btn:hover,
+#achievements-back-btn:hover {
+  background: #42a5f5;
+}
+
+/* Text area for 'How To Play' instructions */
+.how-to-text {
+  font-size: 26px;
   text-align: left;
+  color: #fff;
+  text-shadow: 2px 2px 0 black;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 15px;
+  padding: 30px 50px;
+  line-height: 1.5;
+  width: 80%;
+  max-width: 800px;
+  overflow-y: auto;
+  max-height: 55vh;
+}
+
+/* List styling within the 'How To Play' text */
+.how-to-text ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.how-to-text li {
+  margin: 6px 0;
+}
+
+/*
+ * =================================================================
+ * SHOP LAYOUT
+ * =================================================================
+ */
+
+/* Container for all shop items, using flexbox for horizontal layout */
+#shop-items {
+  display: flex !important;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 25px;
+  flex-direction: row !important;
+  margin-top: 40px;
+}
+
+/* Individual item card in the shop */
+.shop-item {
+  width: 220px;
+  height: 220px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 5px solid white;
+  border-radius: 20px;
   color: white;
   font-family: pixelText;
+  text-align: center;
+  padding: 15px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
-/* Progress bar container for achievements. */
-.achievement-progress {
-  width: 100%;
-  height: 16px;
-  background: rgba(255,255,255,0.2);
-  border: 2px solid #fff;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-top: 6px;
+
+/* Hover effect for shop items */
+.shop-item:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.5);
 }
-/* Progress bar fill. */
-.achievement-progress-fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #4CAF50, #2196F3);
-  transition: width 0.3s ease-out;
+
+/* Style for items that have already been purchased */
+.shop-item.purchased {
+  opacity: 0.5;
+  transform: scale(0.95);
+  cursor: not-allowed;
 }
-/* Base style for the achievement toast. */
-.achievement-toast {
-  min-width: 260px;
-  max-width: 340px;
-  background: rgba(0, 0, 0, 0.85);
-  border: 3px solid #ffffff;
-  border-radius: 14px;
-  padding: 10px 16px;
-  font-family: pixelText;
-  color: #fff;
-  text-align: left;
-  box-shadow: 0 0 18px rgba(0, 0, 0, 0.8);
-  animation: toastIn 0.35s ease-out forwards;
-  pointer-events: auto;
-}
-/* Title text inside the achievement toast. */
-.achievement-toast-title {
-  font-size: 26px;
-  margin-bottom: 4px;
-  text-shadow: 2px 2px 0 #000;
-}
-/* Achievement name text. */
-.achievement-toast-name {
-  font-size: 22px;
-  margin-bottom: 2px;
-}
-/* Achievement tier text. */
-.achievement-toast-tier {
-  font-size: 20px;
-  text-shadow: 1px 1px 0 #000;
-}
-/* --- Inventory/Pause Menu Specific Styles --- */
-/* Container for the inventory button and panel. */
+
+/*
+ * =================================================================
+ * INVENTORY PANEL
+ * =================================================================
+ */
+
+/* Container for the inventory button */
 #inventory-container {
   position: fixed;
   top: 250px;
   left: 20px;
   z-index: 20;
 }
-/* The button to open the inventory/pause menu. */
+
+/* The button to open the inventory */
 #inventory-button {
   font-size: 40px;
   background: rgba(0, 0, 0, 0.15);
@@ -489,13 +630,15 @@ body {
   font-family: pixelText;
   transition: 0.3s;
 }
-/* Hover effect for the inventory button. */
+
+/* Hover effect for the inventory button */
 #inventory-button:hover {
   background: rgba(255, 255, 255, 0.336);
 }
-/* The inventory panel itself - hidden by default. */
+
+/* The inventory panel itself */
 #inventory-panel {
-  display: none;
+  display: none; /* Hidden by default, shown via JS */
   position: absolute;
   top: 80px;
   left: 0;
@@ -510,9 +653,356 @@ body {
   overflow-y: auto;
   text-align: left;
 }
-/* Style for each item listed in the inventory. */
+
+/* Styling for each row/item in the inventory list */
 .inventory-item {
   margin-bottom: 8px;
   padding: 6px 10px;
   border-left: 5px solid;
+}
+
+/*
+ * =================================================================
+ * ACHIEVEMENTS
+ * =================================================================
+ */
+
+/* Grid layout for displaying achievement cards */
+.achievements-grid {
+  width: 90%;
+  max-width: 1000px;
+  display: grid;
+  /* Responsive grid: auto-fit columns with a minimum width of 260px */
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+/* Individual achievement card styling */
+.achievement-card {
+  background: rgba(0,0,0,0.55);
+  border: 4px solid white;
+  border-radius: 16px;
+  padding: 18px;
+  text-align: left;
+  color: white;
+  font-family: pixelText;
+}
+
+/* Achievement card title */
+.achievement-card h3 {
+  margin: 0 0 6px 0;
+  font-size: 30px;
+}
+
+/* Achievement tier text (e.g., Bronze, Silver, Gold) */
+.achievement-tier {
+  font-size: 22px;
+  margin-bottom: 8px;
+  color: #FFD700; /* Gold color */
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* Background container for the progress bar */
+.achievement-progress {
+  width: 100%;
+  height: 16px;
+  background: rgba(255,255,255,0.2);
+  border: 2px solid #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+/* The inner fill of the progress bar */
+.achievement-progress-fill {
+  height: 100%;
+  width: 0%; /* Width is controlled by JS based on progress */
+  background: linear-gradient(90deg, #4CAF50, #2196F3);
+  transition: width 0.3s ease-out;
+}
+
+/* Container for achievement toast notifications (bottom right) */
+#achievement-toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1200;
+  pointer-events: none; /* Allows clicks to pass through to elements underneath */
+}
+
+/* Individual achievement toast notification */
+.achievement-toast {
+  min-width: 260px;
+  max-width: 340px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 3px solid #ffffff;
+  border-radius: 14px;
+  padding: 10px 16px;
+  font-family: pixelText;
+  color: #fff;
+  text-align: left;
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.8);
+  animation: toastIn 0.35s ease-out forwards;
+  pointer-events: auto;
+}
+
+/* Title for the toast (e.g., "Achievement Unlocked!") */
+.achievement-toast-title {
+  font-size: 26px;
+  margin-bottom: 4px;
+  text-shadow: 2px 2px 0 #000;
+}
+
+/* Name of the unlocked achievement */
+.achievement-toast-name {
+  font-size: 22px;
+  margin-bottom: 2px;
+}
+
+/* Tier of the unlocked achievement */
+.achievement-toast-tier {
+  font-size: 20px;
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* Class to hide the toast notification */
+.achievement-toast.hide {
+  animation: toastOut 0.35s ease-in forwards;
+}
+
+/*
+ * =================================================================
+ * MISCELLANEOUS UI & ANIMATIONS
+ * =================================================================
+ */
+
+/* Display for the current level, fixed at the top center */
+#level-display {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 40px;
+  color: white;
+  text-shadow: 3px 3px 0px black;
+  z-index: 100;
+}
+
+/* Display for the player's gold/currency, fixed above the grid */
+#gold-display {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 36px;
+  color: gold;
+  text-shadow: 2px 2px 0px #000;
+  font-family: pixelText;
+  z-index: 100;
+}
+
+/* Button to pause the game */
+#pause-btn {
+  position: fixed;
+  top: 150px;
+  left: 20px;
+  font-size: 40px;
+  background: rgba(0, 0, 0, 0.15);
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 10px 15px;
+  font-family: pixelText;
+  transition: 0.3s;
+  z-index: 20;
+}
+
+/* Hover effect for the pause button */
+#pause-btn:hover {
+  background: rgba(255, 255, 255, 0.336);
+  transform: scale(1.05);
+}
+
+/* Popup for when a character is revived */
+.revive-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 215, 0, 0.9); /* Gold/Yellow background */
+  color: black;
+  font-family: pixelText;
+  font-size: 50px;
+  padding: 20px 50px;
+  border: 4px solid white;
+  border-radius: 20px;
+  text-shadow: 2px 2px 0 #000;
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.7);
+  animation: revivePop 1.5s ease-out forwards;
+  z-index: 1000;
+}
+
+/* Popup for damage numbers/hit indicators */
+.hit-popup {
+  position: fixed;
+  font-family: pixelText;
+  font-size: 50px;
+  text-shadow: 3px 3px 0 #000;
+  pointer-events: none;
+  z-index: 60;
+  transform: translate(-50%, 0) scale(1);
+  opacity: 0;
+  animation: hitPop 1s ease-out forwards;
+}
+
+/* Popup for combo messages */
+.combo-popup {
+  position: fixed;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: pixelText;
+  font-size: 80px;
+  color: #FFD700; /* Gold color */
+  text-shadow: 3px 3px 0px #000;
+  opacity: 0;
+  animation: comboPop 0.8s ease-out forwards;
+  pointer-events: none;
+  z-index: 70;
+}
+
+/* Tooltip for displaying character stats */
+.stats-tooltip {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  font-family: pixelText;
+  font-size: 24px;
+  border: 2px solid white;
+  border-radius: 10px;
+  padding: 15px 25px;
+  line-height: 1.4;
+  text-align: left;
+  pointer-events: none;
+  z-index: 75;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+/* Class to make the stats tooltip visible */
+.stats-tooltip.show {
+  opacity: 1;
+}
+
+/*
+ * =================================================================
+ * ANIMATION KEYFRAMES
+ * =================================================================
+ */
+
+/* Fade-in animation (used for end screen) */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Menu fade-out animation */
+@keyframes crossFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Menu fade-in animation */
+@keyframes crossFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Class to apply the menu fade-out animation */
+.menu-fade-out {
+  animation: crossFadeOut 0.3s ease forwards;
+}
+
+/* Class to apply the menu fade-in animation */
+.menu-fade-in {
+  animation: crossFadeIn 0.3s ease forwards;
+}
+
+/* Menu zoom-out animation (used for game start transition) */
+@keyframes zoomFadeOut {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(7);
+    opacity: 0;
+  }
+}
+
+/* Class to apply the menu zoom-out animation */
+.menu-zoom-out {
+  animation: zoomFadeOut 1s ease forwards;
+}
+
+/* Animation for the revive popup (pop-in and fade-out) */
+@keyframes revivePop {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+  20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
+/* Animation for the hit popup (moves up and fades out) */
+@keyframes hitPop {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -80px) scale(1);
+  }
+}
+
+/* Animation for the combo popup (pop-in and moves up/fades out) */
+@keyframes comboPop {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+  20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -80%) scale(1); opacity: 0; }
+}
+
+/* Animation for the achievement toast sliding in */
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+  }
+}
+
+/* Animation for the achievement toast sliding out */
+@keyframes toastOut {
+  from {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(40px) translateY(10px);
+  }
 }

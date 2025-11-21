@@ -1,30 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Character set and viewport settings -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Page title -->
   <title>Guess The Dungeon</title>
+  <!-- Link to the main stylesheet -->
   <link rel="stylesheet" href="styles.css">
+  <!-- Link to the favicon/game icon -->
   <link rel="icon" type="images/png" href="assets/gameIcon.png">
 </head>
 <body>
 
+  <!-- ================================================================= -->
+  <!-- HEALTH BAR DISPLAY -->
+  <!-- Container for the player and enemy health bars, fixed at the top -->
+  <!-- ================================================================= -->
   <div class="health-bar-container">
+    <!-- Player Health Bar -->
     <div class="health-wrapper player">
       <div class="health-bar-bg">
         <div class="health-bar-fill player-health-fill"></div>
+        <!-- Tooltip to show exact HP values -->
         <div class="health-tooltip player-tooltip">100 / 100</div>
       </div>
     </div>
 
+    <!-- Enemy Health Bar -->
     <div class="health-wrapper enemy">
       <div class="health-bar-bg">
         <div class="health-bar-fill enemy-health-fill"></div>
+        <!-- Tooltip to show exact HP values -->
         <div class="health-tooltip enemy-tooltip">100 / 100</div>
       </div>
     </div>
   </div>
 
+  <!-- ================================================================= -->
+  <!-- CHARACTER SPRITES -->
+  <!-- Containers for the Hero and Enemy sprites -->
+  <!-- ================================================================= -->
   <div class="hero-container">
       <img id="hero" src="assets/ready_1.png" alt="Hero">
   </div>
@@ -33,13 +49,42 @@
     <img id="enemy" src="assets/eReady_1.png" alt="Enemy">
   </div>
 
-  <!-- === STAT TOOLTIPS === -->
+  <!-- ================================================================= -->
+  <!-- GAME UI ELEMENTS -->
+  <!-- ================================================================= -->
+  
+  <!-- Tooltips to display detailed character stats on hover -->
   <div id="player-stats-tooltip" class="stats-tooltip"></div>
   <div id="enemy-stats-tooltip" class="stats-tooltip"></div>
 
+  <!-- The main container for the interactive game grid -->
   <div id="grid-container"></div>
 
-  <!-- ✅ MAIN MENU (Full Screen) -->
+  <!-- Container for the current level number -->
+  <div id="level-display">Level 1</div>
+
+  <!-- Container for the player's current gold amount -->
+  <div id="gold-display">💰 0</div>
+
+  <!-- Button to pause the game -->
+  <button id="pause-btn">⏸️</button>
+
+  <!-- Inventory Button and Panel -->
+  <div id="inventory-container">
+    <button id="inventory-button">🎒</button>
+    <!-- Panel that displays collected items -->
+    <div id="inventory-panel"></div>
+  </div>
+
+  <!-- Container for achievement toast notifications (bottom right) -->
+  <div id="achievement-toast-container"></div>
+
+  <!-- ================================================================= -->
+  <!-- FULLSCREEN GAME SCREENS -->
+  <!-- These screens are hidden/shown by JavaScript -->
+  <!-- ================================================================= -->
+
+  <!-- Main Menu Screen -->
   <div id="main-menu" class="menu-screen fullscreen">
     <div class="menu-inner">
       <h1 class="menu-title">Guess The Dungeon</h1>
@@ -51,9 +96,11 @@
     </div>
   </div>
 
+  <!-- How To Play Screen -->
   <div id="how-to-play-screen" class="menu-screen fullscreen" style="display: none;">
     <div class="menu-inner">
       <h1 class="menu-title">How To Play</h1>
+      <!-- Detailed instructions for the game -->
       <div class="how-to-text">
         <p>Welcome to <strong>Guess The Dungeon</strong> — a mix of luck, risk, and clever choices!</p>
   
@@ -120,25 +167,37 @@
     </div>
   </div>
 
-  <!-- ✅ ACHIEVEMENTS SCREEN -->
+  <!-- Achievements Screen -->
   <div id="achievements-screen" class="menu-screen fullscreen" style="display:none;">
     <div class="menu-inner">
       <h1 class="menu-title">Achievements</h1>
+      <!-- Content populated by JavaScript -->
       <div id="achievements-content" class="achievements-grid"></div>
       <button id="achievements-back-btn">Back to Menu</button>
     </div>
   </div>
 
-
-  <!-- ✅ Inventory Button + Panel -->
-  <div id="inventory-container">
-    <button id="inventory-button">🎒</button>
-    <div id="inventory-panel"></div>
+  <!-- Shop Screen (Hidden by default, shown between levels) -->
+  <div id="shop-screen" class="menu-screen fullscreen" style="display:none;">
+    <div class="menu-inner">
+      <h1 class="menu-title">Shop</h1>
+      <p id="shop-gold">Your Gold: 💰 0</p>
+      <!-- Shop items populated by JavaScript -->
+      <div id="shop-items"></div>
+      <button id="continue-game-btn">Continue</button>
+    </div>
   </div>
 
-  <!-- ✅ Pause Button -->
-  <button id="pause-btn">⏸️</button>
+  <!-- End Game / Game Over Screen -->
+  <div id="end-screen" class="end-screen" style="display: none;">
+    <div class="end-screen-content">
+      <h1 id="end-screen-title">Game Over</h1>
+      <p id="end-screen-message">You reached level 10 and earned 150 gold.</p>
+      <button id="restart-game-btn">Play Again</button>
+    </div>
+  </div>
 
+  <!-- Link to the main JavaScript file -->
   <script src="script.js"></script>
 </body>
 </html>

@@ -70,10 +70,6 @@ const MIN_CELL_PX  = 28;
 let gridBoxW = 0; 
 let gridBoxH = 0; 
 
-// --- NEW GLOBAL SCALE VARIABLE ---
-let globalScale = 1.0;
-const BASE_GAME_WIDTH = 1080; // Base design width (from user's 1080x1920 reference)
-const BASE_GAME_HEIGHT = 1920; // Base design height (from user's 1080x1920 reference)
 
 // After beating level 100, you can keep going in endless mode
 let endlessMode = false;
@@ -82,54 +78,21 @@ let endlessMode = false;
 // Figure out how big the grid should be based on screen size
 function initGridBox(baseCols = cols, baseRows = rows) {
   
-  // 1. Calculate the desired size of the grid based on BASE_CELL_PX
   let wantedW = baseCols * BASE_CELL_PX + (baseCols - 1) * GAP_PX;
   let wantedH = baseRows * BASE_CELL_PX + (baseRows - 1) * GAP_PX;
 
   
-  // 2. Determine the available space for the game
-  const capW = window.innerWidth;
-  const capH = window.innerHeight;
+  const capW = Math.min(window.innerWidth * 1);
+  const capH = Math.min(window.innerHeight * 0.90, 900);
 
-  // 3. Calculate the global scale factor based on the entire viewport
-  // We want the whole game to fit, so we use the smaller of the two ratios (width or height)
-  const scaleX = capW / BASE_GAME_WIDTH;
-  const scaleY = capH / BASE_GAME_HEIGHT;
-  // The game is designed for a 9:16 aspect ratio (1080/1920).
-  // We use the smaller scale factor to ensure the whole game fits on screen.
-  globalScale = Math.min(scaleX, scaleY);
-  // Cap the scale at 1.0 to prevent upscaling on screens larger than the base resolution.
-  globalScale = Math.min(globalScale, 1.0);
-
-  // 4. Apply the global scale to the grid's wanted size
-  const scaledWantedW = wantedW * globalScale;
-  const scaledWantedH = wantedH * globalScale;
-
-  // 5. Calculate the final grid box size, ensuring it fits within the available space
-  // This part is a bit tricky because the original code seems to calculate a scale for the grid itself.
-  // Let's simplify: the grid container should be sized based on the scaled BASE_CELL_PX
   
-  // Recalculate the grid's scale based on the available space for the grid only (e.g., 90% of height)
-  const gridCapH = Math.min(window.innerHeight * 0.90, 900);
-  const gridScale = Math.min(capW / wantedW, gridCapH / wantedH, 1);
-  
-  // The original logic for grid scaling is fine, but we need to ensure the UI elements scale with `globalScale`.
-  // Let's keep the original grid scaling logic for the grid itself, but use the `globalScale` for the main game wrapper.
-  
-  // Reverting to original grid scaling logic for the grid container size:
-  const capW_orig = Math.min(window.innerWidth * 1);
-  const capH_orig = Math.min(window.innerHeight * 0.90, 900);
-  const scale_orig = Math.min(capW_orig / wantedW, capH_orig / wantedH, 1);
-  
-  gridBoxW = Math.floor(wantedW * scale_orig);
-  gridBoxH = Math.floor(wantedH * scale_orig);
+  const scale = Math.min(capW / wantedW, capH / wantedH, 1);
+  gridBoxW = Math.floor(wantedW * scale);
+  gridBoxH = Math.floor(wantedH * scale);
 
   
   container.style.setProperty('--grid-box-w', `${gridBoxW}px`);
   container.style.setProperty('--grid-box-h', `${gridBoxH}px`);
-  
-  // --- NEW: Set the global scale for the CSS to use ---
-  document.documentElement.style.setProperty('--global-scale', globalScale);
 }
 
 
@@ -212,15 +175,12 @@ const startButton = document.getElementById('start-game-btn');
 
 initGridBox();
 
-// --- NEW: Add event listener for window resize to re-calculate scale ---
-window.addEventListener('resize', () => {
-    initGridBox();
-    sizeGridBox(currentGridCols, currentGridRows);
-    // Re-position the main game wrapper if needed, though CSS should handle it
-});
 
-// The level display is now in index.html inside the scaled wrapper.
-const levelDisplay = document.getElementById('level-display');
+// Create the level display that shows what level you're on
+const levelDisplay = document.createElement('div');
+levelDisplay.id = 'level-display';
+levelDisplay.textContent = `Level ${level}`;
+document.body.appendChild(levelDisplay);
 
 
 // Update the health bars for player and enemy
@@ -249,8 +209,11 @@ function updateLevel() {
 }
 
 
-// The gold display is now in index.html inside the scaled wrapper.
-const goldDisplay = document.getElementById('gold-display');
+// Create the gold counter display
+const goldDisplay = document.createElement('div');
+goldDisplay.id = 'gold-display';
+goldDisplay.textContent = `💰 ${playerGold}`;
+document.body.appendChild(goldDisplay);
 
 
 // Refresh the gold counter in the HUD
@@ -391,982 +354,1645 @@ const ACHIEVEMENTS = [
     id: 'gold_digger',
     title: 'Gold Collector',
     desc: 'Accumulate gold across all runs',
-    thresholds: [1000, 5000, 10000, 25000],
+    thresholds: [500, 2000, 10000, 50000],
     getProgress: () => meta.totalGoldEarned
   },
   {
-    id: 'damage_dealer',
-    title: 'Damage Dealer',
-    desc: 'Deal damage across all runs',
-    thresholds: [10000, 50000, 100000, 250000],
-    getProgress: () => meta.totalDamageDealtAllRuns
-  },
-  {
-    id: 'tank',
-    title: 'Tank',
-    desc: 'Take damage across all runs',
-    thresholds: [5000, 25000, 50000, 100000],
-    getProgress: () => meta.totalDamageTakenAllRuns
-  },
-  {
-    id: 'tile_master',
-    title: 'Tile Master',
-    desc: 'Click tiles across all runs',
-    thresholds: [1000, 5000, 10000, 25000],
+    id: 'click_master',
+    title: 'Relentless Clicker',
+    desc: 'Click total tiles across all runs',
+    thresholds: [500, 2000, 8000, 25000],
     getProgress: () => meta.totalTilesClicked
   },
   {
-    id: 'level_climber',
-    title: 'Level Climber',
-    desc: 'Reach a high level in a single run',
-    thresholds: [10, 25, 50, 100],
-    getProgress: () => meta.highestLevel
-  }
+    id: 'heavy_hitter',
+    title: 'Heavy Hitter',
+    desc: 'Deal total damage across all runs',
+    thresholds: [2000, 10000, 50000, 200000],
+    getProgress: () => meta.totalDamageDealtAllRuns
+  },
+  {
+    id: 'survivor',
+    title: 'Survivor',
+    desc: 'Total damage taken across all runs (you lived!)',
+    thresholds: [2000, 10000, 50000, 200000],
+    getProgress: () => meta.totalDamageTakenAllRuns
+  },
 ];
 
 
-// Check if any achievement has been unlocked or upgraded
-function checkAchievements() {
-  ACHIEVEMENTS.forEach(ach => {
-    const progress = ach.getProgress();
-    let currentTier = meta.achievementTiers[ach.id] || -1;
+// Item rarity system - better items are rarer and cost more gold
+const RARITY = {
+  COMMON: { color: "#4CAF50", chance: 0.55 },
+  RARE: { color: "#2196F3", chance: 0.25 },
+  EPIC: { color: "#9C27B0", chance: 0.15 },
+  LEGENDARY: { color: "#FFD700", chance: 0.05 },
+};
 
-    for (let i = currentTier + 1; i < TIERS.length; i++) {
-      if (progress >= ach.thresholds[i]) {
-        meta.achievementTiers[ach.id] = i;
-        showAchievementToast(ach, TIERS[i]);
-        currentTier = i;
-      } else {
-        break;
-      }
+
+// How much each rarity tier costs in the shop
+const RARITY_COST = {
+  COMMON: 10,
+  RARE: 25,
+  EPIC: 50,
+  LEGENDARY: 100,
+};
+
+
+// The complete item database - all the items you can buy in the shop
+// Each item has different bonuses like extra damage, health, gold, etc.
+const allItems = [
+  
+  
+  
+  { id: "smallSword", name: "Small Sword", description: "Gain +1 Attack Square", rarity: RARITY.COMMON,
+    bonusAttackCount: 1, applyEffect() { playerAttackCount += 1; } },
+  { id: "leatherShield", name: "Leather Shield", description: "+20 Max HP", rarity: RARITY.COMMON,
+    bonusHP: 20, applyEffect() {} },
+  { id: "vitalLeaf", name: "Vital Leaf", description: "Heal +2 HP Per Attack Dealt", rarity: RARITY.COMMON,
+    healOnAttack: 2, applyEffect() {} },
+  { id: "tinyRing", name: "Tiny Lucky Ring", description: "5% Chance To Ignore Damage", rarity: RARITY.COMMON,
+    ignoreDamageChance: 0.05, applyEffect() {} },
+  { id: "scoutGem", name: "Scout Gem", description: "1 Attack Number Between 35–40", rarity: RARITY.COMMON,
+    range: [35, 40], applyEffect() {} },
+  { id: "steadyBoots", name: "Steady Boots", description: "Take -3 Damage", rarity: RARITY.COMMON,
+    damageReduction: 3, applyEffect() {} },
+  { id: "minorFocus", name: "Minor Focus", description: "Deal +5 Damage", rarity: RARITY.COMMON,
+    bonusDamage: 5, applyEffect() {} },
+  { id: "lightArmor", name: "Light Armor", description: "Heal +5 HP Per Round", rarity: RARITY.COMMON,
+    regenPerRound: 5, applyEffect() {} },
+  { id: "coinPouch", name: "Coin Pouch", description: "+1 Gold Per Square", rarity: RARITY.COMMON,
+    extraGoldPerTile: 1, applyEffect() {} },
+  { id: "minersMap", name: "Miner's Map", description: "+1 Gold Tiles", rarity: RARITY.COMMON,
+    extraGoldTiles: 1, applyEffect() {} },
+  { id: "streetTithe", name: "Street Tithe", description: "+5 Gold Per Level", rarity: RARITY.COMMON,
+    passiveGoldPerRound: 5, applyEffect() {} },
+  { id: "comboCharm", name: "Combo Charm", description: "Increases Combo +0.1", rarity: RARITY.COMMON,
+    comboBoost: 0.1, applyEffect() {} },
+  { id: "crudePotion", name: "Crude Potion", description: "Instantly heal 40 HP on purchase (repeatable)", rarity: RARITY.COMMON,
+    onPurchaseHeal: 40, repeatable: true, noInventory: true },
+  { id: "sturdyBuckle", name: "Sturdy Buckle", description: "+10 Max HP", rarity: RARITY.COMMON,
+    bonusHP: 10, applyEffect() {} },
+  { id: "whetstone", name: "Whetstone", description: "Deal +3 Damage", rarity: RARITY.COMMON,
+    bonusDamage: 3, applyEffect() {} },
+  { id: "woolCloak", name: "Wool Cloak", description: "Take -2 Damage", rarity: RARITY.COMMON,
+    damageReduction: 2, applyEffect() {} },
+  { id: "rabbitFoot", name: "Rabbit’s Foot", description: "2% Chance To Ignore Damage", rarity: RARITY.COMMON,
+    ignoreDamageChance: 0.02, applyEffect() {} },
+  { id: "trailMap", name: "Trail Map", description: "1 Attack Number Between 28–32", rarity: RARITY.COMMON,
+    range: [28, 32], applyEffect() {} },
+  { id: "quickstep", name: "Quickstep Anklet", description: "Combo Gain +0.1", rarity: RARITY.COMMON,
+    comboBoost: 0.1, applyEffect() {} },
+  { id: "sawbonesKit", name: "Sawbones Kit", description: "Heal +1 HP Per Attack Dealt", rarity: RARITY.COMMON,
+    healOnAttack: 1, applyEffect() {} },
+  { id: "campRations", name: "Camp Rations", description: "Heal +4 HP Per Round", rarity: RARITY.COMMON,
+    regenPerRound: 4, applyEffect() {} },
+  { id: "tinderSpark", name: "Tinder Spark", description: "1 Burn Per Square", rarity: RARITY.COMMON,
+    burnDamage: 1, applyEffect() {} },
+  { id: "purseStrings", name: "Purse Strings", description: "+1 Gold Per Square", rarity: RARITY.COMMON,
+    extraGoldPerTile: 1, applyEffect() {} },
+  { id: "scavengerSatchel", name: "Scavenger Satchel", description: "+1 Gold Tile", rarity: RARITY.COMMON,
+    extraGoldTiles: 1, applyEffect() {} },
+  { id: "streetTips", name: "Street Tips", description: "+3 Gold Per Level", rarity: RARITY.COMMON,
+    passiveGoldPerRound: 3, applyEffect() {} },
+  { id: "practiceBlade", name: "Practice Blade", description: "Gain +1 Attack Square", rarity: RARITY.COMMON,
+    bonusAttackCount: 1, applyEffect() { playerAttackCount += 1; } },
+  { id: "bandage", name: "Bandage", description: "Instantly heal 25 HP on purchase (repeatable)", rarity: RARITY.COMMON,
+    onPurchaseHeal: 25, repeatable: true, noInventory: true },
+  { id: "ironRations", name: "Iron Rations", description: "Instantly heal 35 HP on purchase (repeatable)", rarity: RARITY.COMMON,
+    onPurchaseHeal: 35, repeatable: true, noInventory: true },
+  { id: "barkShield", name: "Bark Shield", description: "+15 Max HP", rarity: RARITY.COMMON,
+    bonusHP: 15, applyEffect() {} },
+  { id: "paddedVambrace", name: "Padded Vambrace", description: "Take -1 Damage", rarity: RARITY.COMMON,
+    damageReduction: 1, applyEffect() {} },
+  { id: "clearMind", name: "Clear Mind", description: "Combo Gain +0.1", rarity: RARITY.COMMON,
+    comboBoost: 0.1, applyEffect() {} },
+  { id: "luckyPenny", name: "Lucky Penny", description: "3% Chance To Ignore Damage", rarity: RARITY.COMMON,
+    ignoreDamageChance: 0.03, applyEffect() {} },
+  { id: "lantern", name: "Miner’s Lantern", description: "1 Attack Number Between 41–45", rarity: RARITY.COMMON,
+    range: [41, 45], applyEffect() {} },
+  { id: "aloeSalve", name: "Aloe Salve", description: "Instantly heal 20 HP on purchase (repeatable)", rarity: RARITY.COMMON,
+    onPurchaseHeal: 20, repeatable: true, noInventory: true },
+  { id: "woodenHammer", name: "Wooden Hammer", description: "Deal +4 Damage", rarity: RARITY.COMMON,
+    bonusDamage: 4, applyEffect() {} },
+  { id: "corkCharm", name: "Cork Charm", description: "Take -1 Damage", rarity: RARITY.COMMON,
+    damageReduction: 1, applyEffect() {} },
+  { id: "copperRing", name: "Copper Ring", description: "+1 Gold Per Square", rarity: RARITY.COMMON,
+    extraGoldPerTile: 1, applyEffect() {} },
+  { id: "gamblerToken", name: "Gambler’s Token", description: "4% Chance To Ignore Damage", rarity: RARITY.COMMON,
+    ignoreDamageChance: 0.04, applyEffect() {} },
+  { id: "ashSmudge", name: "Ash Smudge", description: "1 Burn Per Square", rarity: RARITY.COMMON,
+    burnDamage: 1, applyEffect() {} },
+  { id: "threadbareCloak", name: "Threadbare Cloak", description: "Heal +3 HP Per Round", rarity: RARITY.COMMON,
+    regenPerRound: 3, applyEffect() {} },
+  { id: "brightTally", name: "Bright Tally", description: "1 Attack Number Between 12–16", rarity: RARITY.COMMON,
+    range: [12, 16], applyEffect() {} },
+  { id: "tinyTonic", name: "Tiny Tonic", description: "Instantly heal 15 HP on purchase (repeatable)", rarity: RARITY.COMMON,
+    onPurchaseHeal: 15, repeatable: true, noInventory: true },
+  { id: "spareBlade", name: "Spare Blade", description: "Gain +1 Attack Square", rarity: RARITY.COMMON,
+    bonusAttackCount: 1, applyEffect() { playerAttackCount += 1; } },
+  { id: "leadCharm", name: "Lead Charm", description: "Deal +2 Damage", rarity: RARITY.COMMON,
+    bonusDamage: 2, applyEffect() {} },
+
+  
+  
+  
+  { id: "ironSword", name: "Iron Sword", description: "Gain +2 Attack Squares", rarity: RARITY.RARE,
+    bonusAttackCount: 2, applyEffect() { playerAttackCount += 2; } },
+  { id: "ironShield", name: "Iron Shield", description: "+30 Max HP", rarity: RARITY.RARE,
+    bonusHP: 30, applyEffect() {} },
+  { id: "luckyRing", name: "Lucky Ring", description: "10% Chance To Ignore Damage", rarity: RARITY.RARE,
+    ignoreDamageChance: 0.1, applyEffect() {} },
+  { id: "bloodCharm", name: "Blood Charm", description: "Heal +5 HP Per Attack Dealt", rarity: RARITY.RARE,
+    healOnAttack: 5, applyEffect() {} },
+  { id: "radarGem", name: "Radar Gem", description: "1 Attack Number Between 20–25", rarity: RARITY.RARE,
+    range: [20, 25], applyEffect() {} },
+  { id: "strongBoots", name: "Strong Boots", description: "Take -5 Damage", rarity: RARITY.RARE,
+    damageReduction: 5, applyEffect() {} },
+  { id: "huntersRing", name: "Treasure Hunter's Ring", description: "+2 Gold Per Square", rarity: RARITY.RARE,
+    extraGoldPerTile: 2, applyEffect() {} },
+  { id: "prospectorsPick", name: "Prospector's Pick", description: "+2 Gold Tiles", rarity: RARITY.RARE,
+    extraGoldTiles: 2, applyEffect() {} },
+  { id: "guildStipend", name: "Guild Stipend", description: "+7 Gold Per Level", rarity: RARITY.RARE,
+    passiveGoldPerRound: 7, applyEffect() {} },
+  { id: "bronzeArmor", name: "Bronze Armor", description: "Heal +10 HP Per Round", rarity: RARITY.RARE,
+    regenPerRound: 10, applyEffect() {} },
+  { id: "flamePendant", name: "Flame Pendant", description: "Inflicts 1 Burn Per Square", rarity: RARITY.RARE,
+    burnDamage: 1, applyEffect() {} },
+  { id: "lifeAmulet", name: "Life Amulet", description: "Revive Once With 25% HP", rarity: RARITY.RARE,
+    reviveAtPercent: 0.25, applyEffect() {} },
+  { id: "steelEdge", name: "Steel Edge", description: "Deal +8 Damage", rarity: RARITY.RARE,
+    bonusDamage: 8, applyEffect() {} },
+  { id: "soldierMail", name: "Soldier’s Mail", description: "Take -6 Damage", rarity: RARITY.RARE,
+    damageReduction: 6, applyEffect() {} },
+  { id: "vigorCharm", name: "Vigor Charm", description: "Heal +3 HP Per Attack Dealt", rarity: RARITY.RARE,
+    healOnAttack: 3, applyEffect() {} },
+  { id: "eagleGem", name: "Eagle Gem", description: "1 Attack Number Between 18–22", rarity: RARITY.RARE,
+    range: [18, 22], applyEffect() {} },
+  { id: "guardianBand", name: "Guardian Band", description: "12% Chance To Ignore Damage", rarity: RARITY.RARE,
+    ignoreDamageChance: 0.12, applyEffect() {} },
+  { id: "warmCloak", name: "Warm Cloak", description: "Heal +8 HP Per Round", rarity: RARITY.RARE,
+    regenPerRound: 8, applyEffect() {} },
+  { id: "glowingBrand", name: "Glowing Brand", description: "2 Burn Per Square", rarity: RARITY.RARE,
+    burnDamage: 2, applyEffect() {} },
+  { id: "duelistGrip", name: "Duelist’s Grip", description: "Combo Gain +0.2", rarity: RARITY.RARE,
+    comboBoost: 0.2, applyEffect() {} },
+  { id: "steelBrooch", name: "Steel Brooch", description: "+25 Max HP", rarity: RARITY.RARE,
+    bonusHP: 25, applyEffect() {} },
+  { id: "silverPouch", name: "Silver Pouch", description: "+2 Gold Per Square", rarity: RARITY.RARE,
+    extraGoldPerTile: 2, applyEffect() {} },
+  { id: "townLedgers", name: "Town Ledgers", description: "+8 Gold Per Level", rarity: RARITY.RARE,
+    passiveGoldPerRound: 8, applyEffect() {} },
+  { id: "tealCompass", name: "Teal Compass", description: "+2 Gold Tiles", rarity: RARITY.RARE,
+    extraGoldTiles: 2, applyEffect() {} },
+  { id: "secondWind", name: "Second Wind", description: "Instantly heal 55 HP on purchase (repeatable)", rarity: RARITY.RARE,
+    onPurchaseHeal: 55, repeatable: true, noInventory: true },
+  { id: "honedEdge", name: "Honed Edge", description: "Gain +2 Attack Squares", rarity: RARITY.RARE,
+    bonusAttackCount: 2, applyEffect() { playerAttackCount += 2; } },
+  { id: "riverStone", name: "River Stone", description: "Take -4 Damage", rarity: RARITY.RARE,
+    damageReduction: 4, applyEffect() {} },
+  { id: "hunterSigil", name: "Hunter’s Sigil", description: "1 Attack Number Between 22–26", rarity: RARITY.RARE,
+    range: [22, 26], applyEffect() {} },
+  { id: "amberRing", name: "Amber Ring", description: "Combo Gain +0.2", rarity: RARITY.RARE,
+    comboBoost: 0.2, applyEffect() {} },
+  { id: "emberVial", name: "Ember Vial", description: "Instantly heal 25 HP on purchase (repeatable)", rarity: RARITY.RARE,
+    onPurchaseHeal: 25, repeatable: true, noInventory: true },
+  { id: "scoutCharm", name: "Scout’s Charm", description: "+20 Max HP & Heal +5/round", rarity: RARITY.RARE,
+    bonusHP: 20, regenPerRound: 5, applyEffect() {} },
+  { id: "strikeBelt", name: "Strike Belt", description: "Deal +6 Damage & +0.1 Combo", rarity: RARITY.RARE,
+    bonusDamage: 6, comboBoost: 0.1, applyEffect() {} },
+
+  
+  
+  
+  { id: "crystalSword", name: "Crystal Sword", description: "Gain +5 Attack Squares", rarity: RARITY.EPIC,
+    bonusAttackCount: 5, applyEffect() { playerAttackCount += 5; } },
+  { id: "holyCharm", name: "Holy Charm", description: "Heal +8 HP Per Attack Dealt", rarity: RARITY.EPIC,
+    healOnAttack: 8, applyEffect() {} },
+  { id: "divineRadar", name: "Divine Radar", description: "2 Attack Numbers Between 10–15", rarity: RARITY.EPIC,
+    range: [10, 15], safeNumbers: 2, applyEffect() {} },
+  { id: "adamantArmor", name: "Adamant Armor", description: "Take -10 Damage", rarity: RARITY.EPIC,
+    damageReduction: 10, applyEffect() {} },
+  { id: "focusTalisman", name: "Focus Talisman", description: "Deal +10 Damage", rarity: RARITY.EPIC,
+    bonusDamage: 10, applyEffect() {} },
+  { id: "fireBrand", name: "Firebrand", description: "Combo Gain +0.2 And 2 Burn per Square", rarity: RARITY.EPIC,
+    comboBoost: 0.2, burnDamage: 2, applyEffect() {} },
+  { id: "goldenTouch", name: "Golden Touch", description: "+3 Gold Per Square", rarity: RARITY.EPIC,
+    extraGoldPerTile: 3, applyEffect() {} },
+  { id: "royalCharter", name: "Royal Charter", description: "+10 Gold Per Level", rarity: RARITY.EPIC,
+    passiveGoldPerRound: 10, applyEffect() {} },
+  { id: "gildedCompass", name: "Gilded Compass", description: "+3 Gold Tiles", rarity: RARITY.EPIC,
+    extraGoldTiles: 3, applyEffect() {} },
+  { id: "swiftCharm", name: "Swift Charm", description: "Gain +1 Attack Square & +0.1 Combo Gain", rarity: RARITY.EPIC,
+    bonusAttackCount: 1, comboBoost: 0.1, applyEffect() { playerAttackCount += 1; } },
+  { id: "runedBlade", name: "Runed Blade", description: "Gain +3 Attack Squares & +8 Damage", rarity: RARITY.EPIC,
+    bonusAttackCount: 3, bonusDamage: 8, applyEffect() { playerAttackCount += 3; } },
+  { id: "titanPlate", name: "Titan Plate", description: "Take -12 Damage", rarity: RARITY.EPIC,
+    damageReduction: 12, applyEffect() {} },
+  { id: "vampTalisman", name: "Vampiric Talisman", description: "Heal +10 HP Per Attack Dealt", rarity: RARITY.EPIC,
+    healOnAttack: 10, applyEffect() {} },
+  { id: "seerStone", name: "Seer Stone", description: "2 Attack Numbers Between 8–12", rarity: RARITY.EPIC,
+    range: [8, 12], safeNumbers: 2, applyEffect() {} },
+  { id: "stormBand", name: "Storm Band", description: "Combo Gain +0.3", rarity: RARITY.EPIC,
+    comboBoost: 0.3, applyEffect() {} },
+  { id: "pyreHeart", name: "Pyre Heart", description: "3 Burn Per Square", rarity: RARITY.EPIC,
+    burnDamage: 3, applyEffect() {} },
+  { id: "kingsPurse", name: "King’s Purse", description: "+4 Gold Per Square", rarity: RARITY.EPIC,
+    extraGoldPerTile: 4, applyEffect() {} },
+  { id: "royalDecree", name: "Royal Decree", description: "+12 Gold Per Level", rarity: RARITY.EPIC,
+    passiveGoldPerRound: 12, applyEffect() {} },
+  { id: "orienteerKit", name: "Orienteer Kit", description: "+4 Gold Tiles", rarity: RARITY.EPIC,
+    extraGoldTiles: 4, applyEffect() {} },
+  { id: "ironWill", name: "Iron Will", description: "+40 Max HP & Heal +8/round", rarity: RARITY.EPIC,
+    bonusHP: 40, regenPerRound: 8, applyEffect() {} },
+
+  
+  
+  
+  { id: "phoenixHeart", name: "Phoenix Heart", description: "Revive Once With 100% HP", rarity: RARITY.LEGENDARY,
+    reviveAtPercent: 1, applyEffect() {} },
+  { id: "infernoSoul", name: "Inferno Soul", description: "Combo Gain +0.3 And 3 Burn Per Square", rarity: RARITY.LEGENDARY,
+    comboBoost: 0.3, burnDamage: 3, applyEffect() {} },
+  { id: "godblade", name: "Godblade", description: "Gain +5 Attack Squares, Deal +10 Damage", rarity: RARITY.LEGENDARY,
+    bonusAttackCount: 5, bonusDamage: 10, applyEffect() { playerAttackCount += 5; } },
+  { id: "omnigem", name: "Omni Gem", description: "5 Attack Numbers Between 1–10", rarity: RARITY.LEGENDARY,
+    range: [1, 10], safeNumbers: 5, applyEffect() {} },
+  { id: "heavySword", name: "Heavy Sword", description: "Combo Gain +0.5", rarity: RARITY.LEGENDARY,
+    comboBoost: 0.5, applyEffect() {} },
+  { id: "emberCore", name: "Ember Core", description: "5 Burn Per Square", rarity: RARITY.LEGENDARY,
+    burnDamage: 5, applyEffect() {} },
+  { id: "dragonsHoard", name: "Dragon's Hoard", description: "+5 Gold Per Square & +2 Gold Tiles", rarity: RARITY.LEGENDARY,
+    extraGoldPerTile: 5, extraGoldTiles: 2, applyEffect() {} },
+  { id: "ancientBank", name: "Bank of the Ancients", description: "+20 Gold Per Level", rarity: RARITY.LEGENDARY,
+    passiveGoldPerRound: 20, applyEffect() {} },
+  { id: "secondLife", name: "Second Life", description: "Revive Once With 50% HP", rarity: RARITY.LEGENDARY,
+    reviveAtPercent: 0.5, applyEffect() {} },
+  { id: "blazingCrown", name: "Blazing Crown", description: "4 Burn Per Square & +0.2 Combo", rarity: RARITY.LEGENDARY,
+    burnDamage: 4, comboBoost: 0.2, applyEffect() {} },
+  { id: "warDrum", name: "War Drum", description: "Gain +4 Attack Squares", rarity: RARITY.LEGENDARY,
+    bonusAttackCount: 4, applyEffect() { playerAttackCount += 4; } },
+  { id: "goldenSceptre", name: "Golden Sceptre", description: "+6 Gold Per Square & +2 Gold Tiles", rarity: RARITY.LEGENDARY,
+    extraGoldPerTile: 6, extraGoldTiles: 2, applyEffect() {} },
+  { id: "colossusHeart", name: "Colossus Heart", description: "+80 Max HP & Heal +12/round", rarity: RARITY.LEGENDARY,
+    bonusHP: 80, regenPerRound: 12, applyEffect() {} },
+];
+
+
+// Helper to get random unique numbers for tile placement
+function getRandomUniqueNumbers(count, max, exclude = []) {
+  const numbers = new Set();
+  while (numbers.size < count) {
+    const randomNum = Math.floor(Math.random() * max) + 1;
+    if (!exclude.includes(randomNum)) numbers.add(randomNum);
+  }
+  return Array.from(numbers);
+}
+
+
+// Calculate gold bonuses from items
+function getGoldStats() {
+  const s = getPlayerStats();
+  return {
+    extraGoldPerTile: s.extraGoldPerTile || 0,
+    extraGoldTiles: s.extraGoldTiles || 0,
+    passiveGoldPerRound: s.passiveGoldPerRound || 0,
+  };
+}
+
+let playerAttackNumbers = [];
+let enemyAttackNumbers = [];
+
+const hero = createCharacter(
+  'hero',
+  ['assets/ready_1.png', 'assets/ready_2.png', 'assets/ready_3.png'],
+  ['assets/attack_2.png', 'assets/attack_4.png', 'assets/attack_6.png'],
+  ['assets/death_1.png', 'assets/death_2.png', 'assets/death_3.png'],
+  '.hero-container'
+);
+
+const enemy = createCharacter(
+  'enemy',
+  ['assets/eReady_1.png', 'assets/eReady_2.png', 'assets/eReady_3.png'],
+  ['assets/eAttack_2.png', 'assets/eAttack_4.png', 'assets/eAttack_6.png'],
+  ['assets/eDeath_1.png', 'assets/eDeath_2.png', 'assets/eDeath_3.png'],
+  '.enemy-container'
+);
+
+updateHealth();
+updateLevel();
+
+
+// This is where the actual combat happens
+// Calculates damage, applies healing, handles combos, etc.
+function applyPassiveItemEffectsOnAttack(isPlayerAttack) {
+  const stats = getPlayerStats();
+
+  if (isPlayerAttack) {
+    
+    let totalDamage = (20 + (stats.bonusDamage || 0)) * playerCombo;
+    totalDamage = Math.round(totalDamage); 
+
+    enemyHealth = Math.max(0, enemyHealth - totalDamage);
+    totalDamageDealt += totalDamage;
+    meta.totalDamageDealtAllRuns += totalDamage;
+    metaUpdated();
+
+    
+    if (stats.healOnAttack > 0) {
+      const healAmount = Math.round(stats.healOnAttack);
+      playerHealth = Math.min(playerHealth + healAmount, getPlayerMaxHealth());
+      showHitPopup(true, `+${healAmount}`, true);
+      totalHealingDone += healAmount;
     }
-  });
-}
 
+    
+    showHitPopup(false, `-${totalDamage}`);
 
-// Show a small notification when an achievement is unlocked
-function showAchievementToast(ach, tier) {
-  const container = document.getElementById('achievement-toast-container');
-  const toast = document.createElement('div');
-  toast.className = 'achievement-toast';
-  toast.innerHTML = `
-    <span class="achievement-tier" style="color: ${tier.color};">${tier.name}</span>
-    <span class="achievement-title">${ach.title} Unlocked!</span>
-  `;
-  container.appendChild(toast);
+    
+    if (playerCombo > 1.0) showComboPopup(true);
 
-  // Remove the toast after a few seconds
-  setTimeout(() => {
-    toast.classList.add('fade-out');
-    toast.addEventListener('transitionend', () => toast.remove());
-  }, 5000);
-}
+    
+    playerCombo = Math.min(playerCombo + COMBO_STEP + (stats.comboBoost || 0), MAX_COMBO);
+    enemyCombo = 1.0;
 
+    updateHealth();
 
-// Save the meta progression to localStorage
-function metaUpdated() {
-  localStorage.setItem(SAVE_KEY_META, JSON.stringify(meta));
-  checkAchievements();
-}
+  } else {
+    
+    let baseEnemyDamage = (10 + enemyBonusDamage) * (isBossLevel ? BOSS_MULTIPLIER.damage : 1);
+    let totalDamage = baseEnemyDamage * enemyCombo;
+    totalDamage = Math.round(totalDamage);
+    totalDamage -= Math.round(stats.damageReduction || 0);
 
+    
+    if (totalDamage < 0) totalDamage = 0;
 
-// Load the meta progression from localStorage
-function loadMeta() {
-  const savedMeta = localStorage.getItem(SAVE_KEY_META);
-  if (savedMeta) {
-    meta = JSON.parse(savedMeta);
+    
+    if (Math.random() < (stats.ignoreDamageChance || 0)) {
+      showHitPopup(true, "MISS");
+      enemyCombo = 1.0;
+      updateHealth();
+      return;
+    }
+
+    
+    playerHealth = Math.max(0, playerHealth - totalDamage);
+    totalDamageTaken += totalDamage;
+    meta.totalDamageTakenAllRuns += totalDamage;
+    metaUpdated();
+
+    showHitPopup(true, `-${totalDamage}`);
+
+    if (enemyCombo > 1.0) showComboPopup(false);
+
+    enemyCombo = Math.min(enemyCombo + COMBO_STEP, MAX_COMBO);
+    playerCombo = 1.0;
+
+    updateHealth();
   }
 }
 
+window.addEventListener('resize', () => {
+  initGridBox(); 
+  sizeGridBox(currentGridCols, currentGridRows);
+});
 
-// Save the current game state (run) to localStorage
-function saveGame() {
-  const gameState = {
+
+// Build the grid of tiles for the current level
+// Randomly places attack tiles, gold tiles, and neutral tiles
+// Also sets up click handlers for each tile
+function buildGrid() {
+  let currentCols = cols;
+  let currentRows = rows;
+  let totalCells  = currentCols * currentRows;
+
+  const goldExtras = getGoldStats().extraGoldTiles || 0;
+  const requiredCells = playerAttackCount + enemyAttackCount + (GOLD_TILES_PER_ROUND + goldExtras) + 5;
+
+  let addedCols = 0;
+  while (totalCells < requiredCells) {
+    currentCols++;
+    addedCols++;
+    if (addedCols >= 3) { currentRows++; addedCols = 0; }
+    totalCells = currentCols * currentRows;
+  }
+
+  currentGridCols = currentCols;
+  currentGridRows = currentRows;
+
+  sizeGridBox(currentCols, currentRows);
+
+  container.innerHTML = '';
+  container.classList.remove('grid-grow');
+  void container.offsetWidth; 
+
+  container.classList.add('grid-grow');
+
+  playerAttackNumbers = getRandomUniqueNumbers(playerAttackCount, totalCells);
+  enemyAttackNumbers  = getRandomUniqueNumbers(enemyAttackCount,  totalCells, playerAttackNumbers);
+
+  const taken = new Set([...playerAttackNumbers, ...enemyAttackNumbers]);
+  playerItems
+    .filter(i => i.range)
+    .forEach(i => {
+      const [min, max] = i.range;
+      const rangeNums = Array.from({ length: max - min + 1 }, (_, x) => min + x);
+      const available = rangeNums.filter(n => !taken.has(n) && n >= 1 && n <= totalCells);
+      const count = i.safeNumbers || 1;
+
+      for (let k = 0; k < Math.min(count, available.length); k++) {
+        const idx = Math.floor(Math.random() * available.length);
+        const n = available.splice(idx, 1)[0];
+        playerAttackNumbers.push(n);
+        taken.add(n);
+      }
+    });
+
+  
+  const pool = [];
+  for (let i = 1; i <= totalCells; i++) if (!taken.has(i)) pool.push(i);
+
+  const gstats = getGoldStats();
+  const goldCount = Math.min(GOLD_TILES_PER_ROUND + (gstats.extraGoldTiles || 0), pool.length);
+  const goldNumbers = [];
+  while (goldNumbers.length < goldCount && pool.length > 0) {
+    const i = Math.floor(Math.random() * pool.length);
+    goldNumbers.push(pool.splice(i, 1)[0]);
+  }
+
+  
+  let number = 1;
+  for (let r = 0; r < currentRows; r++) {
+    for (let c = 0; c < currentCols; c++) {
+      if (number > totalCells) break;
+
+      const cell = document.createElement('div');
+      cell.className = 'grid-item';
+      cell.textContent = number;
+
+      
+      cell.addEventListener('click', () => {
+
+        meta.totalTilesClicked++;
+        metaUpdated();
+
+        if (cell.classList.contains('clicked') || gameOver || isPaused) return;
+
+        cell.classList.add('clicked');
+        const cellNumber = parseInt(cell.textContent, 10);
+        cell.classList.remove('safe-range');
+
+        if (enemyAttackNumbers.includes(cellNumber)) {
+          cell.classList.add('eAttack');
+          enemy.playAttack();
+          applyPassiveItemEffectsOnAttack(false);
+
+        } else if (playerAttackNumbers.includes(cellNumber)) {
+          cell.classList.add('attack');
+          hero.playAttack();
+          applyPassiveItemEffectsOnAttack(true);
+
+        } else if (goldNumbers.includes(cellNumber)) {
+          cell.classList.add('gold');
+          const gstats = getGoldStats();
+          const gain = GOLD_PER_TILE + (gstats.extraGoldPerTile || 0);
+          playerGold += gain;
+          meta.totalGoldEarned += gain;
+          metaUpdated();
+
+          updateGoldEverywhere();
+          showHitPopup(true, `+${gain}🪙`, true);
+          playerCombo = 1.0;
+          enemyCombo = 1.0;        
+
+        } else {
+          cell.classList.add('active');
+          playerCombo = 1.0;
+          enemyCombo = 1.0;
+        }
+
+        
+        applyBurnEffect();
+
+        
+        resolveDeaths();
+      });
+
+      container.appendChild(cell);
+      number++;
+    }
+  }
+
+  
+  const gridItems = container.querySelectorAll('.grid-item');
+  playerItems
+    .filter(i => i.range)
+    .forEach(i => {
+      const [min, max] = i.range;
+      gridItems.forEach(cell => {
+        const num = parseInt(cell.textContent);
+        if (num >= min && num <= max) cell.classList.add('safe-range');
+      });
+    });
+
+  saveRun();
+}
+
+
+// Convert item IDs back into full item objects (used when loading a saved game)
+function itemsFromIds(ids) {
+  const byId = new Map(allItems.map(i => [i.id, i]));
+  return (ids || [])
+    .map(id => byId.get(id))
+    .filter(Boolean);
+}
+
+
+// Recalculate all stats when items change
+function recomputeDerivedStats() {
+  
+  const bonusAtt = playerItems.reduce((a, i) => a + (i.bonusAttackCount || 0), 0);
+  playerAttackCount = BASE_PLAYER_ATTACK_COUNT + bonusAtt;
+  
+  playerMaxHealth = getPlayerMaxHealth();
+  enemyMaxHealth = getEnemyMaxHealth() + enemyBonusHealth;
+}
+
+
+// Save the current run to localStorage so you can continue later
+function saveRun() {
+  const data = {
+    level,
+    gameOver,
+    isBossLevel,
+    enemyBonusHealth,
+    enemyBonusDamage,
     playerHealth,
     enemyHealth,
-    playerMaxHealth,
-    enemyMaxHealth,
-    playerCombo,
-    enemyCombo,
-    level,
-    playerItems,
+    playerAttackCount,
+    enemyAttackCount,
     playerGold,
+    playerItems: playerItems.map(i => i.id),
     totalDamageDealt,
     totalDamageTaken,
     totalHealingDone,
     revivesUsed,
-    endlessMode,
-    enemyBonusHealth,
-    enemyBonusDamage,
-    isBossLevel,
-    currentGridCols,
-    currentGridRows,
+    playerCombo,
+    enemyCombo,
+    endlessMode,          
   };
-  localStorage.setItem(SAVE_KEY_RUN, JSON.stringify(gameState));
+  try { localStorage.setItem(SAVE_KEY_RUN, JSON.stringify(data)); } catch(e) {}
 }
 
 
-// Load the game state from localStorage
-function loadGame() {
-  const savedGame = localStorage.getItem(SAVE_KEY_RUN);
-  if (savedGame) {
-    const gameState = JSON.parse(savedGame);
-    playerHealth = gameState.playerHealth;
-    enemyHealth = gameState.enemyHealth;
-    playerMaxHealth = gameState.playerMaxHealth;
-    enemyMaxHealth = gameState.enemyMaxHealth;
-    playerCombo = gameState.playerCombo;
-    enemyCombo = gameState.enemyCombo;
-    level = gameState.level;
-    playerItems = gameState.playerItems;
-    playerGold = gameState.playerGold;
-    totalDamageDealt = gameState.totalDamageDealt;
-    totalDamageTaken = gameState.totalDamageTaken;
-    totalHealingDone = gameState.totalHealingDone;
-    revivesUsed = gameState.revivesUsed;
-    endlessMode = gameState.endlessMode;
-    enemyBonusHealth = gameState.enemyBonusHealth;
-    enemyBonusDamage = gameState.enemyBonusDamage;
-    isBossLevel = gameState.isBossLevel;
-    currentGridCols = gameState.currentGridCols;
-    currentGridRows = gameState.currentGridRows;
+// Load a saved run from localStorage
+function loadRun() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY_RUN);
+    if (!raw) return false;
+    const d = JSON.parse(raw);
 
-    // Update UI elements after loading
+    level = d.level ?? 1;
+    gameOver = !!d.gameOver;
+    isBossLevel = !!d.isBossLevel;
+    enemyBonusHealth = d.enemyBonusHealth || 0;
+    enemyBonusDamage = d.enemyBonusDamage || 0;
+    playerGold = d.playerGold || 0;
+    playerItems = itemsFromIds(d.playerItems);
+    endlessMode = !!d.endlessMode;
+
+    
+    playerAttackCount = d.playerAttackCount ?? BASE_PLAYER_ATTACK_COUNT;
+    enemyAttackCount  = d.enemyAttackCount  ?? BASE_ENEMY_ATTACK_COUNT;
+
+    recomputeDerivedStats();
+
+    playerHealth = Math.min(d.playerHealth ?? playerMaxHealth, playerMaxHealth);
+    enemyMaxHealth = getEnemyMaxHealth() + enemyBonusHealth;
+    enemyHealth = Math.min(d.enemyHealth ?? enemyMaxHealth, enemyMaxHealth);
+
+    totalDamageDealt = d.totalDamageDealt || 0;
+    totalDamageTaken = d.totalDamageTaken || 0;
+    totalHealingDone = d.totalHealingDone || 0;
+    revivesUsed = d.revivesUsed || 0;
+
+    playerCombo = d.playerCombo ?? 1.0;
+    enemyCombo  = d.enemyCombo  ?? 1.0;
+
+    
+    updateGoldEverywhere();
     updateHealth();
     updateLevel();
-    updateGoldDisplay();
-    // Re-initialize the grid size based on loaded state
-    initGridBox(currentGridCols, currentGridRows);
-    sizeGridBox(currentGridCols, currentGridRows);
-    
+    hero.playIdle();
+    enemy.playIdle();
+    buildGrid();
+
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+
+// Save meta progression (achievements, total stats)
+function saveMeta() {
+  try { localStorage.setItem(SAVE_KEY_META, JSON.stringify(meta)); } catch(e) {}
+}
+
+
+// Called whenever meta stats change - saves and checks for new achievements
+function metaUpdated() {
+  checkAchievementUnlocks();
+  saveMeta();
+}
+
+
+// Load meta progression from localStorage
+function loadMeta() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY_META);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    meta = { ...meta, ...d };
+    if (!meta.achievementTiers) meta.achievementTiers = {}; 
+  } catch(e) {}
+}
+
+
+function createCharacter(id, idleFrames, attackFrames, deathFrames, containerSelector, speed = 250) {
+  const el = document.getElementById(id);
+  const container = document.querySelector(containerSelector);
+  let frameIndex = 0;
+  let animInterval = null;
+
+  const character = {
+    idleFrames,
+    attackFrames,
+    deathFrames,
+    currentFrames: idleFrames,
+
+    playAnimation(loop = true) {
+      clearInterval(animInterval);
+      frameIndex = 0;
+      const frames = character.currentFrames;
+      animInterval = setInterval(() => {
+        frameIndex++;
+        if (!loop && frameIndex >= frames.length - 1) {
+          frameIndex = frames.length - 1;
+          el.src = frames[frameIndex];
+          clearInterval(animInterval);
+          return;
+        }
+        frameIndex = frameIndex % frames.length;
+        el.src = frames[frameIndex];
+      }, speed);
+    },
+
+    playIdle() {
+      character.currentFrames = character.idleFrames;
+      character.playAnimation(true);
+    },
+    playAttack() {
+      character.currentFrames = character.attackFrames;
+      character.playAnimation(true);
+      container.classList.add('attacking');
+      setTimeout(() => {
+        container.classList.remove('attacking');
+        character.playIdle();
+      }, 600);
+    },
+    playDeath() {
+      character.currentFrames = character.deathFrames;
+      character.playAnimation(false);
+    }
+  };
+
+  character.playIdle();
+  return character;
+}
+
+
+// Check if anyone died and show the appropriate screen
+function resolveDeaths() {
+  if (gameOver) return true;
+
+  
+  if (playerHealth <= 0) {
+    const revived = tryRevive();
+    if (revived) revivesUsed++;
+  }
+
+  updateHealth();
+
+  
+  if (playerHealth <= 0 && enemyHealth <= 0) {
+    playerHealth = 0;
+    hero.playDeath();
+    showEndScreen(false);
+    saveRun();
+    return true;
+  }
+  if (playerHealth <= 0) {
+    playerHealth = 0;
+    hero.playDeath();
+    showEndScreen(false);
+    saveRun();
+    return true;
+  }
+  if (enemyHealth <= 0) {
+    enemyHealth = 0;
+    enemy.playDeath();
+    showEndScreen(true);
+    saveRun();
     return true;
   }
   return false;
 }
 
 
-// Clear the saved game state
-function clearGameSave() {
-  localStorage.removeItem(SAVE_KEY_RUN);
-}
+function tryRevive() {
+  const reviveItemIndex = playerItems.findIndex(i => i.reviveAtPercent);
 
+  if (reviveItemIndex === -1) return false; 
 
-// The core data structure for a single tile on the grid
-class Tile {
-  constructor(index, type, value = 0) {
-    this.index = index;
-    this.type = type; // 'attack', 'eAttack', 'gold', 'blank'
-    this.value = value;
-    this.element = null; // HTML element reference
-    this.clicked = false;
-  }
-}
+  const reviveItem = playerItems[reviveItemIndex];
+  const revivePercent = reviveItem.reviveAtPercent;
 
-let grid = []; // Array to hold all the Tile objects
-let currentRoundTiles = []; // Tiles for the current round
-let isPlayerTurn = true; // Flag to track whose turn it is
-let isProcessingClick = false; // Prevent double-clicks
-
-// Item definitions
-const ITEMS = [
-  {
-    id: 'small_sword',
-    name: 'Small Sword',
-    desc: '+5 Damage',
-    rarity: 'Common',
-    cost: 100,
-    bonusDamage: 5,
-  },
-  {
-    id: 'leather_armor',
-    name: 'Leather Armor',
-    desc: '5% Damage Reduction',
-    rarity: 'Common',
-    cost: 150,
-    damageReduction: 0.05,
-  },
-  {
-    id: 'healing_potion',
-    name: 'Healing Potion',
-    desc: '+1 HP on every attack',
-    rarity: 'Rare',
-    cost: 300,
-    healOnAttack: 1,
-  },
-  {
-    id: 'lucky_charm',
-    name: 'Lucky Charm',
-    desc: '10% chance to ignore enemy damage',
-    rarity: 'Rare',
-    cost: 400,
-    ignoreDamageChance: 0.1,
-  },
-  {
-    id: 'gold_magnet',
-    name: 'Gold Magnet',
-    desc: '+1 Gold per Gold Tile',
-    rarity: 'Common',
-    cost: 50,
-    extraGoldPerTile: 1,
-  },
-  {
-    id: 'fire_ring',
-    name: 'Ring of Fire',
-    desc: 'Applies 5 Burn Damage per round',
-    rarity: 'Epic',
-    cost: 800,
-    burnDamage: 5,
-  },
-  {
-    id: 'revive_feather',
-    name: 'Phoenix Feather',
-    desc: 'Automatically revives you once per run',
-    rarity: 'Legendary',
-    cost: 1500,
-    revive: true,
-  },
-  {
-    id: 'health_amulet',
-    name: 'Amulet of Vitality',
-    desc: '+25 Max HP',
-    rarity: 'Rare',
-    cost: 500,
-    bonusHP: 25,
-  },
-  {
-    id: 'combo_glove',
-    name: 'Combo Glove',
-    desc: 'Combo increases by 0.3 instead of 0.2',
-    rarity: 'Epic',
-    cost: 700,
-    comboBoost: 0.1, // Adds 0.1 to the base 0.2
-  },
-  {
-    id: 'gold_pouch',
-    name: 'Gold Pouch',
-    desc: '+10 Passive Gold per round',
-    rarity: 'Common',
-    cost: 100,
-    passiveGoldPerRound: 10,
-  },
-  {
-    id: 'extra_gold_map',
-    name: 'Treasure Map',
-    desc: '+1 Extra Gold Tile per round',
-    rarity: 'Rare',
-    cost: 350,
-    extraGoldTiles: 1,
-  }
-];
-
-
-// Helper to get an item by its ID
-function getItemById(id) {
-  return ITEMS.find(item => item.id === id);
-}
-
-
-// Add an item to the player's inventory
-function addItem(item) {
-  playerItems.push(item);
-  playerMaxHealth = getPlayerMaxHealth();
+  
+  playerHealth = Math.floor(getPlayerMaxHealth() * revivePercent);
   updateHealth();
-  updateInventoryDisplay();
-  saveGame();
+
+  
+  playerItems.splice(reviveItemIndex, 1);
+
+  
+  const revivePopup = document.createElement("div");
+  revivePopup.className = "revive-popup";
+  revivePopup.textContent = `${reviveItem.name} activated!`;
+  document.body.appendChild(revivePopup);
+  setTimeout(() => revivePopup.remove(), 1500);
+
+  return true;
 }
 
 
-// Update the inventory panel content
-function updateInventoryDisplay() {
-  const panel = document.getElementById('inventory-panel');
-  panel.innerHTML = ''; // Clear previous content
+function checkGameOver() {
+  if (gameOver) return;
 
-  if (playerItems.length === 0) {
-    panel.innerHTML = '<p>Inventory is empty.</p>';
-    return;
-  }
-
-  const list = document.createElement('ul');
-  playerItems.forEach(item => {
-    const listItem = document.createElement('li');
-    listItem.className = `rarity-${item.rarity.toLowerCase()}`;
-    listItem.innerHTML = `<strong>${item.name}</strong>: ${item.desc}`;
-    list.appendChild(listItem);
-  });
-  panel.appendChild(list);
-}
-
-
-// Show the shop popup
-function showShop() {
-  const shopScreen = document.getElementById('shop-screen');
-  const shopItemsContainer = document.getElementById('shop-items');
-  shopItemsContainer.innerHTML = ''; // Clear previous items
-
-  // Get 3 random items that the player doesn't already have (unless they are stackable)
-  const availableItems = ITEMS.filter(item => {
-    // Check if the item is already owned and if it's a unique item (like revive)
-    const isOwned = playerItems.some(ownedItem => ownedItem.id === item.id);
-    if (item.revive && isOwned) return false; // Only one revive feather
-    return true;
-  });
-
-  // Simple random selection (can be improved with rarity weighting)
-  const shopSelection = [];
-  while (shopSelection.length < 3 && availableItems.length > 0) {
-    const randomIndex = Math.floor(Math.random() * availableItems.length);
-    const item = availableItems.splice(randomIndex, 1)[0];
-    shopSelection.push(item);
-  }
-
-  shopSelection.forEach(item => {
-    const itemEl = document.createElement('div');
-    itemEl.className = `shop-item rarity-${item.rarity.toLowerCase()}`;
-    itemEl.innerHTML = `
-      <h3>${item.name}</h3>
-      <p>${item.desc}</p>
-      <button data-cost="${item.cost}" data-item-id="${item.id}">Buy (${item.cost} 💰)</button>
-    `;
-    shopItemsContainer.appendChild(itemEl);
-  });
-
-  shopScreen.style.display = 'flex';
-  currentShopPopup = shopScreen;
-  updateGoldEverywhere(); // Update gold display and button states
-}
-
-
-// Handle buying an item from the shop
-document.addEventListener('click', (e) => {
-  if (e.target.matches('#shop-items button')) {
-    const button = e.target;
-    const cost = Number(button.dataset.cost);
-    const itemId = button.dataset.itemId;
-
-    if (playerGold >= cost) {
-      playerGold -= cost;
-      const item = getItemById(itemId);
-      addItem(item);
-      button.textContent = 'Purchased!';
-      button.dataset.purchased = '1';
-      updateGoldEverywhere();
-    }
-  }
-});
-
-
-// Hide the shop and continue the game
-document.getElementById('continue-game-btn').addEventListener('click', () => {
-  document.getElementById('shop-screen').style.display = 'none';
-  currentShopPopup = null;
-  startRound();
-});
-
-
-// Handle the pause button
-document.getElementById('pause-btn').addEventListener('click', togglePause);
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    togglePause();
-  }
-});
-
-function togglePause() {
-  const pauseScreen = document.getElementById('pause-screen');
-  if (pauseScreen.style.display === 'flex') {
-    pauseScreen.style.display = 'none';
-    // Resume game logic (if any)
-  } else {
-    pauseScreen.style.display = 'flex';
-    // Pause game logic (if any)
-  }
-}
-
-
-// Create the initial grid structure (but don't populate tiles yet)
-function createGrid() {
-  container.innerHTML = ''; // Clear existing grid
-  grid = [];
-  
-  // Set the number of columns and rows for the CSS grid
-  container.style.gridTemplateColumns = `repeat(${currentGridCols}, var(--cell-size))`;
-  
-  for (let i = 0; i < currentGridCols * currentGridRows; i++) {
-    const tile = new Tile(i, 'blank');
-    grid.push(tile);
-
-    const cell = document.createElement('div');
-    cell.className = 'grid-item';
-    cell.dataset.index = i;
-    cell.addEventListener('click', handleTileClick);
-    
-    tile.element = cell;
-    container.appendChild(cell);
-  }
-  
-  // Trigger the grow-in animation
-  setTimeout(() => container.classList.add('grid-grow'), 50);
-}
-
-
-// Populate the grid with tiles for the current round
-function populateGrid() {
-  // Reset all tiles to blank
-  grid.forEach(tile => {
-    tile.type = 'blank';
-    tile.value = 0;
-    tile.clicked = false;
-    tile.element.className = 'grid-item'; // Reset classes
-    tile.element.textContent = ''; // Clear text
-  });
-
-  // Calculate the number of tiles to spawn
-  const stats = getPlayerStats();
-  const playerTiles = playerAttackCount + stats.bonusDamage;
-  const enemyTiles = enemyAttackCount;
-  const goldTiles = GOLD_TILES_PER_ROUND + stats.extraGoldTiles;
-  
-  // Create a list of all tile types to place
-  const tileTypes = [];
-  for (let i = 0; i < playerTiles; i++) tileTypes.push('attack');
-  for (let i = 0; i < enemyTiles; i++) tileTypes.push('eAttack');
-  for (let i = 0; i < goldTiles; i++) tileTypes.push('gold');
-  
-  // Shuffle the tile types
-  for (let i = tileTypes.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [tileTypes[i], tileTypes[j]] = [tileTypes[j], tileTypes[i]];
-  }
-  
-  // Place the tiles on the grid
-  currentRoundTiles = [];
-  const availableIndices = Array.from({ length: grid.length }, (_, i) => i);
-  
-  tileTypes.forEach(type => {
-    if (availableIndices.length === 0) return; // Grid is full
-
-    const randomIndex = Math.floor(Math.random() * availableIndices.length);
-    const gridIndex = availableIndices.splice(randomIndex, 1)[0];
-    
-    const tile = grid[gridIndex];
-    tile.type = type;
-    tile.element.classList.add(type);
-    currentRoundTiles.push(tile);
-  });
-  
-  // Add safe numbers to the grid
-  // This is a placeholder for the item logic that adds safe numbers
-  // For now, let's just add a safe number to a random blank tile
-  const blankTiles = grid.filter(t => t.type === 'blank');
-  if (blankTiles.length > 0) {
-    const safeTile = blankTiles[Math.floor(Math.random() * blankTiles.length)];
-    safeTile.value = 3; // Example: 3 safe squares
-    safeTile.element.textContent = safeTile.value;
-    safeTile.element.classList.add('safe-range');
-  }
-  
-  isPlayerTurn = true;
-  isProcessingClick = false;
-}
-
-
-// Handle a tile click event
-function handleTileClick(e) {
-  if (gameOver || !isPlayerTurn || isProcessingClick) return;
-
-  const index = Number(e.currentTarget.dataset.index);
-  const tile = grid[index];
-
-  if (tile.clicked) return;
-
-  isProcessingClick = true;
-  tile.clicked = true;
-  tile.element.classList.add('active');
-  meta.totalTilesClicked++;
-  metaUpdated();
-
-  switch (tile.type) {
-    case 'attack':
-      handlePlayerAttack(tile);
-      break;
-    case 'eAttack':
-      handleEnemyAttack(tile);
-      break;
-    case 'gold':
-      handleGoldTile(tile);
-      break;
-    case 'blank':
-      handleBlankTile(tile);
-      break;
-  }
-  
-  // After processing, check for game end conditions
-  if (playerHealth <= 0 || enemyHealth <= 0) {
-    endGame();
-    return;
-  }
-
-  // Check if all tiles have been clicked
-  if (grid.every(t => t.clicked)) {
-    endRound();
-    return;
-  }
-
-  // Allow the next click after a short delay
-  setTimeout(() => {
-    isProcessingClick = false;
-  }, 300);
-}
-
-
-// Player hits an attack tile
-function handlePlayerAttack(tile) {
-  const stats = getPlayerStats();
-  const baseDamage = 10;
-  let damage = Math.round((baseDamage + stats.bonusDamage) * playerCombo);
-  
-  // Apply combo boost
-  playerCombo = Math.min(MAX_COMBO, playerCombo + COMBO_STEP + stats.comboBoost);
-  
-  // Deal damage
-  enemyHealth = Math.max(0, enemyHealth - damage);
-  totalDamageDealt += damage;
-  meta.totalDamageDealtAllRuns += damage;
-  metaUpdated();
-  
-  // Heal on attack
-  if (stats.healOnAttack > 0) {
-    playerHealth = Math.min(playerMaxHealth, playerHealth + stats.healOnAttack);
-    totalHealingDone += stats.healOnAttack;
-    showHitPopup(true, `+${stats.healOnAttack}`, true);
-  }
-  
-  // Visual feedback
-  showHitPopup(false, `-${damage}`);
-  
-  // Animate hero attack
-  const heroEl = document.querySelector('.hero-container');
-  heroEl.classList.add('attacking');
-  setTimeout(() => heroEl.classList.remove('attacking'), 600);
-  
-  updateHealth();
-}
-
-
-// Player hits an enemy attack tile
-function handleEnemyAttack(tile) {
-  const stats = getPlayerStats();
-  const baseDamage = 15;
-  let damage = Math.round(baseDamage * enemyCombo);
-  
-  // Apply damage reduction
-  damage = Math.round(damage * (1 - stats.damageReduction));
-  
-  // Check for ignore damage chance
-  if (Math.random() < stats.ignoreDamageChance) {
-    damage = 0;
-    showHitPopup(true, 'MISS', false);
-  }
-  
-  // Reset player combo
-  playerCombo = 1.0;
-  
-  // Take damage
-  playerHealth = Math.max(0, playerHealth - damage);
-  totalDamageTaken += damage;
-  meta.totalDamageTakenAllRuns += damage;
-  metaUpdated();
-  
-  // Visual feedback
-  showHitPopup(true, `-${damage}`);
-  
-  // Animate enemy attack
-  const enemyEl = document.querySelector('.enemy-container');
-  enemyEl.classList.add('attacking');
-  setTimeout(() => enemyEl.classList.remove('attacking'), 600);
-  
-  updateHealth();
-}
-
-
-// Player hits a gold tile
-function handleGoldTile(tile) {
-  const stats = getPlayerStats();
-  const gold = GOLD_PER_TILE + stats.extraGoldPerTile;
-  playerGold += gold;
-  meta.totalGoldEarned += gold;
-  metaUpdated();
-  
-  // Reset player combo
-  playerCombo = 1.0;
-  
-  // Visual feedback
-  showHitPopup(true, `+${gold} 💰`, true);
-  
-  updateGoldDisplay();
-}
-
-
-// Player hits a blank tile
-function handleBlankTile(tile) {
-  // Reset player combo
-  playerCombo = 1.0;
-  
-  // Handle safe number logic
-  if (tile.value > 0) {
-    // Reveal nearby tiles
-    revealNearbyTiles(tile.index, tile.value);
-    tile.element.textContent = '';
-    tile.element.classList.remove('safe-range');
-  }
-  
-  // Visual feedback
-  showHitPopup(true, 'Safe', true);
-}
-
-
-// Reveal a number of unclicked tiles around the safe tile
-function revealNearbyTiles(centerIndex, count) {
-  const indices = [];
-  const centerCol = centerIndex % currentGridCols;
-  const centerRow = Math.floor(centerIndex / currentGridCols);
-  
-  // Get all 8 neighbors
-  for (let r = -1; r <= 1; r++) {
-    for (let c = -1; c <= 1; c++) {
-      if (r === 0 && c === 0) continue;
-      
-      const newRow = centerRow + r;
-      const newCol = centerCol + c;
-      
-      if (newRow >= 0 && newRow < currentGridRows && newCol >= 0 && newCol < currentGridCols) {
-        const index = newRow * currentGridCols + newCol;
-        if (grid[index] && !grid[index].clicked) {
-          indices.push(index);
-        }
-      }
-    }
-  }
-  
-  // Shuffle and select 'count' number of tiles to reveal
-  for (let i = indices.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [indices[i], indices[j]] = [indices[j], indices[i]];
-  }
-  
-  const tilesToReveal = indices.slice(0, count);
-  
-  tilesToReveal.forEach(index => {
-    const tile = grid[index];
-    tile.element.classList.add('revealed');
-    // Show the tile type temporarily
-    tile.element.textContent = getTileSymbol(tile.type);
-    
-    setTimeout(() => {
-      tile.element.classList.remove('revealed');
-      tile.element.textContent = '';
-    }, 1000);
-  });
-}
-
-
-// Helper to get a symbol for a tile type
-function getTileSymbol(type) {
-  switch (type) {
-    case 'attack': return '⚔️';
-    case 'eAttack': return '💥';
-    case 'gold': return '💰';
-    default: return '';
-  }
-}
-
-
-// Show a floating damage/heal/gold popup
-function showHitPopup(isPlayer, text, isPositive = false) {
-  const containerEl = isPlayer ? document.querySelector('.hero-container') : document.querySelector('.enemy-container');
-  const popup = document.createElement('div');
-  popup.className = `hit-popup ${isPositive ? 'positive' : 'negative'}`;
-  popup.textContent = text;
-  
-  // Position the popup relative to the character container
-  const rect = containerEl.getBoundingClientRect();
-  popup.style.left = `${rect.left + rect.width / 2}px`;
-  popup.style.top = `${rect.top}px`;
-  
-  document.body.appendChild(popup);
-  
-  // Animate and remove
-  setTimeout(() => {
-    popup.classList.add('fade-out');
-    popup.addEventListener('transitionend', () => popup.remove());
-  }, 1000);
-}
-
-
-// End of the current round (all tiles clicked)
-function endRound() {
-  // Apply passive effects (burn, regen, passive gold)
-  let enemyDiedFromBurn = applyBurnEffect();
-  if (enemyDiedFromBurn) {
-    endGame();
-    return;
-  }
-  
-  const stats = getPlayerStats();
-  
-  // Regen
-  playerHealth = Math.min(playerMaxHealth, playerHealth + stats.regenPerRound);
-  updateHealth();
-  
-  // Passive Gold
-  playerGold += stats.passiveGoldPerRound;
-  meta.totalGoldEarned += stats.passiveGoldPerRound;
-  metaUpdated();
-  updateGoldDisplay();
-  
-  // Advance to the next level
-  level++;
-  updateLevel();
-  
-  // Check for boss level
-  isBossLevel = level % 10 === 0;
-  
-  // Show shop every 5 levels (or after a boss)
-  if (level % 5 === 1 || isBossLevel) {
-    showShop();
-  } else {
-    // Start the next round immediately
-    startRound();
-  }
-  
-  saveGame();
-}
-
-
-// Start a new round (new level)
-function startRound() {
-  // Reset enemy health and stats
-  enemyMaxHealth = getEnemyMaxHealth();
-  enemyHealth = enemyMaxHealth;
-  enemyCombo = 1.0;
-  
-  // Increase enemy difficulty based on level
-  enemyBonusHealth = Math.floor(level / 5) * 10;
-  enemyBonusDamage = Math.floor(level / 10) * 5;
-  
-  // Apply boss multiplier
-  if (isBossLevel) {
-    enemyMaxHealth = Math.round(enemyMaxHealth * BOSS_MULTIPLIER.health);
-    enemyHealth = enemyMaxHealth;
-    enemyBonusDamage = Math.round(enemyBonusDamage * BOSS_MULTIPLIER.damage);
-    // Update enemy sprite to boss
-    document.getElementById('enemy').src = bossSprites.idle[0];
-    document.querySelector('.enemy-health-fill').classList.add('boss-health');
-  } else {
-    // Reset enemy sprite
-    document.getElementById('enemy').src = 'assets/eReady_1.png';
-    document.querySelector('.enemy-health-fill').classList.remove('boss-health');
-  }
-  
-  updateHealth();
-  
-  // Populate the grid with new tiles
-  populateGrid();
-}
-
-
-// Game over or victory
-function endGame() {
-  gameOver = true;
-  clearGameSave();
-  
-  const endScreen = document.getElementById('end-screen');
-  const titleEl = document.getElementById('end-screen-title');
-  const messageEl = document.getElementById('end-screen-message');
-  
   if (playerHealth <= 0) {
-    // Check for revive item
-    const reviveItem = playerItems.find(item => item.revive && revivesUsed === 0);
-    if (reviveItem) {
+    
+    if (tryRevive()) {
       revivesUsed++;
-      playerHealth = playerMaxHealth; // Full heal
-      gameOver = false; // Continue game
-      updateHealth();
-      showHitPopup(true, 'REVIVED!', true);
-      // Remove the revive item from inventory display
-      updateInventoryDisplay();
-      // Allow the game to continue
-      setTimeout(() => {
-        isProcessingClick = false;
-      }, 500);
       return;
     }
-    
-    // Actual Game Over
-    titleEl.textContent = 'Game Over';
-    messageEl.innerHTML = `
-      You were defeated at <strong>Level ${level}</strong>.
-      <br>
-      Damage Dealt: ${totalDamageDealt}
-      <br>
-      Damage Taken: ${totalDamageTaken}
-      <br>
-      Gold Earned: ${playerGold}
-    `;
+    playerHealth = 0;
+    updateHealth();
+    hero.playDeath();
+    showEndScreen(false);
   } else if (enemyHealth <= 0) {
-    // Victory
-    titleEl.textContent = 'VICTORY!';
-    messageEl.innerHTML = `
-      You defeated the enemy at <strong>Level ${level}</strong>!
-      <br>
-      You earned <strong>${playerGold}</strong> gold this run.
+    enemyHealth = 0;
+    updateHealth();
+    enemy.playDeath();
+    showEndScreen(true);
+  }
+}
+
+
+function getDynamicRarityChances(level) {
+  
+  const progress = Math.min(level / 50, 1);
+
+  return {
+    COMMON: 0.55 - 0.20 * progress,    
+    RARE: 0.25 + 0.10 * progress,      
+    EPIC: 0.15 + 0.05 * progress,      
+    LEGENDARY: 0.05 + 0.05 * progress, 
+  };
+}
+
+
+// Build the shop interface with all available items
+// Groups items by rarity and handles purchasing
+function buildShopUI(intoPopup) {
+  currentShopPopup = intoPopup;
+
+  
+  const chances = getDynamicRarityChances(level);
+
+  const available = allItems.filter(item => {
+    
+    if (item.repeatable) return true;
+    
+    return !playerItems.some(pi => pi.id === item.id);
+  });
+
+  const weightedPool = available.flatMap(item => {
+    let rarityChance = 0.01;
+    if (item.rarity === RARITY.COMMON) rarityChance = chances.COMMON;
+    else if (item.rarity === RARITY.RARE) rarityChance = chances.RARE;
+    else if (item.rarity === RARITY.EPIC) rarityChance = chances.EPIC;
+    else if (item.rarity === RARITY.LEGENDARY) rarityChance = chances.LEGENDARY;
+    return Array(Math.max(1, Math.floor(rarityChance * 100))).fill(item);
+  });
+
+  
+  const shopChoices = [];
+  const chosenIds = new Set();
+  const count = Math.min(5, available.length);
+
+  let attempts = 0;
+  while (shopChoices.length < count && weightedPool.length > 0 && attempts < 1000) {
+    const idx = Math.floor(Math.random() * weightedPool.length);
+    const candidate = weightedPool[idx];
+    if (!chosenIds.has(candidate.id)) {
+      chosenIds.add(candidate.id);
+      shopChoices.push(candidate);
+      
+      for (let i = weightedPool.length - 1; i >= 0; i--) {
+        if (weightedPool[i].id === candidate.id) weightedPool.splice(i, 1);
+      }
+    }
+    attempts++;
+  }
+
+  const itemContainer = intoPopup.querySelector('#shop-items');
+  itemContainer.innerHTML = "";
+
+  if (shopChoices.length === 0) {
+    const msg = document.createElement('p');
+    msg.textContent = "No items available.";
+    itemContainer.appendChild(msg);
+    return;
+  }
+
+  
+  const rarityOrder = ["COMMON", "RARE", "EPIC", "LEGENDARY"];
+  shopChoices.sort((a, b) => {
+    const ra = rarityOrder.indexOf(Object.keys(RARITY).find(k => RARITY[k] === a.rarity));
+    const rb = rarityOrder.indexOf(Object.keys(RARITY).find(k => RARITY[k] === b.rarity));
+    return ra - rb;
+  });
+
+  shopChoices.forEach(item => {
+    const rarityKey = Object.keys(RARITY).find(k => RARITY[k] === item.rarity);
+    const cost = (rarityKey && RARITY_COST[rarityKey]) || 10;
+
+    const div = document.createElement('div');
+    div.className = 'shop-item';
+    div.style.borderColor = item.rarity.color;
+
+    const repeatableBadge = item.repeatable ? `<div style="font-size:14px;color:#ffd54f;margin-top:6px;">Repeatable</div>` : ``;
+
+    div.innerHTML = `
+      <strong style="color:${item.rarity.color}; font-size:28px;">${item.name}</strong>
+      <p style="font-size:18px; margin:10px 0;">${item.description}</p>
+      ${repeatableBadge}
+      <p style="font-size:20px; color:gold;">Cost: ${cost}💰</p>
     `;
+
+    div.addEventListener('click', () => {
+      
+      if (!item.repeatable && div.classList.contains('purchased')) return;
+
+      if (playerGold < cost) return;
+
+      
+      playerGold -= cost;
+
+      
+      if (item.onPurchaseHeal) {
+        const heal = Math.round(Number(item.onPurchaseHeal));
+        if (heal > 0) {
+          playerHealth = Math.min(getPlayerMaxHealth(), playerHealth + heal);
+          updateHealth();
+          showHitPopup(true, `+${heal}`, true);
+        }
+      }
+
+      
+      if (!item.repeatable && !item.noInventory) {
+        playerItems.push(item);
+        item.applyEffect?.();
+        div.classList.add('purchased');
+        div.innerHTML = `
+          <strong style="color:${item.rarity.color}; font-size:28px;">${item.name}</strong>
+          <p>Purchased!</p>
+          <p style="font-size:20px; color:gold;">Cost: ${cost}💰</p>
+        `;
+      }
+
+      
+      if (item.repeatable || item.noInventory) {
+        item.applyEffect?.(); 
+        
+        div.style.transform = 'scale(1.08)';
+        setTimeout(() => (div.style.transform = ''), 120);
+      }
+
+      updateGoldEverywhere();
+    });
+
+    itemContainer.appendChild(div);
+  });
+
+  updateGoldEverywhere();
+  saveRun();
+}
+
+const achievementsBtn = document.getElementById('achievements-btn');
+const achievementsScreen = document.getElementById('achievements-screen');
+const achievementsBackBtn = document.getElementById('achievements-back-btn');
+const achievementsContent = document.getElementById('achievements-content');
+
+
+// Figure out what achievement tier you've reached based on progress
+function getTier(progress, thresholds) {
+  let tierIdx = -1;
+  for (let i = 0; i < thresholds.length; i++) {
+    if (progress >= thresholds[i]) tierIdx = i;
+  }
+  return tierIdx; 
+}
+
+
+// Show a toast notification when you unlock an achievement
+function showAchievementPopup(achievement, tierIdx) {
+  const tier = TIERS[tierIdx];
+
+  
+  let container = document.getElementById('achievement-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'achievement-toast-container';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = 'achievement-toast';
+
+  toast.style.borderColor = tier.color;
+
+  toast.innerHTML = `
+    <div class="achievement-toast-title">🏆 Achievement Unlocked!</div>
+    <div class="achievement-toast-name">${achievement.title}</div>
+    <div class="achievement-toast-tier" style="color:${tier.color};">
+      ${tier.name} Tier
+    </div>
+  `;
+
+  container.appendChild(toast);
+
+  
+  setTimeout(() => {
+    toast.classList.add('hide');
+    setTimeout(() => toast.remove(), 400);
+  }, 2600);
+}
+
+
+// Check if any achievements were just unlocked
+function checkAchievementUnlocks() {
+  ACHIEVEMENTS.forEach(a => {
+    const progress = a.getProgress();
+    const tierIdx = getTier(progress, a.thresholds); 
+    if (tierIdx < 0) return;
+
+    const prevTier = meta.achievementTiers[a.id] ?? -1;
+
+    
+    if (tierIdx > prevTier) {
+      if (!meta.achievementTiers) meta.achievementTiers = {};
+      meta.achievementTiers[a.id] = tierIdx;
+      showAchievementPopup(a, tierIdx);
+    }
+  });
+}
+
+
+// Render the achievements screen with progress bars
+function renderAchievements() {
+  achievementsContent.innerHTML = '';
+  ACHIEVEMENTS.forEach(a => {
+    const progress = a.getProgress();
+    const tierIdx = getTier(progress, a.thresholds);
+    const nextTarget =
+      tierIdx < a.thresholds.length - 1
+        ? a.thresholds[tierIdx + 1]
+        : a.thresholds[a.thresholds.length - 1];  
+    const currentTarget = tierIdx >= 0 ? a.thresholds[tierIdx] : 0;
+
+    const denom = (tierIdx < a.thresholds.length - 1) ? (nextTarget - currentTarget) : 1;
+    const numer = (tierIdx < a.thresholds.length - 1) ? (progress - currentTarget) : 1;
+    const pct = Math.max(0, Math.min(100, Math.floor((numer / denom) * 100)));
+
+    const tierName = tierIdx >= 0 ? TIERS[tierIdx].name : 'None';
+    const tierColor = tierIdx >= 0 ? TIERS[tierIdx].color : '#bbb';
+
+    const el = document.createElement('div');
+    el.className = 'achievement-card';
+    el.innerHTML = `
+      <h3>${a.title}</h3>
+      <div class="achievement-tier" style="color:${tierColor};">Tier: ${tierName}</div>
+      <div style="font-size:20px;opacity:0.9;">${a.desc}</div>
+      <div style="font-size:18px;margin-top:6px;">
+        Progress: ${progress} / ${nextTarget}
+      </div>
+      <div class="achievement-progress">
+        <div class="achievement-progress-fill" style="width:${pct}%;"></div>
+      </div>
+    `;
+
+    
+    if (tierIdx >= 0) {
+      el.style.borderColor = tierColor;
+      el.style.boxShadow = `0 0 18px 4px ${tierColor}55`;
+    } else {
+      
+      el.style.borderColor = '#ffffff';
+      el.style.boxShadow = '0 0 10px 2px rgba(255,255,255,0.2)';
+    }
+
+    achievementsContent.appendChild(el);
+  });
+}
+
+achievementsBtn.addEventListener('click', () => {
+  mainMenu.classList.add("menu-fade-out");
+  achievementsScreen.style.display = "flex";
+  achievementsScreen.classList.add("menu-fade-in");
+  setTimeout(() => {
+    mainMenu.style.display = "none";
+    mainMenu.classList.remove("menu-fade-out");
+    achievementsScreen.classList.remove("menu-fade-in");
+  }, 400);
+  renderAchievements();
+});
+
+achievementsBackBtn.addEventListener('click', () => {
+  achievementsScreen.classList.add("menu-fade-out");
+  mainMenu.style.display = "flex";
+  mainMenu.classList.add("menu-fade-in");
+  setTimeout(() => {
+    achievementsScreen.style.display = "none";
+    achievementsScreen.classList.remove("menu-fade-out");
+    mainMenu.classList.remove("menu-fade-in");
+  }, 500);
+});
+
+
+// Show the end screen when you win/lose or complete a level
+// Handles the shop, continue button, retry, etc.
+function showEndScreen(playerWon) {
+  if (gameOver) return;
+  gameOver = true;
+
+  const popup = document.createElement('div');
+  popup.className = 'end-screen';
+
+  if (!playerWon) {
+    
+    popup.innerHTML = `
+      <div class="end-screen-content">
+        <h1>Game Over</h1>
+        <p>You reached <strong>Level ${level}</strong></p>
+        <h2 style="margin-top:40px;">🏹 Run Summary</h2>
+        <p>
+          ❤️ Max Health: ${getPlayerMaxHealth()}<br>
+          ⚔️ Attack Squares: ${playerAttackCount}<br>
+          💥 Total Damage Dealt: ${totalDamageDealt}<br>
+          💢 Total Damage Taken: ${totalDamageTaken}<br>
+          🌀 Combo Gain: +${(getPlayerStats().comboBoost || 0).toFixed(1)} / hit<br>
+          💚 Total Healing Done: ${totalHealingDone}<br>
+          🔁 Revives Used: ${revivesUsed}<br>
+          🧩 Items Collected: ${playerItems.length}
+        </p>
+        <br>
+        <button id="retry-btn">Retry</button>
+        <br><br>
+        <button id="main-menu-btn">Main Menu</button>
+      </div>
+    `;
+    document.body.appendChild(popup);
+
+    document.getElementById('retry-btn').addEventListener('click', () => {
+      popup.remove();
+      resetGame();
+      nextLevel();
+    });
+
+  } else {
+    
+
     
     if (isBossLevel) {
+      const bossReward = 50;
+      playerGold += bossReward;
+      updateGoldEverywhere();
       meta.bossesDefeated++;
       metaUpdated();
     }
-    
-    if (level >= 100) {
+
+const runCompleted = (!endlessMode && level >= 100);
+
+    if (runCompleted) {
+      
       meta.wins++;
       metaUpdated();
-      endlessMode = true;
-      messageEl.innerHTML += '<br>You have entered <strong>Endless Mode</strong>!';
+
+      const summaryHtml = `
+        ❤️ Max Health: ${getPlayerMaxHealth()}<br>
+        ⚔️ Attack Squares: ${playerAttackCount}<br>
+        💥 Total Damage Dealt: ${totalDamageDealt}<br>
+        💢 Total Damage Taken: ${totalDamageTaken}<br>
+        💚 Total Healing Done: ${totalHealingDone}<br>
+        🔁 Revives Used: ${revivesUsed}<br>
+        🧩 Items Collected: ${playerItems.length}<br>
+        🏆 Total Wins: ${meta.wins}
+      `;
+
+      popup.innerHTML = `
+        <div class="end-screen-content">
+          <h1>🏆 Run Complete!</h1>
+          <p>You reached <strong>Level 100</strong>. Amazing!</p>
+          <h2 style="margin-top:24px;">📊 Run Summary</h2>
+          <p>${summaryHtml}</p>
+
+          <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;">
+            <button id="continue-endless-btn">Continue (Endless)</button>
+            <button id="new-run-btn">New Run</button>
+            <button id="main-menu-btn">Main Menu</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(popup);
+
+      popup.querySelector('#continue-endless-btn').addEventListener('click', () => {
+        popup.remove();
+        currentShopPopup = null;
+        endlessMode = true;          
+        level++;                     
+        enemyAttackCount += 1;
+        if (level % 2 === 0) playerAttackCount += 1;
+        saveRun();
+        nextLevel();
+      });
+
+      
+      popup.querySelector('#new-run-btn').addEventListener('click', () => {
+        popup.remove();
+        currentShopPopup = null;
+        startNewRun();
+      });
+
+    } else {
+      
+      popup.innerHTML = `
+        <div class="end-screen-content">
+          <h1>You Win!</h1>
+          <p>Level ${level} cleared. Spend your gold, then continue.</p>
+
+          <p>You have <strong style="color:gold;">💰 <span id="shop-gold">${playerGold}</span></strong></p>
+          <div id="shop-items"></div>
+
+          <br>
+          <button id="continue-btn">Continue</button>
+          <br><br>
+          <button id="main-menu-btn">Main Menu</button>
+        </div>
+      `;
+      document.body.appendChild(popup);
+
+      buildShopUI(popup);
+
+      popup.querySelector('#continue-btn').addEventListener('click', () => {
+        popup.remove();
+        currentShopPopup = null;
+        level++;
+        enemyAttackCount += 1;
+        if (level % 2 === 0) playerAttackCount += 1;
+        saveRun();
+        nextLevel();
+      });
     }
   }
+
   
-  endScreen.style.display = 'flex';
+  const mainMenuBtn = document.getElementById('main-menu-btn');
+  if (mainMenuBtn) {
+    mainMenuBtn.addEventListener('click', () => {
+      const confirmPopup = document.createElement('div');
+      confirmPopup.className = 'end-screen';
+      confirmPopup.innerHTML = `
+        <div class="end-screen-content">
+          <h1>Return to Main Menu?</h1>
+          <p>Your current run will be lost.</p>
+          <div style="display:flex;gap:30px;justify-content:center;margin-top:20px;">
+            <button id="confirm-main-menu-yes">Yes</button>
+            <button id="confirm-main-menu-no" style="background:#E53935;">Cancel</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(confirmPopup);
+
+      document.getElementById('confirm-main-menu-yes').addEventListener('click', () => {
+        confirmPopup.remove();
+        popup.remove();
+        mainMenu.style.display = 'flex';
+        container.innerHTML = '';
+        localStorage.removeItem(SAVE_KEY_RUN);
+        resetGame();
+      });
+
+      document.getElementById('confirm-main-menu-no').addEventListener('click', () => {
+        confirmPopup.remove();
+      });
+    });
+  }
 }
 
+const pauseBtn = document.getElementById("pause-btn");
+let isPaused = false;
 
-// Start a new game
-function startGame() {
-  // Reset all game state variables
-  playerHealth = BASE_PLAYER_HEALTH_COUNT;
-  enemyHealth = BASE_ENEMY_HEALTH_COUNT;
-  playerMaxHealth = BASE_PLAYER_HEALTH_COUNT;
-  enemyMaxHealth = BASE_ENEMY_HEALTH_COUNT;
+
+// Show the pause menu with your inventory and stats
+function showPauseMenu() {
+  if (gameOver || isPaused) return; 
+  isPaused = true;
+
+  const pausePopup = document.createElement('div');
+  pausePopup.className = 'end-screen'; 
+  pausePopup.innerHTML = `
+    <div class="end-screen-content">
+      <h1>Game Paused</h1>
+      <p>Take a breather before continuing your dungeon battle.</p>
+      <button id="resume-btn">Resume</button>
+      <br><br>
+      <button id="pause-main-menu-btn">Main Menu</button>
+    </div>
+  `;
+  document.body.appendChild(pausePopup);
+
+  
+  document.getElementById('resume-btn').addEventListener('click', () => {
+    pausePopup.remove();
+    isPaused = false;
+  });
+
+  
+  document.getElementById('pause-main-menu-btn').addEventListener('click', () => {
+    const confirmPopup = document.createElement('div');
+    confirmPopup.className = 'end-screen';
+    confirmPopup.innerHTML = `
+      <div class="end-screen-content">
+        <h1>Return to Main Menu?</h1>
+        <p>Your current run will be lost.</p>
+        <div style="display:flex;gap:30px;justify-content:center;margin-top:20px;">
+          <button id="confirm-main-menu-yes">Yes</button>
+          <button id="confirm-main-menu-no" style="background:#E53935;">Cancel</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(confirmPopup);
+
+    document.getElementById('confirm-main-menu-yes').addEventListener('click', () => {
+      confirmPopup.remove();
+      pausePopup.remove();
+      isPaused = false;
+      mainMenu.style.display = 'flex';
+      container.innerHTML = '';
+      localStorage.removeItem(SAVE_KEY_RUN);
+      resetGame();
+    });
+
+    document.getElementById('confirm-main-menu-no').addEventListener('click', () => {
+      confirmPopup.remove();
+    });
+  });
+}
+
+pauseBtn.addEventListener('click', showPauseMenu);
+
+
+// Move to the next level - check for bosses, scale enemy, rebuild grid
+function nextLevel() {
+  gameOver = false;
+
   playerCombo = 1.0;
   enemyCombo = 1.0;
-  level = 1;
-  gameOver = false;
+  
+  
+  const gstats = getGoldStats();
+  if (gstats.passiveGoldPerRound > 0) {
+    playerGold += gstats.passiveGoldPerRound;
+    meta.totalGoldEarned += gstats.passiveGoldPerRound;
+    metaUpdated();
+    updateGoldEverywhere();
+  }
+
+  
+  isBossLevel = (level % 10 === 0);
+
+  
+  
+  if (level >= 5 && (level - 5) % 10 === 0) {
+    enemyBonusHealth += 25;
+  }
+
+  
+  if ((level - 1) % 10 === 0 && level > 10) {
+    enemyBonusDamage += 5;
+  }
+
+  
+  const stats = getPlayerStats();
+
+  
+  playerMaxHealth = getPlayerMaxHealth();
+  enemyMaxHealth = getEnemyMaxHealth() + enemyBonusHealth;
+
+  if (isBossLevel) {
+    
+    enemyMaxHealth *= BOSS_MULTIPLIER.health;
+    enemyHealth = enemyMaxHealth;
+
+    
+    enemy.idleFrames = bossSprites.idle;
+    enemy.attackFrames = bossSprites.attack;
+    enemy.deathFrames = bossSprites.death;
+    enemy.playIdle();
+
+    
+    const bossPopup = document.createElement("div");
+    bossPopup.className = "revive-popup";
+    bossPopup.style.background = "rgba(200, 0, 0, 0.9)";
+    bossPopup.style.color = "white";
+    bossPopup.textContent = "⚔️ Boss Appears!";
+    document.body.appendChild(bossPopup);
+    setTimeout(() => bossPopup.remove(), 2000);
+
+    
+    document.querySelector('.enemy-health-fill').style.boxShadow = "0 0 25px #ff0000";
+  } else {
+    
+    enemyHealth = enemyMaxHealth;
+
+    enemy.idleFrames = ['assets/eReady_1.png', 'assets/eReady_2.png', 'assets/eReady_3.png'];
+    enemy.attackFrames = ['assets/eAttack_2.png', 'assets/eAttack_4.png', 'assets/eAttack_6.png'];
+    enemy.deathFrames = ['assets/eDeath_1.png', 'assets/eDeath_2.png', 'assets/eDeath_3.png'];
+    enemy.playIdle();
+
+    
+    document.querySelector('.enemy-health-fill').style.boxShadow = "none";
+  }
+
+  
+  playerHealth = Math.min(playerMaxHealth, playerHealth + stats.regenPerRound);
+
+  updateHealth();
+  updateLevel();
+
+  hero.playIdle();
+  enemy.playIdle();
+  buildGrid();
+}
+
+startButton.addEventListener("click", () => {
+  const buttons = document.querySelector("#main-menu .menu-buttons");
+  buttons.style.opacity = "0";
+  buttons.style.pointerEvents = "none";
+  mainMenu.classList.add("menu-zoom-out");
+
+  setTimeout(() => {
+    mainMenu.style.display = "none";
+    mainMenu.classList.remove("menu-zoom-out");
+    buttons.style.opacity = "1";
+    buttons.style.pointerEvents = "auto";
+
+    
+    if (!loadRun()) {
+      startNewRun();
+    }
+  }, 1200);
+});
+
+
+// Reset everything back to starting values for a new run
+function resetGame() {
   playerItems = [];
   playerGold = 0;
+  updateGoldEverywhere();
+
+  level = 1;
   totalDamageDealt = 0;
   totalDamageTaken = 0;
   totalHealingDone = 0;
   revivesUsed = 0;
-  endlessMode = false;
   enemyBonusHealth = 0;
   enemyBonusDamage = 0;
-  isBossLevel = false;
-  currentGridCols = cols;
-  currentGridRows = rows;
-  
+  playerAttackCount = BASE_PLAYER_ATTACK_COUNT;
+  enemyAttackCount = BASE_ENEMY_ATTACK_COUNT;
+  playerHealth = getPlayerMaxHealth();
+  enemyHealth = getEnemyMaxHealth();
+
+  endlessMode = false;  
+
+  updateHealth();
+  updateLevel();
+  gameOver = false;
+
+  playerCombo = 1.0;
+  enemyCombo = 1.0;
+}
+
+
+// Start a fresh run from level 1
+function startNewRun() {
+  resetGame();
   meta.runsStarted++;
   metaUpdated();
+  saveRun();      
+  nextLevel();
+}
+
+const inventoryButton = document.getElementById('inventory-button');
+const inventoryPanel = document.getElementById('inventory-panel');
+
+
+function updateInventoryPanel() {
   
-  // Hide all screens
-  document.getElementById('main-menu').style.display = 'none';
-  document.getElementById('end-screen').style.display = 'none';
-  document.getElementById('how-to-play-screen').style.display = 'none';
-  document.getElementById('achievements-screen').style.display = 'none';
+  const displayableItems = playerItems.filter(i => i.name && i.description);
+
+  if (displayableItems.length === 0) {
+    inventoryPanel.innerHTML = "<p>No items collected yet.</p>";
+    return;
+  }
+
+  inventoryPanel.innerHTML = displayableItems.map(item => `
+    <div class="inventory-item" style="border-color:${item.rarity?.color || '#ccc'};">
+      <strong style="color:${item.rarity?.color || '#fff'};">${item.name}</strong><br>
+      <span>${item.description}</span>
+    </div>
+  `).join('');
+}
+
+inventoryButton.addEventListener('mouseenter', () => {
+  updateInventoryPanel();
+  inventoryPanel.style.display = 'block';
+});
+
+const inventoryContainer = document.getElementById('inventory-container');
+inventoryContainer.addEventListener('mouseleave', () => {
+  inventoryPanel.style.display = 'none';
+});
+
+const howToPlayBtn = document.getElementById("how-to-play-btn");
+const howToPlayScreen = document.getElementById("how-to-play-screen");
+const backToMenuBtn = document.getElementById("back-to-menu-btn");
+
+howToPlayBtn.addEventListener("click", () => {
   
-  // Show game elements
-  document.getElementById('pause-btn').style.display = 'block';
-  document.getElementById('inventory-container').style.display = 'block';
+  mainMenu.classList.add("menu-fade-out");
+
   
-  // Create and start the game
-  createGrid();
-  updateInventoryDisplay();
-  startRound();
+  howToPlayScreen.style.display = "flex";
+  howToPlayScreen.classList.add("menu-fade-in");
+
+  
+  setTimeout(() => {
+    mainMenu.style.display = "none";
+    mainMenu.classList.remove("menu-fade-out");
+    howToPlayScreen.classList.remove("menu-fade-in");
+  }, 400); 
+});
+
+backToMenuBtn.addEventListener("click", () => {
+  
+  howToPlayScreen.classList.add("menu-fade-out");
+
+  
+  mainMenu.style.display = "flex";
+  mainMenu.classList.add("menu-fade-in");
+
+  
+  setTimeout(() => {
+    howToPlayScreen.style.display = "none";
+    howToPlayScreen.classList.remove("menu-fade-out");
+    mainMenu.classList.remove("menu-fade-in");
+  }, 500);
+});
+
+
+// Show floating damage/healing numbers above characters
+function showHitPopup(isPlayer, text, isHeal = false) {
+  const popup = document.createElement('div');
+  popup.className = 'hit-popup';
+  popup.textContent = text;
+
+  if (isHeal) {
+    popup.style.color = '#00ff66'; 
+  } else if (text === 'MISS') {
+    popup.style.color = '#cccccc'; 
+  } else {
+    popup.style.color = '#ff4444'; 
+  }
+
+  
+  const target = isPlayer ? document.querySelector('.hero-container') : document.querySelector('.enemy-container');
+  const rect = target.getBoundingClientRect();
+
+  popup.style.left = `${rect.left + rect.width / 2}px`;
+  popup.style.top = `${rect.top - 20}px`;
+
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 1000);
 }
 
 
-// Event listeners for menu buttons
-startButton.addEventListener('click', startGame);
-document.getElementById('restart-game-btn').addEventListener('click', startGame);
-document.getElementById('how-to-play-btn').addEventListener('click', () => {
-  document.getElementById('main-menu').style.display = 'none';
-  document.getElementById('how-to-play-screen').style.display = 'flex';
-});
-document.getElementById('back-to-menu-btn').addEventListener('click', () => {
-  document.getElementById('how-to-play-screen').style.display = 'none';
-  document.getElementById('main-menu').style.display = 'flex';
-});
-document.getElementById('achievements-btn').addEventListener('click', () => {
-  document.getElementById('main-menu').style.display = 'none';
-  document.getElementById('achievements-screen').style.display = 'flex';
-  renderAchievements();
-});
-document.getElementById('achievements-back-btn').addEventListener('click', () => {
-  document.getElementById('achievements-screen').style.display = 'none';
-  document.getElementById('main-menu').style.display = 'flex';
+// Show the combo multiplier notification
+function showComboPopup(isPlayer) {
+  const comboValue = isPlayer ? playerCombo : enemyCombo;
+  if (comboValue <= 1.0) return;
+
+  const popup = document.createElement('div');
+  popup.className = 'combo-popup';
+  popup.style.color = isPlayer ? '#4CAF50' : '#E53935';
+  popup.textContent = `x${comboValue.toFixed(1)} Combo!`;
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 800);
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') showPauseMenu();
 });
 
+const playerTooltipEl = document.getElementById("player-stats-tooltip");
+const enemyTooltipEl = document.getElementById("enemy-stats-tooltip");
 
-// Render the achievements screen content
-function renderAchievements() {
-  const content = document.getElementById('achievements-content');
-  content.innerHTML = '';
-  
-  ACHIEVEMENTS.forEach(ach => {
-    const currentTierIndex = meta.achievementTiers[ach.id] || -1;
-    const nextTierIndex = currentTierIndex + 1;
-    const currentTier = currentTierIndex >= 0 ? TIERS[currentTierIndex] : null;
-    const nextTier = nextTierIndex < TIERS.length ? TIERS[nextTierIndex] : null;
-    const progress = ach.getProgress();
-    
-    const achEl = document.createElement('div');
-    achEl.className = 'achievement-card';
-    
-    let tierHtml = '';
-    if (currentTier) {
-      tierHtml += `<span class="tier-label" style="color: ${currentTier.color};">${currentTier.name}</span>`;
-    } else {
-      tierHtml += '<span class="tier-label">Locked</span>';
-    }
-    
-    let progressHtml = '';
-    if (nextTier) {
-      const threshold = ach.thresholds[nextTierIndex];
-      const percent = Math.min(100, (progress / threshold) * 100);
-      progressHtml = `
-        <div class="progress-bar-container">
-          <div class="progress-bar" style="width: ${percent}%; background-color: ${nextTier.color};"></div>
-        </div>
-        <p class="progress-text">${progress} / ${threshold} (${nextTier.name})</p>
-      `;
-    } else {
-      progressHtml = '<p class="progress-text">Max Tier Reached!</p>';
-    }
-    
-    achEl.innerHTML = `
-      <div class="achievement-header">
-        <h2>${ach.title}</h2>
-        ${tierHtml}
-      </div>
-      <p class="achievement-desc">${ach.desc}</p>
-      ${progressHtml}
-    `;
-    
-    content.appendChild(achEl);
-  });
+
+function getEnemyBaseDamage() {
+  return Math.round((10 + enemyBonusDamage) * (isBossLevel ? BOSS_MULTIPLIER.damage : 1));
 }
 
 
-// Initial load check
-if (loadGame()) {
-  // If a game was loaded, hide the main menu and show the game
-  document.getElementById('main-menu').style.display = 'none';
-  document.getElementById('pause-btn').style.display = 'block';
-  document.getElementById('inventory-container').style.display = 'block';
-  createGrid();
-  sizeGridBox(currentGridCols, currentGridRows);
-  updateInventoryDisplay();
-} else {
-  // If no game was loaded, show the main menu
-  document.getElementById('main-menu').style.display = 'flex';
-  document.getElementById('pause-btn').style.display = 'none';
-  document.getElementById('inventory-container').style.display = 'none';
+// Build the tooltip that shows player stats on hover
+function buildPlayerTooltip() {
+  const stats = getPlayerStats();
+  const g = getGoldStats();
+  const goldPerTile = GOLD_PER_TILE + (g.extraGoldPerTile || 0);
+  const goldTilesPerRound = GOLD_TILES_PER_ROUND + (g.extraGoldTiles || 0);
+
+  return `
+    <strong style="font-size:28px;color:#4CAF50;">PLAYER STATS</strong><br>
+    ❤️ Max Health: ${getPlayerMaxHealth()}<br>
+    ⚔️ Base Attack: 20<br>
+    💪 Bonus Damage: ${stats.bonusDamage}<br>
+    🛡️ Damage Reduction: ${stats.damageReduction}<br>
+    💉 Heal On Attack: ${stats.healOnAttack}<br>
+    ♻️ Regen Per Round: ${stats.regenPerRound}<br>
+    🎲 Ignore Chance: ${(stats.ignoreDamageChance * 100).toFixed(0)}%<br>
+    🌀 Combo Gain: +${(stats.comboBoost || 0).toFixed(1)} / hit<br>
+    ☠️ Burn per Click: ${stats.burnDamage || 0}<br>
+    🔢 Attack Squares: ${playerAttackCount}<br>
+    🪙 Gold per Tile: ${goldPerTile}<br>
+    🟨 Gold Tiles: ${goldTilesPerRound}
+  `;
 }
+
+
+// Build the tooltip that shows enemy stats on hover
+function buildEnemyTooltip() {
+  return `
+    <strong style="font-size:28px;color:#E53935;">ENEMY STATS</strong><br>
+    ❤️ Max Health: ${enemyMaxHealth}<br>
+    ⚔️ Attack Damage: ${getEnemyBaseDamage()}<br>
+    🔢 Attack Squares: ${enemyAttackCount}
+  `;
+}
+
+
+// Position and show a stats tooltip
+function showStatsTooltip(el, tooltipEl, content) {
+  tooltipEl.innerHTML = content;
+  const rect = el.getBoundingClientRect();
+  tooltipEl.style.left = `${rect.left + rect.width / 2}px`;
+  tooltipEl.style.top = `${rect.top - 100}px`;
+  tooltipEl.classList.add("show");
+}
+
+
+// Hide the stats tooltip
+function hideStatsTooltip(tooltipEl) {
+  tooltipEl.classList.remove("show");
+}
+
+const heroEl = document.querySelector(".hero-container");
+heroEl.addEventListener("mouseenter", () => {
+  showStatsTooltip(heroEl, playerTooltipEl, buildPlayerTooltip());
+});
+heroEl.addEventListener("mouseleave", () => hideStatsTooltip(playerTooltipEl));
+
+const enemyEl = document.querySelector(".enemy-container");
+enemyEl.addEventListener("mouseenter", () => {
+  showStatsTooltip(enemyEl, enemyTooltipEl, buildEnemyTooltip());
+});
+enemyEl.addEventListener("mouseleave", () => hideStatsTooltip(enemyTooltipEl));

@@ -991,7 +991,7 @@ function loadRun() {
       startNewRun();
     }
     else if (enemyHealth === 0) {
-      showEndScreen();
+      buildShopUI();
     }
 
     return true;

@@ -987,6 +987,13 @@ function loadRun() {
     enemy.playIdle();
     buildGrid();
 
+    if (playerHealth === 0) {
+      startNewRun();
+    }
+    else if (enemyHealth === 0) {
+      showEndScreen();
+    }
+
     return true;
   } catch (e) {
     return false;

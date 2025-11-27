@@ -986,13 +986,8 @@ function loadRun() {
     hero.playIdle();
     enemy.playIdle();
     buildGrid();
+    checkGameOver();
 
-    if (playerHealth === 0) {
-      startNewRun();
-    }
-    else if (enemyHealth === 0) {
-      buildShopUI();
-    }
 
     return true;
   } catch (e) {

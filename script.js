@@ -986,8 +986,13 @@ function loadRun() {
     hero.playIdle();
     enemy.playIdle();
     buildGrid();
-    checkGameOver();
-
+    
+    if (playerHealth === 0) {
+      resolveDeaths();
+    }
+    if (enemyHealth === 0) {
+      resolveDeaths();
+    }
 
     return true;
   } catch (e) {

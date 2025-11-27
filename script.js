@@ -986,12 +986,12 @@ function loadRun() {
     hero.playIdle();
     enemy.playIdle();
     buildGrid();
-    
+   
+    if (enemyHealth === 0) {
+      buildShopUI();
+    }
     if (playerHealth === 0) {
       startNewRun();
-    }
-    if (enemyHealth === 0) {
-      resolveDeaths();
     }
 
     return true;

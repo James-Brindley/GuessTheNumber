@@ -987,9 +987,6 @@ function loadRun() {
     enemy.playIdle();
     buildGrid();
    
-    if (enemyHealth === 0) {
-      buildShopUI();
-    }
     if (playerHealth === 0) {
       startNewRun();
     }
@@ -1110,7 +1107,6 @@ function resolveDeaths() {
     enemyHealth = 0;
     enemy.playDeath();
     showEndScreen(true);
-    saveRun();
     return true;
   }
   return false;

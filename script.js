@@ -64,7 +64,7 @@ const GOLD_PER_TILE = 5;
 
 // Visual sizing for the grid - makes it responsive to different screen sizes
 const GAP_PX = 5;
-const BASE_CELL_PX = 80;   
+const BASE_CELL_PX = 100;   
 const MIN_CELL_PX  = 28;   
 
 let gridBoxW = 0; 

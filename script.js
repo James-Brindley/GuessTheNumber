@@ -988,7 +988,7 @@ function loadRun() {
     buildGrid();
     
     if (playerHealth === 0) {
-      resolveDeaths();
+      startNewRun();
     }
     if (enemyHealth === 0) {
       resolveDeaths();

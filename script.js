@@ -894,8 +894,6 @@ function buildGrid() {
         if (num >= min && num <= max) cell.classList.add('safe-range');
       });
     });
-
-  saveRun();
 }
 
 

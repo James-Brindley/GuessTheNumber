@@ -83,7 +83,7 @@ function initGridBox(baseCols = cols, baseRows = rows) {
 
   
   const capW = Math.min(window.innerWidth * 1);
-  const capH = Math.min(window.innerHeight * 0.90, 900);
+  const capH = Math.min(window.innerHeight * 1, 1000);
 
   
   const scale = Math.min(capW / wantedW, capH / wantedH, 1);
@@ -402,8 +402,6 @@ const RARITY_COST = {
 // The complete item database - all the items you can buy in the shop
 // Each item has different bonuses like extra damage, health, gold, etc.
 const allItems = [
-  
-  
   
   { id: "smallSword", name: "Small Sword", description: "Gain +1 Attack Square", rarity: RARITY.COMMON,
     bonusAttackCount: 1, applyEffect() { playerAttackCount += 1; } },
@@ -894,6 +892,8 @@ function buildGrid() {
         if (num >= min && num <= max) cell.classList.add('safe-range');
       });
     });
+
+  saveRun();
 }
 
 
@@ -1105,6 +1105,7 @@ function resolveDeaths() {
     enemyHealth = 0;
     enemy.playDeath();
     showEndScreen(true);
+    saveRun();
     return true;
   }
   return false;

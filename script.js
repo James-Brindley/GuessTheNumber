@@ -82,7 +82,7 @@ function initGridBox(baseCols = cols, baseRows = rows) {
   let wantedH = baseRows * BASE_CELL_PX + (baseRows - 1) * GAP_PX;
 
   
-  const capW = Math.min(window.innerWidth * 1);
+  const capW = Math.min(window.innerWidth * 1.5);
   const capH = Math.min(window.innerHeight * 1, 1000);
 
   

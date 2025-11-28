@@ -500,9 +500,7 @@ body {
   transform: translateY(-5vh);
 }
 
-.menu-buttons button,
-#back-to-menu-btn,
-#achievements-back-btn {
+.menu-buttons button {
   font-size: 50px;
   padding: 20px 70px;
   background: #4CAF50;
@@ -514,9 +512,7 @@ body {
   transition: 0.2s;
 }
 
-.menu-buttons button:hover,
-#back-to-menu-btn:hover,
-#achievements-back-btn:hover {
+.menu-buttons button:hover {
   background: #66bb6a;
   transform: scale(1.05);
 }
@@ -551,19 +547,6 @@ body {
 
 .how-to-text li {
   margin: 6px 0;
-}
-
-#back-to-menu-btn,
-#achievements-back-btn {
-  background: #2196F3;
-  font-size: 45px;
-  margin-top: 20px;
-  padding: 15px 50px;
-}
-
-#back-to-menu-btn:hover,
-#achievements-back-btn:hover {
-  background: #42a5f5;
 }
 
 /* === MENU ANIMATIONS === */
@@ -971,13 +954,25 @@ body {
   text-shadow: 0 0 8px rgba(33, 150, 243, 0.6);
 }
 
+/* Make sure all back buttons have consistent styling */
+#back-to-menu-btn,
+#achievements-back-btn,
 #credits-back-btn {
   background: #2196F3;
   font-size: 45px;
   margin-top: 20px;
   padding: 15px 50px;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-family: pixelText;
+  color: white;
+  transition: 0.2s;
 }
 
+#back-to-menu-btn:hover,
+#achievements-back-btn:hover,
 #credits-back-btn:hover {
   background: #42a5f5;
+  transform: scale(1.05);
 }

@@ -923,3 +923,61 @@ body {
     transform: translateX(40px) translateY(10px);
   }
 }
+
+/* === CREDITS SCREEN === */
+.credits-content {
+  font-size: 26px;
+  text-align: center;
+  color: #fff;
+  text-shadow: 2px 2px 0 black;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 15px;
+  padding: 30px 50px;
+  line-height: 1.5;
+  width: 80%;
+  max-width: 800px;
+  overflow-y: auto;
+  max-height: 55vh;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.credit-section {
+  margin-bottom: 20px;
+}
+
+.credit-section h2 {
+  font-size: 36px;
+  margin: 0 0 15px 0;
+  color: #4CAF50;
+  text-shadow: 3px 3px 0 #000;
+}
+
+.credit-name {
+  font-size: 30px;
+  color: #FFD700;
+  margin: 5px 0;
+}
+
+.credits-content a {
+  color: #2196F3;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.credits-content a:hover {
+  color: #64B5F6;
+  text-shadow: 0 0 8px rgba(33, 150, 243, 0.6);
+}
+
+#credits-back-btn {
+  background: #2196F3;
+  font-size: 45px;
+  margin-top: 20px;
+  padding: 15px 50px;
+}
+
+#credits-back-btn:hover {
+  background: #42a5f5;
+}

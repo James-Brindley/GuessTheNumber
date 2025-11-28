@@ -1998,3 +1998,30 @@ enemyEl.addEventListener("mouseenter", () => {
   showStatsTooltip(enemyEl, enemyTooltipEl, buildEnemyTooltip());
 });
 enemyEl.addEventListener("mouseleave", () => hideStatsTooltip(enemyTooltipEl));
+
+// === CREDITS SCREEN ===
+const creditsBtn = document.getElementById("credits-btn");
+const creditsScreen = document.getElementById("credits-screen");
+const creditsBackBtn = document.getElementById("credits-back-btn");
+
+creditsBtn.addEventListener("click", () => {
+  mainMenu.classList.add("menu-fade-out");
+  creditsScreen.style.display = "flex";
+  creditsScreen.classList.add("menu-fade-in");
+  setTimeout(() => {
+    mainMenu.style.display = "none";
+    mainMenu.classList.remove("menu-fade-out");
+    creditsScreen.classList.remove("menu-fade-in");
+  }, 400);
+});
+
+creditsBackBtn.addEventListener("click", () => {
+  creditsScreen.classList.add("menu-fade-out");
+  mainMenu.style.display = "flex";
+  mainMenu.classList.add("menu-fade-in");
+  setTimeout(() => {
+    creditsScreen.style.display = "none";
+    creditsScreen.classList.remove("menu-fade-out");
+    mainMenu.classList.remove("menu-fade-in");
+  }, 500);
+});
